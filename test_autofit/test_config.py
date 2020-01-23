@@ -2,7 +2,7 @@ from os import path
 
 import pytest
 
-import autofit as af
+import autoconfig as ac
 
 directory = path.dirname(path.realpath(__file__))
 
@@ -15,7 +15,7 @@ class MockClass(object):
 
 @pytest.fixture(name="label_config")
 def make_label_config():
-    return af.conf.LabelConfig("{}/test_files/config/label.ini".format(directory))
+    return ac.conf.LabelConfig("{}/test_files/config/label.ini".format(directory))
 
 
 class TestLabel(object):
