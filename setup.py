@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 
 def version():
-    with open("autoconfig/__init__.py") as f:
+    with open("autoconf/__init__.py") as f:
         lines = f.read().split("\n")
     for line in lines:
         if "__version__" in line:
@@ -17,7 +17,7 @@ with open(join(this_dir, "README.md"), encoding="utf-8") as file:
     long_description = file.read()
 
 setup(
-    name="autoconfig",
+    name="autoconf",
     version=version(),
     description="Configuration parsing for the auto* family",
     long_description=long_description,

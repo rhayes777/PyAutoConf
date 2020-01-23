@@ -2,11 +2,11 @@ from os import path
 
 import pytest
 
-import autoconfig as ac
+import autoconf as ac
 
 directory = path.dirname(path.realpath(__file__))
 
-from test_autoconfig.mock import EllipticalLP, EllipticalGaussian
+from test_autoconf.mock import EllipticalLP, EllipticalGaussian
 
 
 class MockClass(object):
