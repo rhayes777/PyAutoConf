@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PACKAGE_NAME=autoconfig
+export PACKAGE_NAME=autoconf
 
 rm -rf $p/dist
 rm -rf $p/build
