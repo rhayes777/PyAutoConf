@@ -6,7 +6,7 @@ import autoconfig as ac
 
 directory = path.dirname(path.realpath(__file__))
 
-from test_autofit.mock import EllipticalLP, EllipticalGaussian
+from test_autoconfig.mock import EllipticalLP, EllipticalGaussian
 
 
 class MockClass(object):
@@ -34,5 +34,5 @@ class TestLabel(object):
         assert label_config.subscript(EllipticalGaussian) == "l"
 
     def test_exception(self, label_config):
-        with pytest.raises(af.exc.PriorException):
+        with pytest.raises(ac.exc.PriorException):
             label_config.subscript(MockClass)
