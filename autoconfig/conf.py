@@ -2,7 +2,7 @@ import configparser
 import os
 from copy import deepcopy
 
-from autofit import exc
+from autoconfig import exc
 
 
 def family(current_class):

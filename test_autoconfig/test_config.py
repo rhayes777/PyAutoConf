@@ -18,7 +18,7 @@ def make_label_config():
     return ac.conf.LabelConfig("{}/test_files/config/label.ini".format(directory))
 
 
-class TestLabel(object):
+class TestLabel:
     def test_basic(self, label_config):
         assert label_config.label("centre_0") == "x"
         assert label_config.label("redshift") == "z"
