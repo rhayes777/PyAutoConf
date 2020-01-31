@@ -13,10 +13,7 @@ def family(current_class):
 
 
 def get_matplotlib_backend():
-    try:
-        return instance.visualize.get("figures", "backend", str)
-    except Exception:
-        return "TKAgg"
+    return instance.visualize_general.get("general", "backend", str)
 
 
 class NamedConfig(object):
