@@ -162,8 +162,9 @@ class AncestorConfig(object):
 
         ini_filename = cls.__module__.split(".")[-1]
         raise exc.PriorException(
-            "The prior config at {}/{} does not contain {} in {} or any of its "
-            "parents".format(self.path, ini_filename, attribute_name, cls.__name__)
+            f"The prior config at {self.path}/{ini_filename} "
+            f"does not contain {ini_filename} in {cls.__name__} "
+            f"or any of its parents"
         )
 
     def get(self, module_name, class_name, attribute_name):
