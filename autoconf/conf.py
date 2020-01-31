@@ -160,7 +160,7 @@ class AncestorConfig(object):
         ini_filename = cls.__module__.split(".")[-1]
         raise exc.PriorException(
             f"The prior config at {self.path}/{ini_filename} "
-            f"does not contain {ini_filename} in {cls.__name__} "
+            f"does not contain {attribute_name} in {cls.__name__} "
             f"or any of its parents"
         )
 
