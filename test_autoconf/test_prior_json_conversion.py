@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 
 import pytest
-from autoconf.json_prior import converter
+
+from autoconf.json_prior import converter as c
 
 
 @pytest.fixture(
@@ -27,13 +28,25 @@ def make_prior_filename(prior_directory):
     autouse=True
 )
 def make_prior_json(prior_directory, prior_filename):
-    converter.convert(prior_directory)
+    c.convert(prior_directory)
     with open(prior_filename) as f:
         return json.load(f)
 
 
 def test_convert(prior_filename):
     assert os.path.exists(prior_filename)
+
+
+def test_modules(prior_directory):
+    converter = c.Converter(
+        prior_directory
+    )
+    assert converter.modules == [
+        "geometry_profiles",
+        "mock",
+        "test_model_mapper",
+        "test_prior_model"
+    ]
 
 
 def test_geometry_profiles(prior_json):
