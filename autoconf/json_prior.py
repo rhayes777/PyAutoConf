@@ -65,27 +65,13 @@ class JSONPriorConfig:
     def __str__(self):
         return json.dumps(self.obj)
 
-    def _matching_key(self, item):
-        key = ".".join(item)
-        if key in self.obj:
-            return key
-        for i in range(1, len(item)):
-            key = f"*.{'.'.join(item[:-i])}"
-            if key in self.obj:
-                return key
-        raise KeyError(f"No such item {item}")
-
     def __getitem__(self, item):
         return JSONPriorConfig(
-            self.obj[self._matching_key(item)]
+            self.obj[".".join(item)]
         )
 
     def __contains__(self, item):
-        try:
-            _ = self._matching_key(item)
-            return True
-        except KeyError:
-            return False
+        return ".".join(item) in self.obj
 
     @property
     def wildcards(self):
@@ -135,14 +121,11 @@ class JSONPriorConfig:
             wild_card_key = f"*.{'.'.join(wild_path)}"
             for key, value in self.wildcards.items():
                 if wild_card_key.startswith(key):
-                    try:
-                        return JSONPriorConfig(
-                            {
-                                key[2:]: value
-                            }
-                        )(wild_card_key[2:].split("."))
-                    except PriorException:
-                        pass
+                    return JSONPriorConfig(
+                        {
+                            key[2:]: value
+                        }
+                    )(wild_card_key[2:].split("."))
             wild_path = wild_path[1:]
 
         current_path = config_path
