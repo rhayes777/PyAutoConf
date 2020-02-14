@@ -31,6 +31,18 @@ def test_path_for_class(geometry_profile_path):
         },
         {
             "test_autoconf": {"mock.GeometryProfile": "test"}
+        },
+        {
+            "*.GeometryProfile": "test"
+        },
+        {
+            "*.mock.GeometryProfile": "test"
+        },
+        {
+            "*.mock": {"GeometryProfile": "test"}
+        },
+        {
+            "test_autoconf": {"*.GeometryProfile": "test"}
         }
     ]
 )

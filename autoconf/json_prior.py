@@ -41,7 +41,7 @@ class JSONPriorConfig:
             A dictionary describing the prior configuration for constructor arguments
             of different classes.
         """
-        self.config_dict = config_dict
+        self.obj = config_dict
 
     @classmethod
     def from_file(cls, filename: str) -> "JSONPriorConfig":
@@ -63,7 +63,18 @@ class JSONPriorConfig:
             )
 
     def __str__(self):
-        return json.dumps(self.config_dict)
+        return json.dumps(self.obj)
+
+    def __getitem__(self, item):
+        key = ".".join(item)
+        if key in self.obj:
+            return JSONPriorConfig(
+                self.obj[key]
+            )
+
+    def __contains__(self, item):
+        if ".".join(item) in self.obj:
+            return True
 
     def __call__(self, config_path: Iterable[str]):
         """
@@ -89,17 +100,14 @@ class JSONPriorConfig:
         """
         original_config_path = config_path
         after = []
-        config_dict = self.config_dict
         while len(config_path) > 0:
-            key = ".".join(config_path)
-            if key in config_dict:
-                config_dict = config_dict[
-                    key
+            if config_path in self:
+                config = self[
+                    config_path
                 ]
                 if len(after) == 0:
-                    return config_dict
-                config_path = after
-                after = []
+                    return config.obj
+                return config(after)
             else:
                 after = config_path[-1:] + after
                 config_path = config_path[:-1]
