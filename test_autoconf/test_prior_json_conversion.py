@@ -1,4 +1,3 @@
-import json
 import os
 from pathlib import Path
 
@@ -24,23 +23,25 @@ def make_prior_filename(prior_directory):
 
 
 @pytest.fixture(
-    name="prior_json",
-    autouse=True
+    name="converter"
 )
-def make_prior_json(prior_directory, prior_filename):
+def make_converter(prior_directory):
+    return c.Converter(prior_directory)
+
+
+@pytest.fixture(
+    name="prior_json"
+)
+def make_prior_json(converter):
+    return converter.dict
+
+
+def test_convert(prior_directory, prior_filename):
     c.convert(prior_directory)
-    with open(prior_filename) as f:
-        return json.load(f)
-
-
-def test_convert(prior_filename):
     assert os.path.exists(prior_filename)
 
 
-def test_modules(prior_directory):
-    converter = c.Converter(
-        prior_directory
-    )
+def test_modules(converter):
     assert converter.modules == [
         "geometry_profiles",
         "mock",
