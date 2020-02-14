@@ -1,1 +1,171 @@
-{"*.geometry_profiles": {"GeometryProfile": {"centre_0": {}, "centre_1": {}}, "SphericallProfile": {}, "EllipticalProfile": {"axis_ratio": {}, "phi": {}}, "AbstractEllipticalSersic": {"centre_0": {}, "centre_1": {}, "axis_ratio": {}, "phi": {}, "intensity": {}, "effective_radius": {}, "sersic_index": {}}}, "*.mock": {"Redshift": {"redshift": {}}, "RelativeWidth": {"one": {}, "two": {}, "three": {}}, "HyperGalaxy": {"contribution_factor": {}, "noise_factor": {}, "noise_power": {}}, "EllipticalSersic": {"intensity": {}}, "AbstractEllipticalSersic": {"centre_0": {}, "centre_1": {}, "axis_ratio": {}, "phi": {}, "intensity": {}, "effective_radius": {}, "sersic_index": {}, "mass_to_light_ratio": {}}, "EllipticalExponential": {"centre_0": {}, "centre_1": {}, "axis_ratio": {}, "phi": {}, "intensity": {}, "effective_radius": {}, "mass_to_light_ratio": {}}, "SphericalIsothermal": {"centre_0": {}, "centre_1": {}, "einstein_radius": {}}, "SphericalNFW": {"centre_0": {}, "centre_1": {}, "kappa_s": {}, "scale_radius": {}}, "EllipticalGeneralizedNFW": {"kappa_s": {}, "inner_slope": {}, "scale_radius": {}}, "EllipticalCoredIsothermal": {"einstein_radius": {}, "core_radius": {}}, "EllipticalCoreSersic": {"radius_break": {}, "intensity_break": {}, "gamma": {}, "alpha": {}}, "GeometryProfile": {"centre_0": {}, "centre_1": {}}, "SphericallProfile": {}, "EllipticalProfile": {"axis_ratio": {}, "phi": {}}, "SimpleClass": {"one": {}, "two": {}}, "DistanceClass": {"first": {}, "second": {}}, "PositionClass": {"position_0": {}, "position_1": {}}, "MockClassNLOx4": {"one": {}, "two": {}, "three": {}, "four": {}}, "MockClassNLOx5": {"one": {}, "two": {}, "three": {}, "four": {}, "five": {}}, "MockClassNLOx6": {"one_0": {}, "one_1": {}, "two_0": {}, "two_1": {}, "three": {}, "four": {}}, "Galaxy": {"redshift": {}}, "DeferredClass": {"one": {}, "two": {}}, "Tracer": {"grid": {}}}, "*.test_model_mapper": {"MockClassMM": {"one": {}, "two": {}}, "MockClassMMinstance": {"one": {}, "two": {}}, "MockClassGaussian": {"one": {}, "two": {}}, "MockClassInf": {"one": {}, "two": {}}, "ExtendedMockClass": {"three": {}}, "MockProfile": {"centre_0": {}, "centre_1": {}, "intensity": {}}, "WithFloat": {"value": {}}, "WithTuple": {"tup_0": {}, "tup_1": {}}}, "*.test_prior_model": {}}
+{
+    "*.geometry_profiles": {
+        "AbstractEllipticalSersic": {
+            "axis_ratio": {},
+            "centre_0": {},
+            "centre_1": {},
+            "effective_radius": {},
+            "intensity": {},
+            "phi": {},
+            "sersic_index": {}
+        },
+        "EllipticalProfile": {
+            "axis_ratio": {},
+            "phi": {}
+        },
+        "GeometryProfile": {
+            "centre_0": {},
+            "centre_1": {}
+        },
+        "SphericallProfile": {}
+    },
+    "*.mock": {
+        "AbstractEllipticalSersic": {
+            "axis_ratio": {},
+            "centre_0": {},
+            "centre_1": {},
+            "effective_radius": {},
+            "intensity": {},
+            "mass_to_light_ratio": {},
+            "phi": {},
+            "sersic_index": {}
+        },
+        "DeferredClass": {
+            "one": {},
+            "two": {}
+        },
+        "DistanceClass": {
+            "first": {},
+            "second": {}
+        },
+        "EllipticalCoreSersic": {
+            "alpha": {},
+            "gamma": {},
+            "intensity_break": {},
+            "radius_break": {}
+        },
+        "EllipticalCoredIsothermal": {
+            "core_radius": {},
+            "einstein_radius": {}
+        },
+        "EllipticalExponential": {
+            "axis_ratio": {},
+            "centre_0": {},
+            "centre_1": {},
+            "effective_radius": {},
+            "intensity": {},
+            "mass_to_light_ratio": {},
+            "phi": {}
+        },
+        "EllipticalGeneralizedNFW": {
+            "inner_slope": {},
+            "kappa_s": {},
+            "scale_radius": {}
+        },
+        "EllipticalProfile": {
+            "axis_ratio": {},
+            "phi": {}
+        },
+        "EllipticalSersic": {
+            "intensity": {}
+        },
+        "Galaxy": {
+            "redshift": {}
+        },
+        "GeometryProfile": {
+            "centre_0": {},
+            "centre_1": {}
+        },
+        "HyperGalaxy": {
+            "contribution_factor": {},
+            "noise_factor": {},
+            "noise_power": {}
+        },
+        "MockClassNLOx4": {
+            "four": {},
+            "one": {},
+            "three": {},
+            "two": {}
+        },
+        "MockClassNLOx5": {
+            "five": {},
+            "four": {},
+            "one": {},
+            "three": {},
+            "two": {}
+        },
+        "MockClassNLOx6": {
+            "four": {},
+            "one_0": {},
+            "one_1": {},
+            "three": {},
+            "two_0": {},
+            "two_1": {}
+        },
+        "PositionClass": {
+            "position_0": {},
+            "position_1": {}
+        },
+        "Redshift": {
+            "redshift": {}
+        },
+        "RelativeWidth": {
+            "one": {},
+            "three": {},
+            "two": {}
+        },
+        "SimpleClass": {
+            "one": {},
+            "two": {}
+        },
+        "SphericalIsothermal": {
+            "centre_0": {},
+            "centre_1": {},
+            "einstein_radius": {}
+        },
+        "SphericalNFW": {
+            "centre_0": {},
+            "centre_1": {},
+            "kappa_s": {},
+            "scale_radius": {}
+        },
+        "SphericallProfile": {},
+        "Tracer": {
+            "grid": {}
+        }
+    },
+    "*.test_model_mapper": {
+        "ExtendedMockClass": {
+            "three": {}
+        },
+        "MockClassGaussian": {
+            "one": {},
+            "two": {}
+        },
+        "MockClassInf": {
+            "one": {},
+            "two": {}
+        },
+        "MockClassMM": {
+            "one": {},
+            "two": {}
+        },
+        "MockClassMMinstance": {
+            "one": {},
+            "two": {}
+        },
+        "MockProfile": {
+            "centre_0": {},
+            "centre_1": {},
+            "intensity": {}
+        },
+        "WithFloat": {
+            "value": {}
+        },
+        "WithTuple": {
+            "tup_0": {},
+            "tup_1": {}
+        }
+    },
+    "*.test_prior_model": {}
+}

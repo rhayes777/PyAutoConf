@@ -113,5 +113,7 @@ def convert(directory):
             Converter(
                 directory
             ).dict,
-            f
+            f,
+            sort_keys=True,
+            indent=4
         )
