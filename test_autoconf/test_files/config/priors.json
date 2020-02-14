@@ -7,19 +7,19 @@
                 "upper_limit": 1.0
             },
             "centre_0": {
-                "lower_limit": 0.0,
+                "lower_limit": -1.0,
                 "type": "Uniform",
                 "upper_limit": 1.0
             },
             "centre_1": {
-                "lower_limit": 0.0,
+                "lower_limit": -1.0,
                 "type": "Uniform",
                 "upper_limit": 1.0
             },
             "effective_radius": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 3.0
             },
             "intensity": {
                 "lower_limit": 0.0,
@@ -29,24 +29,24 @@
             "phi": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 180.0
             },
             "sersic_index": {
-                "lower_limit": 0.0,
+                "lower_limit": 0.6,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 8.0
             }
         },
         "EllipticalProfile": {
             "axis_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             },
             "phi": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             }
         },
         "GeometryProfile": {
@@ -68,7 +68,7 @@
             "axis_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             },
             "centre_0": {
                 "lower_limit": 0.0,
@@ -78,32 +78,28 @@
             "centre_1": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             },
             "effective_radius": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             },
-            "intensity": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
+            "intensity": {},
             "mass_to_light_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 10.0
             },
             "phi": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             },
             "sersic_index": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             }
         },
         "DeferredClass": {
@@ -112,11 +108,7 @@
                 "type": "Uniform",
                 "upper_limit": 1.0
             },
-            "two": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            }
+            "two": {}
         },
         "DistanceClass": {
             "first": {
@@ -168,7 +160,7 @@
             "axis_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             },
             "centre_0": {
                 "lower_limit": 0.0,
@@ -178,27 +170,23 @@
             "centre_1": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             },
             "effective_radius": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             },
-            "intensity": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
+            "intensity": {},
             "mass_to_light_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 10.0
             },
             "phi": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             }
         },
         "EllipticalGeneralizedNFW": {
@@ -222,12 +210,12 @@
             "axis_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             },
             "phi": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             }
         },
         "EllipticalSersic": {
@@ -258,100 +246,100 @@
         },
         "HyperGalaxy": {
             "contribution_factor": {
-                "lower_limit": 0.0,
+                "lower_limit": 1.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             },
             "noise_factor": {
-                "lower_limit": 0.0,
+                "lower_limit": 1.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             },
             "noise_power": {
-                "lower_limit": 0.0,
+                "lower_limit": 1.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             }
         },
         "MockClassNLOx4": {
             "four": {
-                "lower_limit": 0.0,
+                "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 120.0
             },
             "one": {
-                "lower_limit": 0.0,
+                "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 120.0
             },
             "three": {
-                "lower_limit": 0.0,
+                "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 120.0
             },
             "two": {
-                "lower_limit": 0.0,
+                "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 120.0
             }
         },
         "MockClassNLOx5": {
             "five": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "four": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "one": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "three": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "two": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             }
         },
         "MockClassNLOx6": {
             "four": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "one_0": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "one_1": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "three": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "two_0": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             },
             "two_1": {
-                "lower_limit": 0.0,
+                "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 101.0
             }
         },
         "PositionClass": {
@@ -370,7 +358,7 @@
             "redshift": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 3.0
             }
         },
         "RelativeWidth": {
@@ -411,12 +399,12 @@
             "centre_1": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             },
             "einstein_radius": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             }
         },
         "SphericalNFW": {
@@ -428,26 +416,22 @@
             "centre_1": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 0.5
             },
             "kappa_s": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             },
             "scale_radius": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 2.0
             }
         },
         "SphericallProfile": {},
         "Tracer": {
-            "grid": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            }
+            "grid": {}
         }
     },
     "*.test_model_mapper": {
@@ -459,28 +443,12 @@
             }
         },
         "MockClassGaussian": {
-            "one": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
-            "two": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            }
+            "one": {},
+            "two": {}
         },
         "MockClassInf": {
-            "one": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
-            "two": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            }
+            "one": {},
+            "two": {}
         },
         "MockClassMM": {
             "one": {
@@ -495,11 +463,7 @@
             }
         },
         "MockClassMMinstance": {
-            "one": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
+            "one": {},
             "two": {
                 "lower_limit": 0.0,
                 "type": "Uniform",

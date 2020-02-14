@@ -17,24 +17,35 @@ class Prior:
         return self.cls.default_section[self.name]
 
     @property
+    def default_array(self):
+        return self.default_string.split(",")
+
+    @property
+    def type_character(self):
+        return self.default_array[0]
+
+    @property
     def type_string(self):
-        return "Uniform"
+        if self.type_character == "u":
+            return "Uniform"
 
     @property
     def lower_limit(self):
-        return 0.0
+        return float(self.default_array[1])
 
     @property
     def upper_limit(self):
-        return 1.0
+        return float(self.default_array[2])
 
     @property
     def dict(self):
-        return {
-            "type": self.type_string,
-            "lower_limit": self.lower_limit,
-            "upper_limit": self.upper_limit
-        }
+        if self.type_character == "u":
+            return {
+                "type": self.type_string,
+                "lower_limit": self.lower_limit,
+                "upper_limit": self.upper_limit
+            }
+        return {}
 
 
 class Class:
