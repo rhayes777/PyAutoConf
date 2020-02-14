@@ -85,7 +85,13 @@
                 "type": "Uniform",
                 "upper_limit": 2.0
             },
-            "intensity": {},
+            "intensity": {
+                "lower_limit": -Infinity,
+                "mean": 0.0,
+                "sigma": 0.5,
+                "type": null,
+                "upper_limit": -Infinity
+            },
             "mass_to_light_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
@@ -108,7 +114,9 @@
                 "type": "Uniform",
                 "upper_limit": 1.0
             },
-            "two": {}
+            "two": {
+                "type": null
+            }
         },
         "DistanceClass": {
             "first": {
@@ -177,7 +185,13 @@
                 "type": "Uniform",
                 "upper_limit": 2.0
             },
-            "intensity": {},
+            "intensity": {
+                "lower_limit": 0.0,
+                "mean": 0.0,
+                "sigma": 0.5,
+                "type": null,
+                "upper_limit": 10.0
+            },
             "mass_to_light_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
@@ -230,6 +244,15 @@
                 "lower_limit": 0.0,
                 "type": "Uniform",
                 "upper_limit": 1.0
+            }
+        },
+        "Gaussian": {
+            "gaussian": {
+                "lower_limit": -Infinity,
+                "mean": 0.0,
+                "sigma": 1.0,
+                "type": null,
+                "upper_limit": Infinity
             }
         },
         "GeometryProfile": {
@@ -431,7 +454,9 @@
         },
         "SphericallProfile": {},
         "Tracer": {
-            "grid": {}
+            "grid": {
+                "type": null
+            }
         }
     },
     "*.test_model_mapper": {
@@ -443,12 +468,36 @@
             }
         },
         "MockClassGaussian": {
-            "one": {},
-            "two": {}
+            "one": {
+                "lower_limit": 0.0,
+                "mean": 0.0,
+                "sigma": 1.0,
+                "type": null,
+                "upper_limit": 1.0
+            },
+            "two": {
+                "lower_limit": 0.0,
+                "mean": 0.0,
+                "sigma": 1.0,
+                "type": null,
+                "upper_limit": 2.0
+            }
         },
         "MockClassInf": {
-            "one": {},
-            "two": {}
+            "one": {
+                "lower_limit": -Infinity,
+                "mean": 0.0,
+                "sigma": 1.0,
+                "type": null,
+                "upper_limit": 0.0
+            },
+            "two": {
+                "lower_limit": 0.0,
+                "mean": 0.0,
+                "sigma": 1.0,
+                "type": null,
+                "upper_limit": Infinity
+            }
         },
         "MockClassMM": {
             "one": {
@@ -463,7 +512,10 @@
             }
         },
         "MockClassMMinstance": {
-            "one": {},
+            "one": {
+                "type": null,
+                "value": 3.0
+            },
             "two": {
                 "lower_limit": 0.0,
                 "type": "Uniform",

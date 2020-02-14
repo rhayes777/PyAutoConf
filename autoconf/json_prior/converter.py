@@ -9,6 +9,7 @@ class Prior:
             cls,
             name
     ):
+        print(name)
         self.name = name
         self.cls = cls
 
@@ -19,6 +20,14 @@ class Prior:
     @property
     def default_array(self):
         return self.default_string.split(",")
+
+    @property
+    def limit_string(self):
+        return self.cls.limit_section[self.name]
+
+    @property
+    def limit_array(self):
+        return self.limit_string.split(",")
 
     @property
     def type_character(self):
@@ -35,21 +44,64 @@ class Prior:
 
     @property
     def upper_limit(self):
-        return float(self.default_array[2])
+        try:
+            return float(self.default_array[2])
+        except IndexError:
+            pass
 
     @property
     def dict(self):
-        if self.type_character == "u":
+        prior_dict = {
+            "type": self.type_string
+        }
+        if self.type_character == "d":
+            return prior_dict
+        if self.type_string == "n":
             return {
-                "type": self.type_string,
-                "lower_limit": self.lower_limit,
-                "upper_limit": self.upper_limit
+                **prior_dict,
+                "value": None
             }
-        return {}
+        if self.type_character == "c":
+            value = self.default_array[1]
+            try:
+                value = float(value)
+            except ValueError:
+                pass
+            return {
+                **prior_dict,
+                "value": value
+            }
+        prior_dict = {
+            **prior_dict,
+            "lower_limit": self.lower_limit,
+            "upper_limit": self.upper_limit
+
+        }
+        if self.type_character in ("u", "l"):
+            return prior_dict
+        if self.type_character == "g":
+            lower_limit = float("-inf")
+            upper_limit = float("-inf")
+            try:
+                lower_limit = float(self.limit_array[0])
+                upper_limit = float(self.limit_array[1])
+            except KeyError:
+                pass
+            return {
+                **prior_dict,
+                "mean": float(self.default_array[1]),
+                "sigma": float(self.default_array[2]),
+                "lower_limit": lower_limit,
+                "upper_limit": upper_limit
+            }
+        raise AssertionError(
+            f"Unrecognised prior type {self.type_character}"
+        )
 
 
 class Class:
     def __init__(self, module, name):
+        print(name)
         self.name = name
         self.module = module
 
@@ -69,6 +121,10 @@ class Class:
         return self.module.default[self.name]
 
     @property
+    def limit_section(self):
+        return self.module.limit[self.name]
+
+    @property
     def dict(self):
         return {
             prior.name: prior.dict
@@ -79,6 +135,7 @@ class Class:
 
 class Module:
     def __init__(self, converter, name):
+        print(name)
         self.converter = converter
         self.name = name
         self.default = ConfigParser()
