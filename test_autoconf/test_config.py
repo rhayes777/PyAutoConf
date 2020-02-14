@@ -9,7 +9,7 @@ directory = path.dirname(path.realpath(__file__))
 from test_autoconf.mock import EllipticalLP, EllipticalGaussian
 
 
-class MockClass(object):
+class MockClass:
     pass
 
 

@@ -16,7 +16,7 @@ def get_matplotlib_backend():
     return instance.visualize_general.get("general", "backend", str)
 
 
-class NamedConfig(object):
+class NamedConfig:
     """Parses generic config"""
 
     def __init__(self, config_path):
@@ -110,7 +110,7 @@ class LabelConfig(NamedConfig):
         )
 
 
-class AncestorConfig(object):
+class AncestorConfig:
     """Parses prior config"""
 
     def __init__(self, config_folder_path):
