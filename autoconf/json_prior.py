@@ -1,5 +1,5 @@
 import json
-from typing import List, Iterable
+from typing import List
 
 from autoconf.exc import PriorException
 
@@ -65,18 +65,50 @@ class JSONPriorConfig:
     def __str__(self):
         return json.dumps(self.obj)
 
-    def __getitem__(self, item):
+    def _matching_key(self, item):
         key = ".".join(item)
         if key in self.obj:
-            return JSONPriorConfig(
-                self.obj[key]
-            )
+            return key
+        for i in range(1, len(item)):
+            key = f"*.{'.'.join(item[:-i])}"
+            if key in self.obj:
+                return key
+        raise KeyError(f"No such item {item}")
+
+    def __getitem__(self, item):
+        return JSONPriorConfig(
+            self.obj[self._matching_key(item)]
+        )
 
     def __contains__(self, item):
-        if ".".join(item) in self.obj:
+        try:
+            _ = self._matching_key(item)
             return True
+        except KeyError:
+            return False
 
-    def __call__(self, config_path: Iterable[str]):
+    @property
+    def wildcards(self):
+        def get_wild_cards(obj):
+            wild_cards = dict()
+            if not isinstance(obj, dict):
+                return wild_cards
+            for key, value in obj.items():
+                if key.startswith("*."):
+                    wild_cards[key] = value
+                wild_cards = {
+                    **wild_cards,
+                    **get_wild_cards(
+                        value
+                    )
+                }
+            return wild_cards
+
+        return get_wild_cards(
+            self.obj
+        )
+
+    def __call__(self, config_path: List[str]):
         """
         Get the config at the end of the config_path.
 
@@ -98,19 +130,34 @@ class JSONPriorConfig:
         PriorException
             If no configuration is found.
         """
-        original_config_path = config_path
+        wild_path = config_path
+        while len(wild_path) > 0:
+            wild_card_key = f"*.{'.'.join(wild_path)}"
+            for key, value in self.wildcards.items():
+                if wild_card_key.startswith(key):
+                    try:
+                        return JSONPriorConfig(
+                            {
+                                key[2:]: value
+                            }
+                        )(wild_card_key[2:].split("."))
+                    except PriorException:
+                        pass
+            wild_path = wild_path[1:]
+
+        current_path = config_path
         after = []
-        while len(config_path) > 0:
-            if config_path in self:
+        while len(current_path) > 0:
+            if current_path in self:
                 config = self[
-                    config_path
+                    current_path
                 ]
                 if len(after) == 0:
                     return config.obj
                 return config(after)
-            else:
-                after = config_path[-1:] + after
-                config_path = config_path[:-1]
+
+            after = current_path[-1:] + after
+            current_path = current_path[:-1]
         raise PriorException(
-            f"No configuration was found for the path {original_config_path}"
+            f"No configuration was found for the path {config_path}"
         )
