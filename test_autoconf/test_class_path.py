@@ -1,13 +1,14 @@
+import pytest
+
 import autoconf as ac
 from test_autoconf.mock import GeometryProfile
-import pytest
 
 
 @pytest.fixture(
     name="geometry_profile_path"
 )
 def make_geometry_profile_path():
-    return "test_autoconf.mock.GeometryProfile"
+    return ["test_autoconf", "mock", "GeometryProfile"]
 
 
 def test_path_for_class(geometry_profile_path):
@@ -16,11 +17,29 @@ def test_path_for_class(geometry_profile_path):
     ) == geometry_profile_path
 
 
-def test_config_for_path(geometry_profile_path):
-    assert ac.JSONPriorConfig(
+@pytest.mark.parametrize(
+    "config_dict",
+    [
         {
             "test_autoconf.mock.GeometryProfile": "test"
+        },
+        {
+            "test_autoconf.mock": {"GeometryProfile": "test"}
+        },
+        {
+            "test_autoconf": {"mock": {"GeometryProfile": "test"}}
+        },
+        {
+            "test_autoconf": {"mock.GeometryProfile": "test"}
         }
+    ]
+)
+def test_config_for_path(
+        geometry_profile_path,
+        config_dict
+):
+    assert ac.JSONPriorConfig(
+        config_dict
     )(
         geometry_profile_path
     ) == "test"
