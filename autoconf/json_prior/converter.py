@@ -13,8 +13,28 @@ class Prior:
         self.cls = cls
 
     @property
+    def default_string(self):
+        return self.cls.default_section[self.name]
+
+    @property
+    def type_string(self):
+        return "Uniform"
+
+    @property
+    def lower_limit(self):
+        return 0.0
+
+    @property
+    def upper_limit(self):
+        return 1.0
+
+    @property
     def dict(self):
-        return {}
+        return {
+            "type": self.type_string,
+            "lower_limit": self.lower_limit,
+            "upper_limit": self.upper_limit
+        }
 
 
 class Class:
@@ -30,8 +50,12 @@ class Class:
                 name
             )
             for name
-            in self.module.default[self.name]
+            in self.default_section
         ]
+
+    @property
+    def default_section(self):
+        return self.module.default[self.name]
 
     @property
     def dict(self):
@@ -46,6 +70,14 @@ class Module:
     def __init__(self, converter, name):
         self.converter = converter
         self.name = name
+        self.default = ConfigParser()
+        self.default.read(
+            f"{self.converter.default_directory}/{self.name}.ini"
+        )
+        self.limit = ConfigParser()
+        self.limit.read(
+            f"{self.converter.limit_directory}/{self.name}.ini"
+        )
         self.default = ConfigParser()
         self.default.read(
             f"{self.converter.default_directory}/{self.name}.ini"
@@ -83,6 +115,14 @@ class Converter:
     @property
     def default_directory(self):
         return f"{self.directory}/default"
+
+    @property
+    def limit_directory(self):
+        return f"{self.directory}/limit"
+
+    @property
+    def width_directory(self):
+        return f"{self.directory}/limit"
 
     @property
     def modules(self):

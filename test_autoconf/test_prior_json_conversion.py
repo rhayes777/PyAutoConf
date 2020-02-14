@@ -51,7 +51,10 @@ def test_modules(converter):
 
 
 def test_geometry_profiles(prior_json):
-    assert "*.geometry_profiles" in prior_json
-    profiles_json = prior_json["*.geometry_profiles"]
-    assert "GeometryProfile" in profiles_json
-    assert "centre_0" in profiles_json["GeometryProfile"]
+    module_json = prior_json["*.geometry_profiles"]
+    class_json = module_json["GeometryProfile"]
+    assert class_json["centre_0"] == {
+        "type": "Uniform",
+        "lower_limit": 0.0,
+        "upper_limit": 1.0
+    }
