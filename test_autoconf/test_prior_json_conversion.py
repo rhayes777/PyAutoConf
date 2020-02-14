@@ -52,4 +52,6 @@ def test_modules(converter):
 
 def test_geometry_profiles(prior_json):
     assert "*.geometry_profiles" in prior_json
-    assert "GeometryProfile" in prior_json["*.geometry_profiles"]
+    profiles_json = prior_json["*.geometry_profiles"]
+    assert "GeometryProfile" in profiles_json
+    assert "centre_0" in profiles_json["GeometryProfile"]
