@@ -50,4 +50,5 @@ def test_modules(prior_directory):
 
 
 def test_geometry_profiles(prior_json):
-    assert "geometry_profiles" in prior_json
+    assert "*.geometry_profiles" in prior_json
+    assert "GeometryProfile" in prior_json["*.geometry_profiles"]
