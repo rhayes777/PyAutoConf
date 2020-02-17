@@ -291,6 +291,5 @@ def convert(directory):
                 directory
             ).dict,
             f,
-            sort_keys=True,
             indent=4
         )
