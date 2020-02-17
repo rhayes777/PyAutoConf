@@ -48,7 +48,6 @@ class Width:
         self.prior = prior
 
     @property
-    @default_empty
     def dict(self):
         return {
             "type": self.type_string,

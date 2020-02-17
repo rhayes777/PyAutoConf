@@ -94,6 +94,15 @@ class JSONPriorConfig:
             self.obj
         )
 
+    def for_class_and_prior_name(
+            self,
+            cls,
+            prior_name
+    ):
+        return self(
+            path_for_class(cls) + [prior_name]
+        )
+
     def __call__(self, config_path: List[str]):
         """
         Get the config at the end of the config_path.
