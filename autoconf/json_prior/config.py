@@ -1,8 +1,8 @@
 import json
 from typing import List
-from autoconf.named import family
 
 from autoconf.exc import PriorException
+from autoconf.named import family
 
 
 def path_for_class(cls) -> List[str]:
@@ -101,20 +101,20 @@ class JSONPriorConfig:
             self.obj
         )
 
-    def for_class_and_prior_name(
+    def for_class_and_suffix_path(
             self,
             cls,
-            prior_name
+            suffix_path
     ):
         for cls in family(cls):
             try:
                 return self(
-                    path_for_class(cls) + [prior_name]
+                    path_for_class(cls) + suffix_path
                 )
             except PriorException:
                 pass
         raise PriorException(
-            f"No configuration was found for the class {cls} and attribute {prior_name}"
+            f"No configuration was found for the class {cls} and attribute {'.'.join(suffix_path)}"
             + ("" if self.directory is None else f" ({self.directory})")
         )
 
