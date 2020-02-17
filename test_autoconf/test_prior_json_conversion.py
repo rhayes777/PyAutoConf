@@ -72,6 +72,17 @@ class TestPrior:
             "upper_limit": "inf"
         }
 
+    @pytest.mark.parametrize(
+        "key, type_string",
+        [
+            ("grid", "Deferred"),
+            ("nothing", "Constant"),
+            ("constant", "Constant")
+        ]
+    )
+    def test_constants(self, mock_json, key, type_string):
+        assert mock_json["Tracer"][key]["type"] == type_string
+
 
 class TestWidth:
     def test_relative(self, mock_json):

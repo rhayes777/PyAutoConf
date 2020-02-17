@@ -488,6 +488,11 @@
         "Tracer": {
             "grid": {
                 "type": "Deferred"
+            },
+            "nothing": {},
+            "constant": {
+                "type": "Constant",
+                "value": 1.0
             }
         }
     },

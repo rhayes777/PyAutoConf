@@ -147,7 +147,7 @@ class Prior(Object):
         }
         if self.type_character == "d":
             return prior_dict
-        if self.type_string == "n":
+        if self.type_character == "n":
             return {
                 **prior_dict,
                 "value": None
