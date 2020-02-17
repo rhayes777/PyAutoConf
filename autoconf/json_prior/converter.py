@@ -165,7 +165,7 @@ class Prior(Object):
             "upper_limit": self.upper_limit
         }
         try:
-            prior_dict["width"] = self.width.dict
+            prior_dict["width_modifier"] = self.width.dict
         except KeyError:
             pass
         if self.type_character in ("u", "l"):

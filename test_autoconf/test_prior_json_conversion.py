@@ -75,13 +75,13 @@ class TestPrior:
 
 class TestWidth:
     def test_relative(self, mock_json):
-        assert mock_json["RelativeWidth"]["one"]["width"] == {
+        assert mock_json["RelativeWidth"]["one"]["width_modifier"] == {
             "type": "Relative",
             "value": 0.1
         }
 
     def test_absolute(self, mock_json):
-        assert mock_json["EllipticalExponential"]["intensity"]["width"] == {
+        assert mock_json["EllipticalExponential"]["intensity"]["width_modifier"] == {
             "type": "Absolute",
             "value": 1.0
         }
