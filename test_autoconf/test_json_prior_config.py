@@ -21,28 +21,29 @@ def test_path_for_class(geometry_profile_path):
     "config_dict",
     [
         {
-            "test_autoconf.mock.GeometryProfile": "test"
+            "test_autoconf.mock.GeometryProfile": "test",
+            "test_autoconf.mock.Other": "toast"
         },
         {
-            "test_autoconf.mock": {"GeometryProfile": "test"}
+            "test_autoconf.mock": {"GeometryProfile": "test", "Other": "toast"},
         },
         {
-            "test_autoconf": {"mock": {"GeometryProfile": "test"}}
+            "test_autoconf": {"mock": {"GeometryProfile": "test", "Other": "toast"}}
         },
         {
-            "test_autoconf": {"mock.GeometryProfile": "test"}
+            "test_autoconf": {"mock.GeometryProfile": "test", "mock.Other": "toast"}
         },
         {
-            "*.GeometryProfile": "test"
+            "*.GeometryProfile": "test", "*.Other": "toast"
         },
         {
-            "*.mock.GeometryProfile": "test"
+            "*.mock.GeometryProfile": "test", "*.mock.Other": "toast"
         },
         {
-            "*.mock": {"GeometryProfile": "test"}
+            "*.mock": {"GeometryProfile": "test", "Other": "toast"}
         },
         {
-            "test_autoconf": {"*.GeometryProfile": "test"}
+            "test_autoconf": {"*.GeometryProfile": "test", "*.Other": "toast"}
         }
     ]
 )
@@ -50,8 +51,12 @@ def test_config_for_path(
         geometry_profile_path,
         config_dict
 ):
-    assert ac.JSONPriorConfig(
+    config = ac.JSONPriorConfig(
         config_dict
-    )(
+    )
+    assert config(
         geometry_profile_path
     ) == "test"
+    assert config(
+        ["test_autoconf", "mock", "Other"]
+    ) == "toast"
