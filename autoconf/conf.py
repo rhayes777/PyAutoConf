@@ -1,7 +1,8 @@
 import os
 
+from autoconf.json_prior.config import JSONPriorConfig
+from autoconf.json_prior.converter import convert
 from autoconf.named import NamedConfig, LabelConfig
-from autoconf.prior import DefaultPriorConfig, LimitConfig
 
 
 def get_matplotlib_backend():
@@ -11,9 +12,18 @@ def get_matplotlib_backend():
 class Config:
     def __init__(self, config_path, output_path="output"):
         self.config_path = config_path
-        self.prior_default = DefaultPriorConfig("{}/priors/default".format(config_path))
-        self.prior_width = DefaultPriorConfig("{}/priors/width".format(config_path))
-        self.prior_limit = LimitConfig("{}/priors/limit".format(config_path))
+        json_config_path = f"{config_path}/priors.json"
+        print(json_config_path)
+        if not os.path.exists(
+                json_config_path
+        ):
+            convert(
+                f"{config_path}/priors"
+            )
+        self.prior_config = JSONPriorConfig.from_file(
+            json_config_path
+        )
+
         self.non_linear = NamedConfig("{}/non_linear.ini".format(config_path))
         self.label = LabelConfig("{}/label.ini".format(config_path))
         self.label_format = NamedConfig("{}/label_format.ini".format(config_path))

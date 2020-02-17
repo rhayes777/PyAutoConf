@@ -1,7 +1,10 @@
 import json
+import logging
 from configparser import ConfigParser
 from functools import wraps
 from glob import glob
+
+logger = logging.getLogger(__name__)
 
 
 def string_infinity(func):
@@ -13,6 +16,18 @@ def string_infinity(func):
         if result == float("-inf"):
             return "-inf"
         return result
+
+    return wrapper
+
+
+def default_empty(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logger.exception(e)
+            return dict()
 
     return wrapper
 
@@ -33,6 +48,7 @@ class Width:
         self.prior = prior
 
     @property
+    @default_empty
     def dict(self):
         return {
             "type": self.type_string,
@@ -109,7 +125,10 @@ class Prior(Object):
                 return float(self.limit_array[0])
             except KeyError:
                 return float("-inf")
-        return float(self.default_array[1])
+        try:
+            return float(self.default_array[1])
+        except IndexError:
+            pass
 
     @property
     @string_infinity
@@ -122,6 +141,7 @@ class Prior(Object):
         return float(self.default_array[2])
 
     @property
+    @default_empty
     def dict(self):
         prior_dict = {
             "type": self.type_string
@@ -191,6 +211,7 @@ class Class(Object):
         return self.module.width[self.name]
 
     @property
+    @default_empty
     def dict(self):
         return {
             prior.name: prior.dict
@@ -234,6 +255,7 @@ class Module(Object):
         ]
 
     @property
+    @default_empty
     def dict(self):
         return {
             cls.name: cls.dict
@@ -276,6 +298,7 @@ class Converter:
         ]
 
     @property
+    @default_empty
     def dict(self):
         return {
             f"*.{module.name}": module.dict
