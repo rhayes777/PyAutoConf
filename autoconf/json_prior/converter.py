@@ -28,10 +28,37 @@ class Object:
         return f"<{self.__class__.__name__} {self.name}>"
 
 
+class Width:
+    def __init__(self, prior):
+        self.prior = prior
+
+    @property
+    def dict(self):
+        return {
+            "type": self.type_string,
+            "value": float(self.prior.width_array[1])
+        }
+
+    @property
+    def type_string(self):
+        width_character = self.prior.width_array[0]
+        if width_character == "r":
+            return "Relative"
+        if width_character == "a":
+            return "Absolute"
+        raise AssertionError(
+            f"Width character {width_character} not recognised"
+        )
+
+
 class Prior(Object):
     def __init__(self, cls, name):
         super().__init__(name)
         self.cls = cls
+
+    @property
+    def width(self):
+        return Width(self)
 
     @property
     def default_string(self):
@@ -40,6 +67,14 @@ class Prior(Object):
     @property
     def default_array(self):
         return self.default_string.split(",")
+
+    @property
+    def width_string(self):
+        return self.cls.width_section[self.name]
+
+    @property
+    def width_array(self):
+        return self.width_string.split(",")
 
     @property
     def limit_string(self):
@@ -99,21 +134,21 @@ class Prior(Object):
                 "value": None
             }
         if self.type_character == "c":
-            value = self.default_array[1]
-            try:
-                value = float(value)
-            except ValueError:
-                pass
             return {
                 **prior_dict,
-                "value": value
+                "value": float(
+                    self.default_array[1]
+                )
             }
         prior_dict = {
             **prior_dict,
             "lower_limit": self.lower_limit,
             "upper_limit": self.upper_limit
-
         }
+        try:
+            prior_dict["width"] = self.width.dict
+        except KeyError:
+            pass
         if self.type_character in ("u", "l"):
             return prior_dict
         if self.type_character == "g":
@@ -152,6 +187,10 @@ class Class(Object):
         return self.module.limit[self.name]
 
     @property
+    def width_section(self):
+        return self.module.width[self.name]
+
+    @property
     def dict(self):
         return {
             prior.name: prior.dict
@@ -175,6 +214,10 @@ class Module(Object):
         self.default = ConfigParser()
         self.default.read(
             f"{self.converter.default_directory}/{self.name}.ini"
+        )
+        self.width = ConfigParser()
+        self.width.read(
+            f"{self.converter.width_directory}/{self.name}.ini"
         )
 
     def __eq__(self, other):
@@ -216,7 +259,7 @@ class Converter:
 
     @property
     def width_directory(self):
-        return f"{self.directory}/limit"
+        return f"{self.directory}/width"
 
     @property
     def modules(self):

@@ -1,68 +1,4 @@
 {
-    "*.geometry_profiles": {
-        "AbstractEllipticalSersic": {
-            "axis_ratio": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
-            "centre_0": {
-                "lower_limit": -1.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
-            "centre_1": {
-                "lower_limit": -1.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
-            "effective_radius": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 3.0
-            },
-            "intensity": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
-            "phi": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 180.0
-            },
-            "sersic_index": {
-                "lower_limit": 0.6,
-                "type": "Uniform",
-                "upper_limit": 8.0
-            }
-        },
-        "EllipticalProfile": {
-            "axis_ratio": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 2.0
-            },
-            "phi": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 2.0
-            }
-        },
-        "GeometryProfile": {
-            "centre_0": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            },
-            "centre_1": {
-                "lower_limit": 0.0,
-                "type": "Uniform",
-                "upper_limit": 1.0
-            }
-        },
-        "SphericallProfile": {}
-    },
     "*.mock": {
         "AbstractEllipticalSersic": {
             "axis_ratio": {
@@ -190,7 +126,11 @@
                 "mean": 0.0,
                 "sigma": 0.5,
                 "type": "Gaussian",
-                "upper_limit": 10.0
+                "upper_limit": 10.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 1.0
+                }
             },
             "mass_to_light_ratio": {
                 "lower_limit": 0.0,
@@ -224,12 +164,20 @@
             "axis_ratio": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 2.0
+                "upper_limit": 2.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 0.1
+                }
             },
             "phi": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 2.0
+                "upper_limit": 2.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 10.0
+                }
             }
         },
         "EllipticalSersic": {
@@ -243,7 +191,11 @@
             "redshift": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             }
         },
         "Gaussian": {
@@ -259,12 +211,20 @@
             "centre_0": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 0.05
+                }
             },
             "centre_1": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 0.05
+                }
             }
         },
         "HyperGalaxy": {
@@ -288,81 +248,141 @@
             "four": {
                 "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 120.0
+                "upper_limit": 120.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             },
             "one": {
                 "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 120.0
+                "upper_limit": 120.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 1.0
+                }
             },
             "three": {
                 "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 120.0
+                "upper_limit": 120.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             },
             "two": {
                 "lower_limit": -120.0,
                 "type": "Uniform",
-                "upper_limit": 120.0
+                "upper_limit": 120.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             }
         },
         "MockClassNLOx5": {
             "five": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             },
             "four": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             },
             "one": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 1.0
+                }
             },
             "three": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             },
             "two": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             }
         },
         "MockClassNLOx6": {
             "four": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 4.0
+                }
             },
             "one_0": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 1.0
+                }
             },
             "one_1": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 1.0
+                }
             },
             "three": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 3.0
+                }
             },
             "two_0": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             },
             "two_1": {
                 "lower_limit": -100.0,
                 "type": "Uniform",
-                "upper_limit": 101.0
+                "upper_limit": 101.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             }
         },
         "PositionClass": {
@@ -388,17 +408,29 @@
             "one": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Relative",
+                    "value": 0.1
+                }
             },
             "three": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Relative",
+                    "value": 1.0
+                }
             },
             "two": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Relative",
+                    "value": 0.5
+                }
             }
         },
         "SimpleClass": {
@@ -473,14 +505,22 @@
                 "mean": 0.0,
                 "sigma": 1.0,
                 "type": "Gaussian",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 1.0
+                }
             },
             "two": {
                 "lower_limit": 0.0,
                 "mean": 0.0,
                 "sigma": 1.0,
                 "type": "Gaussian",
-                "upper_limit": 2.0
+                "upper_limit": 2.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             }
         },
         "MockClassInf": {
@@ -503,12 +543,20 @@
             "one": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 1.0
+                }
             },
             "two": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 2.0
+                }
             }
         },
         "MockClassMMinstance": {
@@ -526,17 +574,29 @@
             "centre_0": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 0.0
+                }
             },
             "centre_1": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 0.0
+                }
             },
             "intensity": {
                 "lower_limit": 0.0,
                 "type": "Uniform",
-                "upper_limit": 1.0
+                "upper_limit": 1.0,
+                "width": {
+                    "type": "Absolute",
+                    "value": 0.0
+                }
             }
         },
         "WithFloat": {

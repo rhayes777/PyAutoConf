@@ -43,27 +43,45 @@ def test_convert(prior_directory, prior_filename):
 
 def test_modules(converter):
     assert converter.modules == [
-        "geometry_profiles",
         "mock",
         "test_model_mapper"
     ]
 
 
-def test_geometry_profiles(prior_json):
-    module_json = prior_json["*.geometry_profiles"]
-    class_json = module_json["GeometryProfile"]
-    assert class_json["centre_0"] == {
-        "type": "Uniform",
-        "lower_limit": 0.0,
-        "upper_limit": 1.0
-    }
+@pytest.fixture(name="mock_json")
+def make_mock_json(prior_json):
+    return prior_json["*.mock"]
 
 
-def test_intensity(prior_json):
-    prior_json = prior_json["*.mock"]["AbstractEllipticalSersic"]["intensity"]
-    assert prior_json["type"] == "Gaussian"
-    assert prior_json["mean"] == 0.0
-    assert prior_json["sigma"] == 0.5
-    assert prior_json["lower_limit"] == "-inf"
-    assert prior_json["upper_limit"] == "inf"
+class TestPrior:
+    def test_uniform(self, mock_json):
+        uniform_dict = mock_json["EllipticalSersic"]["intensity"]
+        assert uniform_dict == {
+            "type": "Uniform",
+            "lower_limit": 0.0,
+            "upper_limit": 1.0
+        }
 
+    def test_gaussian(self, mock_json):
+        gaussian_dict = mock_json["AbstractEllipticalSersic"]["intensity"]
+        assert gaussian_dict == {
+            "type": "Gaussian",
+            "mean": 0.0,
+            "sigma": 0.5,
+            "lower_limit": "-inf",
+            "upper_limit": "inf"
+        }
+
+
+class TestWidth:
+    def test_relative(self, mock_json):
+        assert mock_json["RelativeWidth"]["one"]["width"] == {
+            "type": "Relative",
+            "value": 0.1
+        }
+
+    def test_absolute(self, mock_json):
+        assert mock_json["EllipticalExponential"]["intensity"]["width"] == {
+            "type": "Absolute",
+            "value": 1.0
+        }
