@@ -293,3 +293,9 @@ def convert(directory):
             f,
             indent=4
         )
+
+
+if __name__ == "__main__":
+    from sys import argv
+
+    convert(argv[1])
