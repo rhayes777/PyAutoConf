@@ -58,3 +58,13 @@ def test_geometry_profiles(prior_json):
         "lower_limit": 0.0,
         "upper_limit": 1.0
     }
+
+
+def test_intensity(prior_json):
+    prior_json = prior_json["*.mock"]["AbstractEllipticalSersic"]["intensity"]
+    assert prior_json["type"] == "Gaussian"
+    assert prior_json["mean"] == 0.0
+    assert prior_json["sigma"] == 0.5
+    assert prior_json["lower_limit"] == "-inf"
+    assert prior_json["upper_limit"] == "inf"
+

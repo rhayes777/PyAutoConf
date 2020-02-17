@@ -1,6 +1,20 @@
 import json
 from configparser import ConfigParser
+from functools import wraps
 from glob import glob
+
+
+def string_infinity(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        if result == float("inf"):
+            return "inf"
+        if result == float("-inf"):
+            return "-inf"
+        return result
+
+    return wrapper
 
 
 class Prior:
@@ -9,7 +23,6 @@ class Prior:
             cls,
             name
     ):
-        print(name)
         self.name = name
         self.cls = cls
 
@@ -35,19 +48,36 @@ class Prior:
 
     @property
     def type_string(self):
+        if self.type_character == "d":
+            return "Deferred"
+        if self.type_character in ("c", "n"):
+            return "Constant"
+        if self.type_character == "l":
+            return "LogUniform"
+        if self.type_character == "g":
+            return "Gaussian"
         if self.type_character == "u":
             return "Uniform"
 
     @property
+    @string_infinity
     def lower_limit(self):
+        if self.type_character == "g":
+            try:
+                return float(self.limit_array[0])
+            except KeyError:
+                return float("-inf")
         return float(self.default_array[1])
 
     @property
+    @string_infinity
     def upper_limit(self):
-        try:
-            return float(self.default_array[2])
-        except IndexError:
-            pass
+        if self.type_character == "g":
+            try:
+                return float(self.limit_array[1])
+            except KeyError:
+                return float("inf")
+        return float(self.default_array[2])
 
     @property
     def dict(self):
@@ -80,19 +110,10 @@ class Prior:
         if self.type_character in ("u", "l"):
             return prior_dict
         if self.type_character == "g":
-            lower_limit = float("-inf")
-            upper_limit = float("-inf")
-            try:
-                lower_limit = float(self.limit_array[0])
-                upper_limit = float(self.limit_array[1])
-            except KeyError:
-                pass
             return {
                 **prior_dict,
                 "mean": float(self.default_array[1]),
-                "sigma": float(self.default_array[2]),
-                "lower_limit": lower_limit,
-                "upper_limit": upper_limit
+                "sigma": float(self.default_array[2])
             }
         raise AssertionError(
             f"Unrecognised prior type {self.type_character}"
@@ -101,7 +122,6 @@ class Prior:
 
 class Class:
     def __init__(self, module, name):
-        print(name)
         self.name = name
         self.module = module
 
@@ -135,7 +155,6 @@ class Class:
 
 class Module:
     def __init__(self, converter, name):
-        print(name)
         self.converter = converter
         self.name = name
         self.default = ConfigParser()

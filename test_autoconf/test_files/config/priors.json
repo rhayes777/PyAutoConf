@@ -86,11 +86,11 @@
                 "upper_limit": 2.0
             },
             "intensity": {
-                "lower_limit": -Infinity,
+                "lower_limit": "-inf",
                 "mean": 0.0,
                 "sigma": 0.5,
-                "type": null,
-                "upper_limit": -Infinity
+                "type": "Gaussian",
+                "upper_limit": "inf"
             },
             "mass_to_light_ratio": {
                 "lower_limit": 0.0,
@@ -115,7 +115,7 @@
                 "upper_limit": 1.0
             },
             "two": {
-                "type": null
+                "type": "Deferred"
             }
         },
         "DistanceClass": {
@@ -189,7 +189,7 @@
                 "lower_limit": 0.0,
                 "mean": 0.0,
                 "sigma": 0.5,
-                "type": null,
+                "type": "Gaussian",
                 "upper_limit": 10.0
             },
             "mass_to_light_ratio": {
@@ -248,11 +248,11 @@
         },
         "Gaussian": {
             "gaussian": {
-                "lower_limit": -Infinity,
+                "lower_limit": "-inf",
                 "mean": 0.0,
                 "sigma": 1.0,
-                "type": null,
-                "upper_limit": Infinity
+                "type": "Gaussian",
+                "upper_limit": "inf"
             }
         },
         "GeometryProfile": {
@@ -455,7 +455,7 @@
         "SphericallProfile": {},
         "Tracer": {
             "grid": {
-                "type": null
+                "type": "Deferred"
             }
         }
     },
@@ -472,31 +472,31 @@
                 "lower_limit": 0.0,
                 "mean": 0.0,
                 "sigma": 1.0,
-                "type": null,
+                "type": "Gaussian",
                 "upper_limit": 1.0
             },
             "two": {
                 "lower_limit": 0.0,
                 "mean": 0.0,
                 "sigma": 1.0,
-                "type": null,
+                "type": "Gaussian",
                 "upper_limit": 2.0
             }
         },
         "MockClassInf": {
             "one": {
-                "lower_limit": -Infinity,
+                "lower_limit": "-inf",
                 "mean": 0.0,
                 "sigma": 1.0,
-                "type": null,
+                "type": "Gaussian",
                 "upper_limit": 0.0
             },
             "two": {
                 "lower_limit": 0.0,
                 "mean": 0.0,
                 "sigma": 1.0,
-                "type": null,
-                "upper_limit": Infinity
+                "type": "Gaussian",
+                "upper_limit": "inf"
             }
         },
         "MockClassMM": {
@@ -513,7 +513,7 @@
         },
         "MockClassMMinstance": {
             "one": {
-                "type": null,
+                "type": "Constant",
                 "value": 3.0
             },
             "two": {
