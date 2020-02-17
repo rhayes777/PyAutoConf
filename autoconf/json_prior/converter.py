@@ -17,13 +17,20 @@ def string_infinity(func):
     return wrapper
 
 
-class Prior:
-    def __init__(
-            self,
-            cls,
-            name
-    ):
+class Object:
+    def __init__(self, name):
         self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.name}>"
+
+
+class Prior(Object):
+    def __init__(self, cls, name):
+        super().__init__(name)
         self.cls = cls
 
     @property
@@ -120,9 +127,9 @@ class Prior:
         )
 
 
-class Class:
+class Class(Object):
     def __init__(self, module, name):
-        self.name = name
+        super().__init__(name)
         self.module = module
 
     @property
@@ -153,10 +160,10 @@ class Class:
         }
 
 
-class Module:
+class Module(Object):
     def __init__(self, converter, name):
+        super().__init__(name)
         self.converter = converter
-        self.name = name
         self.default = ConfigParser()
         self.default.read(
             f"{self.converter.default_directory}/{self.name}.ini"

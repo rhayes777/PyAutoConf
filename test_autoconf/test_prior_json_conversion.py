@@ -45,8 +45,7 @@ def test_modules(converter):
     assert converter.modules == [
         "geometry_profiles",
         "mock",
-        "test_model_mapper",
-        "test_prior_model"
+        "test_model_mapper"
     ]
 
 

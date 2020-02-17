@@ -558,6 +558,5 @@
                 "upper_limit": 1.0
             }
         }
-    },
-    "*.test_prior_model": {}
+    }
 }
