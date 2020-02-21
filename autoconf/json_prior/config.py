@@ -1,8 +1,29 @@
+import inspect
 import json
-from typing import List, Type, Dict, Tuple
+from typing import List, Type, Tuple
 
 from autoconf.exc import PriorException
 from autoconf.named import family
+
+default_prior = {
+    "type": "Uniform",
+    "lower_limit": 0.0,
+    "upper_limit": 1.0,
+    "width_modifier": {
+        "type": "Absolute",
+        "value": 0.2
+    }
+}
+
+
+def make_config_for_class(cls):
+    key = ".".join(path_for_class(cls))
+    arguments = inspect.getfullargspec(cls).args[1:]
+    config = {
+        argument: default_prior
+        for argument in arguments
+    }
+    return key, config
 
 
 def path_for_class(cls) -> List[str]:
@@ -121,9 +142,7 @@ class JSONPriorConfig:
             self,
             cls: Type,
             suffix_path: List[str]
-    ) -> Dict[
-         str, object
-         ]:
+    ):
         """
         Get configuration for a prior.
 
