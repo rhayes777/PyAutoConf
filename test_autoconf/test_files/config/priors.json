@@ -1,5 +1,5 @@
 {
-    "*.mock": {
+    "mock": {
         "Redshift": {
             "redshift": {
                 "type": "Uniform",
@@ -499,7 +499,7 @@
             }
         }
     },
-    "*.test_model_mapper": {
+    "test_model_mapper": {
         "MockClassMM": {
             "one": {
                 "type": "Uniform",

@@ -122,7 +122,7 @@ class JSONPriorConfig:
             cls: Type,
             suffix_path: List[str]
     ) -> Dict[
-         str: object
+         str, object
          ]:
         """
         Get configuration for a prior.

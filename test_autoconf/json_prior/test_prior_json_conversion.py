@@ -11,7 +11,7 @@ from autoconf.json_prior import converter as c
 )
 def make_prior_directory():
     return str(
-        Path(__file__).parent / "test_files" / "config" / "priors"
+        Path(__file__).parent.parent / "test_files" / "config" / "priors"
     )
 
 
