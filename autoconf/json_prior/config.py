@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Type, Dict, Tuple
 
 from autoconf.exc import PriorException
 from autoconf.named import family
@@ -54,7 +54,11 @@ class JSONPriorConfig:
         return list(self.path_value_map.keys())
 
     @property
-    def path_value_map(self):
+    def path_value_map(self) -> dict:
+        """
+        A dictionary matching every possible path to the configuration it points to.
+        """
+
         def get_path_values(obj):
             path_values = dict()
             if isinstance(obj, dict):
@@ -70,7 +74,11 @@ class JSONPriorConfig:
         )
 
     @property
-    def path_value_tuples(self):
+    def path_value_tuples(self) -> List[Tuple[str, object]]:
+        """
+        Tuple pairs matching every possible path to the configuration it points to.
+        These are ordered by key length with the longest key first.
+        """
         return sorted(
             list(self.path_value_map.items()),
             key=lambda item: len(item[0]),
@@ -111,9 +119,37 @@ class JSONPriorConfig:
 
     def for_class_and_suffix_path(
             self,
-            cls,
-            suffix_path
-    ):
+            cls: Type,
+            suffix_path: List[str]
+    ) -> Dict[
+         str: object
+         ]:
+        """
+        Get configuration for a prior.
+
+        If it is just basic configuration then the suffix path is just the
+        name of the prior in a list. Width configuration also adds an
+        additional "width_modifier" item.
+
+        If configuration is not found for the class then configurations for
+        parents of the class are searched.
+
+        Parameters
+        ----------
+        cls
+            The class with which the prior is associated.
+        suffix_path
+            The path to the prior.
+
+        Returns
+        -------
+        A configuration dictionary
+
+        Raises
+        ------
+        PriorException
+            If no matching configuration is found.
+        """
         for c in family(cls):
             try:
                 return self(
