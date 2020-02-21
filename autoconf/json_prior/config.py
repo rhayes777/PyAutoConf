@@ -204,9 +204,10 @@ class JSONPriorConfig:
             def collapsed(self, key=None):
                 if len(self.__dict) == 1:
                     new_key = list(self.__dict.keys())[0]
+                    new_dict = self.__dict[new_key]
                     if key is not None:
                         new_key = f"{key}.{new_key}"
-                    return list(self.__dict.values())[0].collapsed(new_key)
+                    return new_dict.collapsed(new_key)
                 if len(self.__dict) == 0:
                     if key is not None:
                         return {key: self.value}
