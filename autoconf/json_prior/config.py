@@ -163,11 +163,6 @@ class JSONPriorConfig:
         Returns
         -------
         A configuration dictionary
-
-        Raises
-        ------
-        PriorException
-            If no matching configuration is found.
         """
         for c in family(cls):
             try:
@@ -176,9 +171,11 @@ class JSONPriorConfig:
                 )
             except PriorException:
                 pass
-        raise PriorException(
-            f"No configuration was found for the class {cls} and attribute {'.'.join(suffix_path)}"
-            + ("" if self.directory is None else f" ({self.directory})")
+        key, value = make_config_for_class(cls)
+        self.obj[key] = value
+        return self.for_class_and_suffix_path(
+            cls,
+            suffix_path
         )
 
     def __call__(self, config_path: List[str]):
