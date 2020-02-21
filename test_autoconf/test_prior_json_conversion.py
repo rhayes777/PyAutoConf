@@ -50,7 +50,7 @@ def test_modules(converter):
 
 @pytest.fixture(name="mock_json")
 def make_mock_json(prior_json):
-    return prior_json["*.mock"]
+    return prior_json["mock"]
 
 
 class TestPrior:

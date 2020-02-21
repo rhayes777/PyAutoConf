@@ -300,7 +300,7 @@ class Converter:
     @default_empty
     def dict(self):
         return {
-            f"*.{module.name}": module.dict
+            f"{module.name}": module.dict
             for module
             in self.modules
         }
