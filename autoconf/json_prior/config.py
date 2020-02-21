@@ -17,13 +17,13 @@ default_prior = {
 
 
 def make_config_for_class(cls):
-    key = ".".join(path_for_class(cls))
+    path = path_for_class(cls)
     arguments = inspect.getfullargspec(cls).args[1:]
     config = {
         argument: default_prior
         for argument in arguments
     }
-    return key, config
+    return path, config
 
 
 def path_for_class(cls) -> List[str]:
@@ -171,11 +171,90 @@ class JSONPriorConfig:
                 )
             except PriorException:
                 pass
-        key, value = make_config_for_class(cls)
-        self.obj[key] = value
+        path, value = make_config_for_class(cls)
+
+        self.obj[".".join(path)] = value
+
+        self.rearrange()
+
         return self.for_class_and_suffix_path(
             cls,
             suffix_path
+        )
+
+    def rearrange(self):
+        class PlaceHolder:
+            pass
+
+        place_holder = PlaceHolder()
+
+        class PathDict:
+            def __init__(self):
+                self.__dict = dict()
+
+            def __getitem__(self, item):
+                if item not in self.__dict:
+                    self.__dict[item] = PathDict()
+                return self.__dict[item]
+
+            def __setitem__(self, key, value):
+                self.__dict[key] = value
+
+            def collapsed(self, key=None):
+                if len(self.__dict) == 1:
+                    new_key = list(self.__dict.keys())[0]
+                    if key is not None:
+                        new_key = f"{key}.{new_key}"
+                    return list(self.__dict.values())[0].collapsed(new_key)
+                if len(self.__dict) == 0:
+                    if key is not None:
+                        return {key: place_holder}
+                    return place_holder
+                if len(self.__dict) > 1:
+                    dicts = {
+                        key: value.collapsed()
+                        for key, value
+                        in self.__dict.items()
+                    }
+                    if key is not None:
+                        return {key: dicts}
+                    return dicts
+
+            @property
+            def dict(self):
+                return {
+                    key: value.dict
+                    for key, value in
+                    self.__dict.items()
+                }
+
+            def add_path(self, path):
+                current = self
+                for item in path:
+                    current = current[item]
+
+        path_dict = PathDict()
+        for path_key in self.paths:
+            path_dict.add_path(path_key.split("."))
+        result = path_dict.collapsed()
+
+        def populate_values(place_holder_dict, path=None):
+            populated_dict = dict()
+            path = path or list()
+            for key, value in place_holder_dict.items():
+                new_path = path + [key]
+                if isinstance(value, dict):
+                    populated_dict[key] = populate_values(
+                        value, new_path
+                    )
+                if value is place_holder:
+                    populated_dict[key] = self(
+                        new_path
+                    )
+            return populated_dict
+
+        self.obj = populate_values(
+            result
         )
 
     def __call__(self, config_path: List[str]):
