@@ -49,6 +49,34 @@ class JSONPriorConfig:
         self.obj = config_dict
         self.directory = directory
 
+    @property
+    def paths(self):
+        return list(self.path_value_map.keys())
+
+    @property
+    def path_value_map(self):
+        def get_path_values(obj):
+            path_values = dict()
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    path_values[key] = value
+                    for path, path_value in get_path_values(value).items():
+                        path_values[f"{key}.{path}"] = path_value
+
+            return path_values
+
+        return get_path_values(
+            self.obj
+        )
+
+    @property
+    def path_value_tuples(self):
+        return sorted(
+            list(self.path_value_map.items()),
+            key=lambda item: len(item[0]),
+            reverse=True
+        )
+
     @classmethod
     def from_file(cls, filename: str) -> "JSONPriorConfig":
         """
@@ -74,42 +102,22 @@ class JSONPriorConfig:
 
     def __getitem__(self, item):
         return JSONPriorConfig(
-            self.obj[".".join(item)]
+            self.obj[".".join(item)],
+            directory=self.directory
         )
 
     def __contains__(self, item):
         return ".".join(item) in self.obj
-
-    @property
-    def wildcards(self):
-        def get_wild_cards(obj):
-            wild_cards = dict()
-            if not isinstance(obj, dict):
-                return wild_cards
-            for key, value in obj.items():
-                if key.startswith("*."):
-                    wild_cards[key] = value
-                wild_cards = {
-                    **wild_cards,
-                    **get_wild_cards(
-                        value
-                    )
-                }
-            return wild_cards
-
-        return get_wild_cards(
-            self.obj
-        )
 
     def for_class_and_suffix_path(
             self,
             cls,
             suffix_path
     ):
-        for cls in family(cls):
+        for c in family(cls):
             try:
                 return self(
-                    path_for_class(cls) + suffix_path
+                    path_for_class(c) + suffix_path
                 )
             except PriorException:
                 pass
@@ -140,34 +148,10 @@ class JSONPriorConfig:
         PriorException
             If no configuration is found.
         """
-        try:
-            wild_path = config_path
-            while len(wild_path) > 0:
-                wild_card_key = f"*.{'.'.join(wild_path)}"
-                for key, value in self.wildcards.items():
-                    if wild_card_key.startswith(key):
-                        return JSONPriorConfig(
-                            {
-                                key[2:]: value
-                            }
-                        )(wild_card_key[2:].split("."))
-                wild_path = wild_path[1:]
-
-            current_path = config_path
-            after = []
-            while len(current_path) > 0:
-                if current_path in self:
-                    config = self[
-                        current_path
-                    ]
-                    if len(after) == 0:
-                        return config.obj
-                    return config(after)
-
-                after = current_path[-1:] + after
-                current_path = current_path[:-1]
-        except PriorException:
-            pass
+        key = ".".join(config_path)
+        for path, value in self.path_value_tuples:
+            if key.endswith(path):
+                return value
         raise PriorException(
             f"No configuration was found for the path {config_path}"
             + ("" if self.directory is None else f" ({self.directory})")

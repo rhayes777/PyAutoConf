@@ -489,7 +489,10 @@
             "grid": {
                 "type": "Deferred"
             },
-            "nothing": {},
+            "nothing": {
+                "type": "Constant",
+                "value": null
+            },
             "constant": {
                 "type": "Constant",
                 "value": 1.0
