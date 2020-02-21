@@ -183,13 +183,14 @@ class JSONPriorConfig:
         )
 
     def rearrange(self):
-        class PlaceHolder:
-            pass
-
-        place_holder = PlaceHolder()
+        """
+        Rearrange the configuration trying to create a more embedded
+        dictionary structure rather than a big collection of paths
+        mapped to values.
+        """
 
         class PathDict:
-            def __init__(self, value=place_holder):
+            def __init__(self, value=None):
                 self.value = value
                 self.__dict = dict()
 
