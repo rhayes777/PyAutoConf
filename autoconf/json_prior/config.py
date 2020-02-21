@@ -189,7 +189,8 @@ class JSONPriorConfig:
         place_holder = PlaceHolder()
 
         class PathDict:
-            def __init__(self):
+            def __init__(self, value=place_holder):
+                self.value = value
                 self.__dict = dict()
 
             def __getitem__(self, item):
@@ -208,12 +209,12 @@ class JSONPriorConfig:
                     return list(self.__dict.values())[0].collapsed(new_key)
                 if len(self.__dict) == 0:
                     if key is not None:
-                        return {key: place_holder}
-                    return place_holder
+                        return {key: self.value}
+                    return self.value
                 if len(self.__dict) > 1:
                     dicts = {
-                        key: value.collapsed()
-                        for key, value
+                        k: value.collapsed()
+                        for k, value
                         in self.__dict.items()
                     }
                     if key is not None:
@@ -228,34 +229,17 @@ class JSONPriorConfig:
                     self.__dict.items()
                 }
 
-            def add_path(self, path):
+            def add_path(self, path, value):
                 current = self
                 for item in path:
                     current = current[item]
+                current.value = value
 
         path_dict = PathDict()
         for path_key in self.paths:
-            path_dict.add_path(path_key.split("."))
-        result = path_dict.collapsed()
-
-        def populate_values(place_holder_dict, path=None):
-            populated_dict = dict()
-            path = path or list()
-            for key, value in place_holder_dict.items():
-                new_path = path + [key]
-                if isinstance(value, dict):
-                    populated_dict[key] = populate_values(
-                        value, new_path
-                    )
-                if value is place_holder:
-                    populated_dict[key] = self(
-                        new_path
-                    )
-            return populated_dict
-
-        self.obj = populate_values(
-            result
-        )
+            path_list = path_key.split(".")
+            path_dict.add_path(path_list, self(path_list))
+        self.obj = path_dict.collapsed()
 
     def __call__(self, config_path: List[str]):
         """

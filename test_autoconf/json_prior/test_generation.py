@@ -38,9 +38,15 @@ def make_filename():
 def make_config(filename):
     return ac.JSONPriorConfig(
         {
-            "test_autoconf.json_prior.test_generation.AnotherClass": {
+            "test_autoconf.json_prior.test_generation.ClassOne": {
                 "attribute": {}
-            }
+            },
+            "different_project.json_prior.test_generation.ClassTwo": {
+                "attribute": {}
+            },
+            "test_autoconf.json_prior.different_module.ClassThree": {
+                "attribute": {}
+            },
         },
         directory=filename
     )
@@ -63,10 +69,37 @@ def test_generate(result):
 
 def test_rearrange(config, my_class_config):
     assert config.obj == {
-        "test_autoconf.json_prior.test_generation": {
-            "MyClass": my_class_config,
-            "AnotherClass": {
-                "attribute": {}
+        'different_project': {
+            'json_prior.test_generation.ClassTwo.attribute': {}
+        },
+        'test_autoconf': {
+            'json_prior': {
+                'different_module': {
+                    'ClassThree.attribute': {}
+                },
+                'test_generation': {
+                    'ClassOne': {
+                        'attribute': {}
+                    },
+                    'MyClass': {
+                        'one': {
+                            'lower_limit': 0.0,
+                            'type': 'Uniform',
+                            'upper_limit': 1.0,
+                            'width_modifier': {
+                                'type': 'Absolute',
+                                'value': 0.2}
+                        },
+                        'two': {
+                            'lower_limit': 0.0,
+                            'type': 'Uniform',
+                            'upper_limit': 1.0,
+                            'width_modifier': {
+                                'type': 'Absolute',
+                                'value': 0.2}
+                        }
+                    }
+                }
             }
         }
     }
