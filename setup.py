@@ -43,8 +43,7 @@ setup(
     ],
     keywords="cli",
     packages=find_packages(exclude=["docs"]),
-    install_requires=[
-    ],
+    install_requires=[],
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
 )

@@ -225,9 +225,9 @@ class DefaultPriorConfig(AncestorConfig):
         """
         arr = (
             super(DefaultPriorConfig, self)
-                .get(module_name, class_name, attribute_name)
-                .replace(" ", "")
-                .split(",")
+            .get(module_name, class_name, attribute_name)
+            .replace(" ", "")
+            .split(",")
         )
         return [arr[0]] + list(map(float, arr[1:]))
 
@@ -256,9 +256,9 @@ class LimitConfig(AncestorConfig):
         """
         arr = (
             super(LimitConfig, self)
-                .get(module_name, class_name, attribute_name)
-                .replace(" ", "")
-                .split(",")
+            .get(module_name, class_name, attribute_name)
+            .replace(" ", "")
+            .split(",")
         )
         return tuple(map(float, arr[:2]))
 
@@ -277,10 +277,16 @@ class Config:
         self.label = LabelConfig("{}/label.ini".format(config_path))
         self.label_format = NamedConfig("{}/label_format.ini".format(config_path))
         self.general = NamedConfig("{}/general.ini".format(config_path))
-        self.visualize_general = NamedConfig("{}/visualize/general.ini".format(config_path))
+        self.visualize_general = NamedConfig(
+            "{}/visualize/general.ini".format(config_path)
+        )
         self.visualize_plots = NamedConfig("{}/visualize/plots.ini".format(config_path))
-        self.visualize_figures = NamedConfig("{}/visualize/figures.ini".format(config_path))
-        self.visualize_subplots = NamedConfig("{}/visualize/subplots.ini".format(config_path))
+        self.visualize_figures = NamedConfig(
+            "{}/visualize/figures.ini".format(config_path)
+        )
+        self.visualize_subplots = NamedConfig(
+            "{}/visualize/subplots.ini".format(config_path)
+        )
         self.output_path = output_path
 
 
