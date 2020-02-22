@@ -3,19 +3,22 @@ from os import path
 import pytest
 
 import autoconf as ac
+import autoconf.named
 
 directory = path.dirname(path.realpath(__file__))
 
 from test_autoconf.mock import EllipticalLP, EllipticalGaussian
 
 
-class MockClass(object):
+class MockClass:
     pass
 
 
 @pytest.fixture(name="label_config")
 def make_label_config():
-    return ac.conf.LabelConfig("{}/test_files/config/label.ini".format(directory))
+    return autoconf.named.LabelConfig(
+        "{}/test_files/config/label.ini".format(directory)
+    )
 
 
 class TestLabel:
