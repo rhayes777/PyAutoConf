@@ -1,3 +1,5 @@
 from autoconf import exc
 from autoconf.conf import *
-__version__ = '0.2.2'
+from autoconf.json_prior.config import *
+
+__version__ = '0.3.0'
