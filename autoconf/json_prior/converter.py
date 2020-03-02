@@ -254,8 +254,10 @@ class Converter:
 
 
 def convert(directory):
-    with open(f"{directory}.json", "w+") as f:
-        json.dump(Converter(directory).dict, f, indent=4)
+    converter = Converter(directory)
+    for module in converter.modules:
+        with open(f"{directory}/{module.name}.json", "w+") as f:
+            json.dump(module.dict, f, indent=4)
 
 
 if __name__ == "__main__":
