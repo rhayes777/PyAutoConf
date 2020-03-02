@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from configparser import ConfigParser
 from functools import wraps
 from glob import glob
@@ -135,6 +136,16 @@ class Prior(Object):
         return float(self.default_array[2])
 
     @property
+    @string_infinity
+    def gaussian_limit_lower(self):
+        return float(self.limit_array[0])
+
+    @property
+    @string_infinity
+    def gaussian_limit_higher(self):
+        return float(self.limit_array[1])
+
+    @property
     @default_empty
     def dict(self):
         prior_dict = {"type": self.type_string}
@@ -156,8 +167,8 @@ class Prior(Object):
         if self.type_character in ("u", "l"):
             try:
                 prior_dict["gaussian_limits"] = {
-                    "lower": float(self.limit_array[0]),
-                    "upper": float(self.limit_array[1]),
+                    "lower": self.gaussian_limit_lower,
+                    "upper": self.gaussian_limit_higher,
                 }
             except KeyError:
                 pass
@@ -253,14 +264,15 @@ class Converter:
         return {f"{module.name}": module.dict for module in self.modules}
 
 
-def convert(directory):
-    converter = Converter(directory)
+def convert(in_directory, out_directory):
+    converter = Converter(in_directory)
+    os.makedirs(out_directory, exist_ok=True)
     for module in converter.modules:
-        with open(f"{directory}/{module.name}.json", "w+") as f:
+        with open(f"{out_directory}/{module.name}.json", "w+") as f:
             json.dump(module.dict, f, indent=4)
 
 
 if __name__ == "__main__":
     from sys import argv
 
-    convert(argv[1])
+    convert(argv[1], argv[1])

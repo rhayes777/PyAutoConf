@@ -12,11 +12,10 @@ def get_matplotlib_backend():
 class Config:
     def __init__(self, config_path, output_path="output"):
         self.config_path = config_path
-        json_config_path = f"{config_path}/priors.json"
-        print(json_config_path)
+        json_config_path = f"{config_path}/json_priors"
         if not os.path.exists(json_config_path):
-            convert(f"{config_path}/priors")
-        self.prior_config = JSONPriorConfig.from_file(json_config_path)
+            convert(f"{config_path}/priors", json_config_path)
+        self.prior_config = JSONPriorConfig.from_directory(json_config_path)
 
         self.non_linear = NamedConfig("{}/non_linear.ini".format(config_path))
         self.label = LabelConfig("{}/label.ini".format(config_path))

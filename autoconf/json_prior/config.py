@@ -1,6 +1,7 @@
 import inspect
 import json
 import logging
+from glob import glob
 from typing import List, Type, Tuple
 
 from autoconf.exc import PriorException
@@ -102,21 +103,25 @@ class JSONPriorConfig:
         )
 
     @classmethod
-    def from_file(cls, filename: str) -> "JSONPriorConfig":
+    def from_directory(cls, directory: str) -> "JSONPriorConfig":
         """
         Load JSONPriorConfiguration from a file.
 
         Parameters
         ----------
-        filename
+        directory
             The path to a file.
 
         Returns
         -------
         A configuration instance.
         """
-        with open(filename) as f:
-            return JSONPriorConfig(json.load(f), directory=filename)
+        config_dict = dict()
+        for file in glob(f"{directory}/*.json"):
+            with open(file) as f:
+                config_dict[file.split("/")[-1].split(".")[0]] = json.load(f)
+
+        return JSONPriorConfig(config_dict, directory=directory)
 
     def __str__(self):
         return json.dumps(self.obj)
@@ -140,6 +145,7 @@ class JSONPriorConfig:
 
         Parameters
         ----------
+        should_retry
         cls
             The class with which the prior is associated.
         suffix_path
@@ -156,7 +162,7 @@ class JSONPriorConfig:
                 pass
 
         if not should_retry:
-            raise PriorException("No config found")
+            raise PriorException(f"No config found for {cls} and {suffix_path}")
 
         self._path_value_map = None
 
