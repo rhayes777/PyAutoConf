@@ -154,6 +154,13 @@ class Prior(Object):
         except KeyError:
             pass
         if self.type_character in ("u", "l"):
+            try:
+                prior_dict["limit"] = {
+                    "lower_limit": float(self.limit_array[0]),
+                    "upper_limit": float(self.limit_array[1]),
+                }
+            except KeyError:
+                pass
             return prior_dict
         if self.type_character == "g":
             return {
