@@ -1,9 +1,12 @@
 import inspect
 import json
+import logging
 from typing import List, Type, Tuple
 
 from autoconf.exc import PriorException
 from autoconf.named import family
+
+logger = logging.getLogger(__name__)
 
 default_prior = {
     "type": "Uniform",
@@ -59,6 +62,7 @@ class JSONPriorConfig:
         """
         self.obj = config_dict
         self.directory = directory
+        self._path_value_map = None
 
     @property
     def paths(self):
@@ -69,18 +73,20 @@ class JSONPriorConfig:
         """
         A dictionary matching every possible path to the configuration it points to.
         """
+        if self._path_value_map is None:
 
-        def get_path_values(obj):
-            path_values = dict()
-            if isinstance(obj, dict):
-                for key, value in obj.items():
-                    path_values[key] = value
-                    for path, path_value in get_path_values(value).items():
-                        path_values[f"{key}.{path}"] = path_value
+            def get_path_values(obj):
+                path_values = dict()
+                if isinstance(obj, dict):
+                    for key, value in obj.items():
+                        path_values[key] = value
+                        for path, path_value in get_path_values(value).items():
+                            path_values[f"{key}.{path}"] = path_value
 
-            return path_values
+                return path_values
 
-        return get_path_values(self.obj)
+            self._path_value_map = get_path_values(self.obj)
+        return self._path_value_map
 
     @property
     def path_value_tuples(self) -> List[Tuple[str, object]]:
@@ -120,7 +126,7 @@ class JSONPriorConfig:
     def __contains__(self, item):
         return ".".join(item) in self.obj
 
-    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str]):
+    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str], fail_if_not_found=False):
         """
         Get configuration for a prior.
 
@@ -137,6 +143,8 @@ class JSONPriorConfig:
             The class with which the prior is associated.
         suffix_path
             The path to the prior.
+        fail_if_not_found
+            Search should only be repeated once.
 
         Returns
         -------
@@ -145,15 +153,20 @@ class JSONPriorConfig:
         for c in family(cls):
             try:
                 return self(path_for_class(c) + suffix_path)
-            except PriorException:
-                pass
+            except PriorException as e:
+                logger.exception(e)
+
+        if fail_if_not_found:
+            raise PriorException(
+                f"Could not find configuration for {cls.__name__} and {suffix_path}"
+            )
         path, value = make_config_for_class(cls)
 
         self.obj[".".join(path)] = value
 
         self.rearrange()
 
-        return self.for_class_and_suffix_path(cls, suffix_path)
+        return self.for_class_and_suffix_path(cls, suffix_path, fail_if_not_found=True)
 
     def rearrange(self):
         """
