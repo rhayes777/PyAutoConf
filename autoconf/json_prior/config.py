@@ -1,15 +1,20 @@
 import inspect
 import json
+import logging
+from glob import glob
 from typing import List, Type, Tuple
 
 from autoconf.exc import PriorException
 from autoconf.named import family
+
+logger = logging.getLogger(__name__)
 
 default_prior = {
     "type": "Uniform",
     "lower_limit": 0.0,
     "upper_limit": 1.0,
     "width_modifier": {"type": "Absolute", "value": 0.2},
+    "gaussian_limits": {"lower": 0.0, "upper": 1.0}
 }
 
 
@@ -59,6 +64,7 @@ class JSONPriorConfig:
         """
         self.obj = config_dict
         self.directory = directory
+        self._path_value_map = None
 
     @property
     def paths(self):
@@ -69,18 +75,20 @@ class JSONPriorConfig:
         """
         A dictionary matching every possible path to the configuration it points to.
         """
+        if self._path_value_map is None:
 
-        def get_path_values(obj):
-            path_values = dict()
-            if isinstance(obj, dict):
-                for key, value in obj.items():
-                    path_values[key] = value
-                    for path, path_value in get_path_values(value).items():
-                        path_values[f"{key}.{path}"] = path_value
+            def get_path_values(obj):
+                path_values = dict()
+                if isinstance(obj, dict):
+                    for key, value in obj.items():
+                        path_values[key] = value
+                        for path, path_value in get_path_values(value).items():
+                            path_values[f"{key}.{path}"] = path_value
 
-            return path_values
+                return path_values
 
-        return get_path_values(self.obj)
+            self._path_value_map = get_path_values(self.obj)
+        return self._path_value_map
 
     @property
     def path_value_tuples(self) -> List[Tuple[str, object]]:
@@ -95,21 +103,30 @@ class JSONPriorConfig:
         )
 
     @classmethod
-    def from_file(cls, filename: str) -> "JSONPriorConfig":
+    def from_directory(cls, directory: str) -> "JSONPriorConfig":
         """
         Load JSONPriorConfiguration from a file.
 
         Parameters
         ----------
-        filename
+        directory
             The path to a file.
 
         Returns
         -------
         A configuration instance.
         """
-        with open(filename) as f:
-            return JSONPriorConfig(json.load(f), directory=filename)
+        config_dict = dict()
+        for file in glob(f"{directory}/*.json"):
+            with open(file) as f:
+                config_dict[file.split("/")[-1].split(".")[0]] = json.load(f)
+
+        return JSONPriorConfig(config_dict, directory=directory)
+
+    def save(self):
+        for key in self.obj.keys():
+            with open(f"{self.directory}/{key}.json", "w+") as f:
+                json.dump(self.obj[key], f)
 
     def __str__(self):
         return json.dumps(self.obj)
@@ -120,7 +137,7 @@ class JSONPriorConfig:
     def __contains__(self, item):
         return ".".join(item) in self.obj
 
-    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str]):
+    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str], should_retry=True):
         """
         Get configuration for a prior.
 
@@ -133,6 +150,7 @@ class JSONPriorConfig:
 
         Parameters
         ----------
+        should_retry
         cls
             The class with which the prior is associated.
         suffix_path
@@ -147,13 +165,20 @@ class JSONPriorConfig:
                 return self(path_for_class(c) + suffix_path)
             except PriorException:
                 pass
+
+        if not should_retry:
+            raise PriorException(f"No config found for {cls} and {suffix_path}")
+
+        self._path_value_map = None
+
         path, value = make_config_for_class(cls)
 
         self.obj[".".join(path)] = value
 
         self.rearrange()
+        self.save()
 
-        return self.for_class_and_suffix_path(cls, suffix_path)
+        return self.for_class_and_suffix_path(cls, suffix_path, should_retry=False)
 
     def rearrange(self):
         """

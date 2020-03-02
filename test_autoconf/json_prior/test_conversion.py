@@ -11,11 +11,6 @@ def make_prior_directory():
     return str(Path(__file__).parent.parent / "test_files" / "config" / "priors")
 
 
-@pytest.fixture(name="prior_filename")
-def make_prior_filename(prior_directory):
-    return f"{prior_directory}.json"
-
-
 @pytest.fixture(name="converter")
 def make_converter(prior_directory):
     return c.Converter(prior_directory)
@@ -24,11 +19,6 @@ def make_converter(prior_directory):
 @pytest.fixture(name="prior_json")
 def make_prior_json(converter):
     return converter.dict
-
-
-def test_convert(prior_directory, prior_filename):
-    c.convert(prior_directory)
-    assert os.path.exists(prior_filename)
 
 
 def test_modules(converter):
@@ -47,6 +37,7 @@ class TestPrior:
             "type": "Uniform",
             "lower_limit": 0.0,
             "upper_limit": 1.0,
+            'gaussian_limits': {'lower': 0.0, 'upper': 10.0},
         }
 
     def test_gaussian(self, mock_json):
@@ -65,6 +56,12 @@ class TestPrior:
     )
     def test_constants(self, mock_json, key, type_string):
         assert mock_json["Tracer"][key]["type"] == type_string
+
+
+def test_limit(mock_json):
+    limit_dict = mock_json["MockClassNLOx4"]["four"]["gaussian_limits"]
+    assert limit_dict["lower"] == -120
+    assert limit_dict["upper"] == 120
 
 
 class TestWidth:
