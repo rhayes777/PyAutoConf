@@ -154,7 +154,7 @@ class JSONPriorConfig:
             try:
                 return self(path_for_class(c) + suffix_path)
             except PriorException as e:
-                logger.exception(e)
+                pass
 
         if fail_if_not_found:
             raise PriorException(
