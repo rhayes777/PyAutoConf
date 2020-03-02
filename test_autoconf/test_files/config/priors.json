@@ -16,9 +16,9 @@
                     "type": "Relative",
                     "value": 0.1
                 },
-                "limit": {
-                    "lower_limit": -Infinity,
-                    "upper_limit": Infinity
+                "gaussian_limits": {
+                    "lower": -Infinity,
+                    "upper": Infinity
                 }
             },
             "two": {
@@ -29,9 +29,9 @@
                     "type": "Relative",
                     "value": 0.5
                 },
-                "limit": {
-                    "lower_limit": -Infinity,
-                    "upper_limit": Infinity
+                "gaussian_limits": {
+                    "lower": -Infinity,
+                    "upper": Infinity
                 }
             },
             "three": {
@@ -42,9 +42,9 @@
                     "type": "Relative",
                     "value": 1.0
                 },
-                "limit": {
-                    "lower_limit": -Infinity,
-                    "upper_limit": Infinity
+                "gaussian_limits": {
+                    "lower": -Infinity,
+                    "upper": Infinity
                 }
             }
         },
@@ -79,9 +79,9 @@
                 "type": "Uniform",
                 "lower_limit": 0.0,
                 "upper_limit": 1.0,
-                "limit": {
-                    "lower_limit": 0.0,
-                    "upper_limit": 10.0
+                "gaussian_limits": {
+                    "lower": 0.0,
+                    "upper": 10.0
                 }
             }
         },
@@ -271,9 +271,9 @@
                     "type": "Absolute",
                     "value": 0.05
                 },
-                "limit": {
-                    "lower_limit": -Infinity,
-                    "upper_limit": Infinity
+                "gaussian_limits": {
+                    "lower": -Infinity,
+                    "upper": Infinity
                 }
             },
             "centre_1": {
@@ -284,9 +284,9 @@
                     "type": "Absolute",
                     "value": 0.05
                 },
-                "limit": {
-                    "lower_limit": -Infinity,
-                    "upper_limit": Infinity
+                "gaussian_limits": {
+                    "lower": -Infinity,
+                    "upper": Infinity
                 }
             }
         },
@@ -300,9 +300,9 @@
                     "type": "Absolute",
                     "value": 0.1
                 },
-                "limit": {
-                    "lower_limit": 0.0,
-                    "upper_limit": 1.0
+                "gaussian_limits": {
+                    "lower": 0.0,
+                    "upper": 1.0
                 }
             },
             "phi": {
@@ -313,9 +313,9 @@
                     "type": "Absolute",
                     "value": 10.0
                 },
-                "limit": {
-                    "lower_limit": 0.0,
-                    "upper_limit": 180.0
+                "gaussian_limits": {
+                    "lower": 0.0,
+                    "upper": 180.0
                 }
             }
         },
@@ -364,9 +364,9 @@
                     "type": "Absolute",
                     "value": 1.0
                 },
-                "limit": {
-                    "lower_limit": -120.0,
-                    "upper_limit": 120.0
+                "gaussian_limits": {
+                    "lower": -120.0,
+                    "upper": 120.0
                 }
             },
             "two": {
@@ -377,9 +377,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -120.0,
-                    "upper_limit": 120.0
+                "gaussian_limits": {
+                    "lower": -120.0,
+                    "upper": 120.0
                 }
             },
             "three": {
@@ -390,9 +390,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -120.0,
-                    "upper_limit": 120.0
+                "gaussian_limits": {
+                    "lower": -120.0,
+                    "upper": 120.0
                 }
             },
             "four": {
@@ -403,9 +403,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -120.0,
-                    "upper_limit": 120.0
+                "gaussian_limits": {
+                    "lower": -120.0,
+                    "upper": 120.0
                 }
             }
         },
@@ -418,9 +418,9 @@
                     "type": "Absolute",
                     "value": 1.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "two": {
@@ -431,9 +431,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "three": {
@@ -444,9 +444,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "four": {
@@ -457,9 +457,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "five": {
@@ -470,9 +470,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             }
         },
@@ -485,9 +485,9 @@
                     "type": "Absolute",
                     "value": 1.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "one_1": {
@@ -498,9 +498,9 @@
                     "type": "Absolute",
                     "value": 1.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "two_0": {
@@ -511,9 +511,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "two_1": {
@@ -524,9 +524,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "three": {
@@ -537,9 +537,9 @@
                     "type": "Absolute",
                     "value": 3.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             },
             "four": {
@@ -550,9 +550,9 @@
                     "type": "Absolute",
                     "value": 4.0
                 },
-                "limit": {
-                    "lower_limit": -100.0,
-                    "upper_limit": 101.0
+                "gaussian_limits": {
+                    "lower": -100.0,
+                    "upper": 101.0
                 }
             }
         },
@@ -565,9 +565,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -Infinity,
-                    "upper_limit": Infinity
+                "gaussian_limits": {
+                    "lower": -Infinity,
+                    "upper": Infinity
                 }
             }
         },
@@ -605,9 +605,9 @@
                     "type": "Absolute",
                     "value": 1.0
                 },
-                "limit": {
-                    "lower_limit": -10.0,
-                    "upper_limit": 10.0
+                "gaussian_limits": {
+                    "lower": -10.0,
+                    "upper": 10.0
                 }
             },
             "two": {
@@ -618,9 +618,9 @@
                     "type": "Absolute",
                     "value": 2.0
                 },
-                "limit": {
-                    "lower_limit": -10.0,
-                    "upper_limit": 10.0
+                "gaussian_limits": {
+                    "lower": -10.0,
+                    "upper": 10.0
                 }
             }
         },
@@ -691,9 +691,9 @@
                     "type": "Absolute",
                     "value": 0.0
                 },
-                "limit": {
-                    "lower_limit": 0.0,
-                    "upper_limit": 1.0
+                "gaussian_limits": {
+                    "lower": 0.0,
+                    "upper": 1.0
                 }
             },
             "centre_1": {
@@ -704,9 +704,9 @@
                     "type": "Absolute",
                     "value": 0.0
                 },
-                "limit": {
-                    "lower_limit": 0.0,
-                    "upper_limit": 1.0
+                "gaussian_limits": {
+                    "lower": 0.0,
+                    "upper": 1.0
                 }
             },
             "intensity": {
@@ -717,9 +717,9 @@
                     "type": "Absolute",
                     "value": 0.0
                 },
-                "limit": {
-                    "lower_limit": 0.0,
-                    "upper_limit": 1.0
+                "gaussian_limits": {
+                    "lower": 0.0,
+                    "upper": 1.0
                 }
             }
         },

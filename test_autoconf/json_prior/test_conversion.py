@@ -47,7 +47,7 @@ class TestPrior:
             "type": "Uniform",
             "lower_limit": 0.0,
             "upper_limit": 1.0,
-            'limit': {'lower_limit': 0.0, 'upper_limit': 10.0},
+            'gaussian_limits': {'lower': 0.0, 'upper': 10.0},
         }
 
     def test_gaussian(self, mock_json):
@@ -69,9 +69,9 @@ class TestPrior:
 
 
 def test_limit(mock_json):
-    limit_dict = mock_json["MockClassNLOx4"]["four"]["limit"]
-    assert limit_dict["lower_limit"] == -120
-    assert limit_dict["upper_limit"] == 120
+    limit_dict = mock_json["MockClassNLOx4"]["four"]["gaussian_limits"]
+    assert limit_dict["lower"] == -120
+    assert limit_dict["upper"] == 120
 
 
 class TestWidth:

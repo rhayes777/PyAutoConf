@@ -60,12 +60,20 @@ def test_rearrange(config, my_class_config):
                             "type": "Uniform",
                             "upper_limit": 1.0,
                             "width_modifier": {"type": "Absolute", "value": 0.2},
+                            "gaussian_limits": {
+                                "lower": 0.0,
+                                "upper": 1.0
+                            }
                         },
                         "two": {
                             "lower_limit": 0.0,
                             "type": "Uniform",
                             "upper_limit": 1.0,
                             "width_modifier": {"type": "Absolute", "value": 0.2},
+                            "gaussian_limits": {
+                                "lower": 0.0,
+                                "upper": 1.0
+                            }
                         },
                     },
                 },

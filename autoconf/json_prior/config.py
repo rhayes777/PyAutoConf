@@ -13,6 +13,7 @@ default_prior = {
     "lower_limit": 0.0,
     "upper_limit": 1.0,
     "width_modifier": {"type": "Absolute", "value": 0.2},
+    "gaussian_limits": {"lower": 0.0, "upper": 1.0}
 }
 
 
@@ -126,7 +127,7 @@ class JSONPriorConfig:
     def __contains__(self, item):
         return ".".join(item) in self.obj
 
-    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str], fail_if_not_found=False):
+    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str]):
         """
         Get configuration for a prior.
 
@@ -143,8 +144,6 @@ class JSONPriorConfig:
             The class with which the prior is associated.
         suffix_path
             The path to the prior.
-        fail_if_not_found
-            Search should only be repeated once.
 
         Returns
         -------
@@ -153,20 +152,18 @@ class JSONPriorConfig:
         for c in family(cls):
             try:
                 return self(path_for_class(c) + suffix_path)
-            except PriorException as e:
+            except PriorException:
                 pass
 
-        if fail_if_not_found:
-            raise PriorException(
-                f"Could not find configuration for {cls.__name__} and {suffix_path}"
-            )
+        self._path_value_map = None
+
         path, value = make_config_for_class(cls)
 
         self.obj[".".join(path)] = value
 
         self.rearrange()
 
-        return self.for_class_and_suffix_path(cls, suffix_path, fail_if_not_found=True)
+        return self.for_class_and_suffix_path(cls, suffix_path)
 
     def rearrange(self):
         """
