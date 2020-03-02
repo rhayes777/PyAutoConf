@@ -127,7 +127,7 @@ class JSONPriorConfig:
     def __contains__(self, item):
         return ".".join(item) in self.obj
 
-    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str]):
+    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str], should_retry=True):
         """
         Get configuration for a prior.
 
@@ -155,6 +155,9 @@ class JSONPriorConfig:
             except PriorException:
                 pass
 
+        if not should_retry:
+            raise PriorException("No config found")
+
         self._path_value_map = None
 
         path, value = make_config_for_class(cls)
@@ -163,7 +166,7 @@ class JSONPriorConfig:
 
         self.rearrange()
 
-        return self.for_class_and_suffix_path(cls, suffix_path)
+        return self.for_class_and_suffix_path(cls, suffix_path, should_retry=False)
 
     def rearrange(self):
         """
