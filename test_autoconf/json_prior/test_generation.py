@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 import autoconf as ac
@@ -22,7 +24,9 @@ def test_make_config(my_class_config):
 
 @pytest.fixture(name="filename")
 def make_filename():
-    return "priors.json"
+    filename = "priors"
+    os.makedirs(filename, exist_ok=True)
+    return filename
 
 
 @pytest.fixture(name="config")
