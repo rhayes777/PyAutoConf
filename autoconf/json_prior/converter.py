@@ -155,7 +155,7 @@ class Prior(Object):
             pass
         if self.type_character in ("u", "l"):
             try:
-                prior_dict["limit"] = {
+                prior_dict["gaussian_limits"] = {
                     "lower": float(self.limit_array[0]),
                     "upper": float(self.limit_array[1]),
                 }
