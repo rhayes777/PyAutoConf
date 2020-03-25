@@ -126,7 +126,7 @@ class JSONPriorConfig:
     def save(self):
         for key in self.obj.keys():
             with open(f"{self.directory}/{key}.json", "w+") as f:
-                json.dump(self.obj[key], f)
+                json.dump(self.obj[key], f, indent=4)
 
     def __str__(self):
         return json.dumps(self.obj)
