@@ -126,7 +126,7 @@ class JSONPriorConfig:
     def save(self):
         for key in self.obj.keys():
             with open(f"{self.directory}/{key}.json", "w+") as f:
-                json.dump(self.obj[key], f)
+                json.dump(self.obj[key], f, indent=4)
 
     def __str__(self):
         return json.dumps(self.obj)
@@ -178,7 +178,11 @@ class JSONPriorConfig:
         self.rearrange()
         self.save()
 
-        return self.for_class_and_suffix_path(cls, suffix_path, should_retry=False)
+        return self.for_class_and_suffix_path(
+            cls,
+            suffix_path,
+            should_retry=False
+        )
 
     def rearrange(self):
         """
