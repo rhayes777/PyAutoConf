@@ -1,0 +1,40 @@
+{
+    "json_prior": {
+        "test_generation": {
+            "ClassOne": {
+                "attribute": {}
+            },
+            "MyClass": {
+                "one": {
+                    "type": "Uniform",
+                    "lower_limit": 0.0,
+                    "upper_limit": 1.0,
+                    "width_modifier": {
+                        "type": "Absolute",
+                        "value": 0.2
+                    },
+                    "gaussian_limits": {
+                        "lower": 0.0,
+                        "upper": 1.0
+                    }
+                },
+                "two": {
+                    "type": "Uniform",
+                    "lower_limit": 0.0,
+                    "upper_limit": 1.0,
+                    "width_modifier": {
+                        "type": "Absolute",
+                        "value": 0.2
+                    },
+                    "gaussian_limits": {
+                        "lower": 0.0,
+                        "upper": 1.0
+                    }
+                }
+            }
+        },
+        "different_module": {
+            "ClassThree.attribute": {}
+        }
+    }
+}

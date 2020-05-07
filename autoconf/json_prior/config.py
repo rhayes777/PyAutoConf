@@ -178,7 +178,11 @@ class JSONPriorConfig:
         self.rearrange()
         self.save()
 
-        return self.for_class_and_suffix_path(cls, suffix_path, should_retry=False)
+        return self.for_class_and_suffix_path(
+            cls,
+            suffix_path,
+            should_retry=False
+        )
 
     def rearrange(self):
         """

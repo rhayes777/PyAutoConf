@@ -9,6 +9,14 @@ def get_matplotlib_backend():
     return instance.visualize_general.get("general", "backend", str)
 
 
+class NonLinear:
+    def __init__(self, directory):
+        self.directory = directory
+
+    def config_for(self, name):
+        return NamedConfig(f"{self.directory}/{name}.ini")
+
+
 class Config:
     def __init__(self, config_path, output_path="output"):
         self.config_path = config_path
@@ -16,8 +24,9 @@ class Config:
         if not os.path.exists(json_config_path):
             convert(f"{config_path}/priors", json_config_path)
         self.prior_config = JSONPriorConfig.from_directory(json_config_path)
-
-        self.non_linear = NamedConfig("{}/non_linear.ini".format(config_path))
+        self.non_linear = NonLinear(
+            f"{config_path}/non_linear"
+        )
         self.label = LabelConfig("{}/label.ini".format(config_path))
         self.label_format = NamedConfig("{}/label_format.ini".format(config_path))
         self.general = NamedConfig("{}/general.ini".format(config_path))
