@@ -1,0 +1,10 @@
+{
+    "json_prior": {
+        "test_generation": {
+            "ClassOne.attribute": {}
+        },
+        "different_module": {
+            "ClassThree.attribute": {}
+        }
+    }
+}
