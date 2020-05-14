@@ -18,7 +18,7 @@ def make_my_class_config():
 
 def test_make_config(my_class_config):
     path, value = ac.make_config_for_class(MyClass)
-    assert path == ["test_autoconf", "json_prior", "test_generation", "MyClass"]
+    assert path == ["json_prior", "test_generation", "MyClass"]
     assert value == my_class_config
 
 
@@ -52,35 +52,41 @@ def test_generate(result):
 
 def test_rearrange(config, my_class_config):
     assert config.obj == {
-        "different_project": {"json_prior.test_generation.ClassTwo.attribute": {}},
-        "test_autoconf": {
-            "json_prior": {
-                "different_module": {"ClassThree.attribute": {}},
-                "test_generation": {
-                    "ClassOne": {"attribute": {}},
-                    "MyClass": {
-                        "one": {
-                            "lower_limit": 0.0,
-                            "type": "Uniform",
-                            "upper_limit": 1.0,
-                            "width_modifier": {"type": "Absolute", "value": 0.2},
-                            "gaussian_limits": {
-                                "lower": 0.0,
-                                "upper": 1.0
-                            }
-                        },
-                        "two": {
-                            "lower_limit": 0.0,
-                            "type": "Uniform",
-                            "upper_limit": 1.0,
-                            "width_modifier": {"type": "Absolute", "value": 0.2},
-                            "gaussian_limits": {
-                                "lower": 0.0,
-                                "upper": 1.0
-                            }
-                        },
+        'different_project': {'json_prior.test_generation.ClassTwo.attribute': {}},
+        'json_prior': {
+            'test_generation.MyClass': {
+                'one': {
+                    'gaussian_limits': {
+                        'lower': 0.0,
+                        'upper': 1.0
                     },
+                    'lower_limit': 0.0,
+                    'type': 'Uniform',
+                    'upper_limit': 1.0,
+                    'width_modifier': {
+                        'type': 'Absolute',
+                        'value': 0.2
+                    }
                 },
+                'two': {
+                    'gaussian_limits': {
+                        'lower': 0.0,
+                        'upper': 1.0
+                    },
+                    'lower_limit': 0.0,
+                    'type': 'Uniform',
+                    'upper_limit': 1.0,
+                    'width_modifier': {
+                        'type': 'Absolute',
+                        'value': 0.2
+                    }
+                }
             }
         },
+        'test_autoconf': {
+            'json_prior': {
+                'different_module': {'ClassThree.attribute': {}},
+                'test_generation': {'ClassOne.attribute': {}}
+            }
+        }
     }
