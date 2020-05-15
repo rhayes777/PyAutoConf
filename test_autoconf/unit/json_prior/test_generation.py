@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-import autoconf as ac
+import autoconf as aconf
 
 
 class MyClass:
@@ -13,11 +13,11 @@ class MyClass:
 
 @pytest.fixture(name="my_class_config")
 def make_my_class_config():
-    return {"one": ac.default_prior, "two": ac.default_prior}
+    return {"one": aconf.default_prior, "two": aconf.default_prior}
 
 
 def test_make_config(my_class_config):
-    path, value = ac.make_config_for_class(MyClass)
+    path, value = aconf.make_config_for_class(MyClass)
     assert path == ["json_prior", "test_generation", "MyClass"]
     assert value == my_class_config
 
@@ -31,7 +31,7 @@ def make_filename():
 
 @pytest.fixture(name="config")
 def make_config(filename):
-    return ac.JSONPriorConfig(
+    return aconf.JSONPriorConfig(
         {
             "test_autoconf.json_prior.test_generation.ClassOne": {"attribute": {}},
             "different_project.json_prior.test_generation.ClassTwo": {"attribute": {}},
@@ -47,7 +47,7 @@ def make_result(config):
 
 
 def test_generate(result):
-    assert result == ac.default_prior
+    assert result == aconf.default_prior
 
 
 def test_rearrange(config, my_class_config):

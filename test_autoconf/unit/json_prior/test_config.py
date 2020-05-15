@@ -1,6 +1,6 @@
 import pytest
 
-import autoconf as ac
+import autoconf as aconf
 from test_autoconf.mock import GeometryProfile
 
 
@@ -10,7 +10,7 @@ def make_geometry_profile_path():
 
 
 def test_path_for_class(geometry_profile_path):
-    assert ac.path_for_class(GeometryProfile) == geometry_profile_path
+    assert aconf.path_for_class(GeometryProfile) == geometry_profile_path
 
 
 @pytest.mark.parametrize(
@@ -60,7 +60,7 @@ def test_path_for_class(geometry_profile_path):
     ],
 )
 def test_paths(config_dict, paths):
-    config = ac.JSONPriorConfig(config_dict)
+    config = aconf.JSONPriorConfig(config_dict)
     assert config.paths == paths
 
 
@@ -79,11 +79,11 @@ def test_paths(config_dict, paths):
     ],
 )
 def test_config_for_path(geometry_profile_path, config_dict):
-    config = ac.JSONPriorConfig(config_dict)
+    config = aconf.JSONPriorConfig(config_dict)
     assert config(geometry_profile_path) == "test"
     assert config(["test_autoconf", "mock", "Other"]) == "toast"
 
 
 def test_path_double():
-    config = ac.JSONPriorConfig({"mock": {"GeometryProfile": "test"}})
+    config = aconf.JSONPriorConfig({"mock": {"GeometryProfile": "test"}})
     assert config(["something", "mock", "mock", "GeometryProfile"]) == "test"

@@ -8,7 +8,7 @@ from autoconf.json_prior import converter as c
 
 @pytest.fixture(name="prior_directory")
 def make_prior_directory():
-    return str(Path(__file__).parent.parent / "test_files" / "config" / "priors")
+    return str(Path(__file__).parent.parent / "files" / "config" / "priors")
 
 
 @pytest.fixture(name="converter")
