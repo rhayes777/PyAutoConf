@@ -32,7 +32,7 @@ def make_filename():
 @pytest.fixture(name="config")
 def make_config(filename):
     return aconf.JSONPriorConfig(
-        {
+        config_dict={
             "test_autoconf.json_prior.test_generation.ClassOne": {"attribute": {}},
             "different_project.json_prior.test_generation.ClassTwo": {"attribute": {}},
             "test_autoconf.json_prior.different_module.ClassThree": {"attribute": {}},

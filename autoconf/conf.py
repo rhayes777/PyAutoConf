@@ -27,8 +27,9 @@ class Config:
         self.non_linear = NonLinear(
             f"{config_path}/non_linear"
         )
-        self.label = LabelConfig("{}/label.ini".format(config_path))
-        self.label_format = NamedConfig("{}/label_format.ini".format(config_path))
+        self.label = LabelConfig("{}/notation/label.ini".format(config_path))
+        self.label_format = NamedConfig("{}/notation/label_format.ini".format(config_path))
+        self.tag = LabelConfig("{}/notation/tags.ini".format(config_path))
         self.general = NamedConfig("{}/general.ini".format(config_path))
         self.visualize_general = NamedConfig(
             "{}/visualize/general.ini".format(config_path)
@@ -40,12 +41,17 @@ class Config:
         self.visualize_subplots = NamedConfig(
             "{}/visualize/subplots.ini".format(config_path)
         )
+        self.interpolate = NamedConfig(
+            "{}/grids/interpolate.ini".format(config_path)
+        )
+        self.radial_min = NamedConfig(
+            "{}/grids/radial_minimum.ini".format(config_path)
+        )
         self.output_path = output_path
 
 
 def is_config_in(folder):
     return os.path.isdir("{}/config".format(folder))
-
 
 """
 Search for default configuration and put output in the same folder as config.
