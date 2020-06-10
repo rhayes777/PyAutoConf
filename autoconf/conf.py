@@ -24,9 +24,23 @@ class Config:
         if not os.path.exists(json_config_path):
             convert(f"{config_path}/priors", json_config_path)
         self.prior_config = JSONPriorConfig.from_directory(json_config_path)
+
         self.non_linear = NonLinear(
             f"{config_path}/non_linear"
         )
+        self.optimize = NonLinear(
+            f"{config_path}/non_linear/optimize"
+        )
+        self.mcmc = NonLinear(
+            f"{config_path}/non_linear/mcmc"
+        )
+        self.nest = NonLinear(
+            f"{config_path}/non_linear/nest"
+        )
+        self.mock = NonLinear(
+            f"{config_path}/non_linear/mock"
+        )
+
         self.label = LabelConfig("{}/notation/label.ini".format(config_path))
         self.label_format = NamedConfig("{}/notation/label_format.ini".format(config_path))
         self.tag = LabelConfig("{}/notation/tags.ini".format(config_path))
