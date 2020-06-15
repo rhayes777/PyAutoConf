@@ -22,7 +22,7 @@ class SphericalProfile(GeometryProfile):
 
 
 class EllipticalProfile(SphericalProfile):
-    def __init__(self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0):
+    def __init__(self, centre=(0.0, 0.0),             elliptical_comps=(0.0, 0.0)):
         """ Generic elliptical profiles class to contain functions shared by light
         and mass profiles.
 
@@ -43,7 +43,7 @@ class EllipticalProfile(SphericalProfile):
 class EllipticalLP(EllipticalProfile):
     """Generic class for an elliptical light profiles"""
 
-    def __init__(self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0):
+    def __init__(self, centre=(0.0, 0.0),             elliptical_comps=(0.0, 0.0)):
         """  Abstract class for an elliptical light-profile.
 
         Parameters
@@ -60,7 +60,7 @@ class EllipticalLP(EllipticalProfile):
 
 class EllipticalGaussian(EllipticalLP):
     def __init__(
-        self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
+        self, centre=(0.0, 0.0),             elliptical_comps=(0.0, 0.0), intensity=0.1, sigma=0.01
     ):
         """ The elliptical Gaussian profile.
 

@@ -354,7 +354,7 @@
             "upper_limit": 1.0
         }
     },
-    "MockClassNLOx4": {
+    "MockClassx4": {
         "one": {
             "type": "Uniform",
             "lower_limit": -120.0,
@@ -408,7 +408,7 @@
             }
         }
     },
-    "MockClassNLOx5": {
+    "MockClassx5": {
         "one": {
             "type": "Uniform",
             "lower_limit": -100.0,
@@ -475,20 +475,6 @@
             }
         }
     },
-    "MockClassNLOx6": {
-        "one_0": {
-            "type": "Uniform",
-            "lower_limit": -100.0,
-            "upper_limit": 101.0,
-            "width_modifier": {
-                "type": "Absolute",
-                "value": 1.0
-            },
-            "gaussian_limits": {
-                "lower": -100.0,
-                "upper": 101.0
-            }
-        },
         "one_1": {
             "type": "Uniform",
             "lower_limit": -100.0,
