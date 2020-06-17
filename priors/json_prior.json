@@ -1,6 +1,6 @@
 {
     "test_generation.MyClass": {
-        "one": {
+        "two": {
             "type": "Uniform",
             "lower_limit": 0.0,
             "upper_limit": 1.0,
@@ -13,7 +13,7 @@
                 "upper": 1.0
             }
         },
-        "two": {
+        "one": {
             "type": "Uniform",
             "lower_limit": 0.0,
             "upper_limit": 1.0,
