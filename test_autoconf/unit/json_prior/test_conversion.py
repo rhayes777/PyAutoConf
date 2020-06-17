@@ -59,7 +59,7 @@ class TestPrior:
 
 
 def test_limit(mock_json):
-    limit_dict = mock_json["MockClassNLOx4"]["four"]["gaussian_limits"]
+    limit_dict = mock_json["MockClassx4"]["four"]["gaussian_limits"]
     assert limit_dict["lower"] == -120
     assert limit_dict["upper"] == 120
 
