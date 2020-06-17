@@ -5,10 +5,25 @@ import pytest
 import autoconf as aconf
 
 
+class TupleClass:
+    def __init__(self, t=(0.0, 0.0)):
+        self.t = t
+
+
 class MyClass:
     def __init__(self, one, two):
         self.one = one
         self.two = two
+
+
+def test_with_tuple():
+    _, value = aconf.make_config_for_class(
+        TupleClass
+    )
+    assert value == {
+        "t_0": aconf.default_prior,
+        "t_1": aconf.default_prior
+    }
 
 
 @pytest.fixture(name="my_class_config")
