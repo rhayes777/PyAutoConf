@@ -1,14 +1,4 @@
-class GeometryProfile:
-    def __init__(self, centre=(0.0, 0.0)):
-        """Abstract GeometryProfile, describing an object with y, x cartesian
-        coordinates """
-        self.centre = centre
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-
-
-class SphericalProfile(GeometryProfile):
+class SphericalProfile():
     def __init__(self, centre=(0.0, 0.0)):
         """ Generic circular profiles class to contain functions shared by light and
         mass profiles.
@@ -18,11 +8,10 @@ class SphericalProfile(GeometryProfile):
         centre: (float, float)
             The (y,x) coordinates of the origin of the profile.
         """
-        super(SphericalProfile, self).__init__(centre)
-
+        self.centre = centre
 
 class EllipticalProfile(SphericalProfile):
-    def __init__(self, centre=(0.0, 0.0),             elliptical_comps=(0.0, 0.0)):
+    def __init__(self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0):
         """ Generic elliptical profiles class to contain functions shared by light
         and mass profiles.
 
@@ -40,27 +29,9 @@ class EllipticalProfile(SphericalProfile):
         self.phi = phi
 
 
-class EllipticalLP(EllipticalProfile):
-    """Generic class for an elliptical light profiles"""
-
-    def __init__(self, centre=(0.0, 0.0),             elliptical_comps=(0.0, 0.0)):
-        """  Abstract class for an elliptical light-profile.
-
-        Parameters
-        ----------
-        centre: (float, float)
-            The (y,x) coordinates of the origin of the profiles
-        axis_ratio : float
-            Ratio of light profiles ellipse's minor and major axes (b/a)
-        phi : float
-            Rotational angle of profiles ellipse counter-clockwise from positive x-axis
-        """
-        super(EllipticalLP, self).__init__(centre, axis_ratio, phi)
-
-
-class EllipticalGaussian(EllipticalLP):
+class EllipticalGaussian(EllipticalProfile):
     def __init__(
-        self, centre=(0.0, 0.0),             elliptical_comps=(0.0, 0.0), intensity=0.1, sigma=0.01
+        self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
     ):
         """ The elliptical Gaussian profile.
 
