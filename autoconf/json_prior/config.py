@@ -1,6 +1,7 @@
 import inspect
 import json
 import logging
+from collections import Sized
 from glob import glob
 from typing import List, Type, Tuple
 
@@ -20,8 +21,23 @@ default_prior = {
 
 def make_config_for_class(cls):
     path = path_for_class(cls)
-    arguments = inspect.getfullargspec(cls).args[1:]
-    config = {argument: default_prior for argument in arguments}
+    arg_spec = inspect.getfullargspec(cls)
+    arguments = arg_spec.args[1:]
+    defaults = list(reversed(arg_spec.defaults or list()))
+
+    config = dict()
+    for i, argument in enumerate(reversed(arguments)):
+        if i < len(defaults):
+            default = defaults[i]
+            if isinstance(
+                    default,
+                    Sized
+            ):
+                for j in range(len(default)):
+                    config[f"{argument}_{j}"] = default_prior
+                continue
+        config[argument] = default_prior
+
     return path, config
 
 

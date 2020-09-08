@@ -43,7 +43,8 @@ class Config:
 
         self.label = LabelConfig("{}/notation/label.ini".format(config_path))
         self.label_format = NamedConfig("{}/notation/label_format.ini".format(config_path))
-        self.tag = LabelConfig("{}/notation/tags.ini".format(config_path))
+        self.settings_tag = LabelConfig("{}/notation/settings_tags.ini".format(config_path))
+        self.setup_tag = LabelConfig("{}/notation/setup_tags.ini".format(config_path))
         self.general = NamedConfig("{}/general.ini".format(config_path))
         self.visualize_general = NamedConfig(
             "{}/visualize/general.ini".format(config_path)

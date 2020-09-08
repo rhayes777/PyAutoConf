@@ -7,7 +7,7 @@ import autoconf.named
 
 directory = path.dirname(path.realpath(__file__))
 
-from test_autoconf.mock import EllipticalLP, EllipticalGaussian
+from test_autoconf.mock_real import EllipticalProfile, EllipticalGaussian
 
 
 class MockClass:
@@ -31,7 +31,7 @@ class TestLabel:
         assert label_config.label("contribution_factor") == r"\omega0"
 
     def test_subscript(self, label_config):
-        assert label_config.subscript(EllipticalLP) == "l"
+        assert label_config.subscript(EllipticalProfile) == "l"
 
     def test_inheritance(self, label_config):
         assert label_config.subscript(EllipticalGaussian) == "l"
