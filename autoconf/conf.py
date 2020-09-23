@@ -7,7 +7,10 @@ from autoconf.named import NamedConfig, AbstractConfig
 
 
 def get_matplotlib_backend():
-    return instance["visualize_general"]["general"]["backend"]
+    try:
+        return instance["visualize_general"]["general"]["backend"]
+    except KeyError:
+        return "default"
 
 
 class RecursiveConfig(AbstractConfig):
@@ -31,6 +34,9 @@ class RecursiveConfig(AbstractConfig):
             return RecursiveConfig(
                 item_path
             )
+        raise KeyError(
+            f"No configuration found for {item} at path {self.path}"
+        )
 
 
 class Config(RecursiveConfig):
