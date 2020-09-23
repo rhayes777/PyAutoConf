@@ -1,5 +1,4 @@
 from autoconf import exc
-from autoconf.conf import NonLinear
 from autoconf.conf import Config
 from autoconf.conf import instance
 from autoconf.json_prior.config import default_prior

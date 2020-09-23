@@ -1,10 +1,38 @@
 import configparser
+from abc import abstractmethod, ABC
 from copy import deepcopy
 
-from autoconf import exc
+
+class AbstractConfig(ABC):
+    @abstractmethod
+    def __getitem__(self, item):
+        pass
+
+    def family(self, cls):
+        for cls in family(cls):
+            key = cls.__name__
+            try:
+                return self[key]
+            except (KeyError, configparser.NoOptionError):
+                pass
+        raise KeyError(
+            f"No configuration found for {cls.__name__}"
+        )
 
 
-class NamedConfig:
+class SectionConfig(AbstractConfig):
+    def __init__(self, parser, section):
+        self.parser = parser
+        self.section = section
+
+    def __getitem__(self, item):
+        return self.parser.get(
+            self.section,
+            item
+        )
+
+
+class NamedConfig(AbstractConfig):
     """Parses generic config"""
 
     def __init__(self, config_path):
@@ -25,6 +53,12 @@ class NamedConfig:
         for k, v in self.__dict__.items():
             setattr(result, k, v if k == "parser" else deepcopy(v, memo))
         return result
+
+    def __getitem__(self, item):
+        return SectionConfig(
+            self.parser,
+            item
+        )
 
     def __eq__(self, other):
         return isinstance(other, NamedConfig) and self.path == other.path
@@ -87,19 +121,3 @@ def family(current_class):
     for next_class in current_class.__bases__:
         for val in family(next_class):
             yield val
-
-
-class LabelConfig(NamedConfig):
-    def label(self, name):
-        return self.get("label", name)
-
-    def subscript(self, cls):
-        for family_cls in family(cls):
-            if self.has("subscript", family_cls.__name__):
-                return self.get("subscript", family_cls.__name__)
-
-        ini_filename = cls.__module__.split(".")[-1]
-        raise exc.PriorException(
-            "The prior config at {}/{} does not a subscript for {} or any of its "
-            "parents".format(self.path, ini_filename, cls.__name__)
-        )
