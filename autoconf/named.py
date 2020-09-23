@@ -26,10 +26,19 @@ class SectionConfig(AbstractConfig):
         self.section = section
 
     def __getitem__(self, item):
-        return self.parser.get(
+        result = self.parser.get(
             self.section,
             item
         )
+        if result.lower() == "true":
+            return True
+        if result.lower() == "false":
+            return False
+        if result.isdigit():
+            if "." in result:
+                return float(result)
+            return int(result)
+        return result
 
 
 class NamedConfig(AbstractConfig):
