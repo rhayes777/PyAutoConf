@@ -34,6 +34,8 @@ class SectionConfig(AbstractConfig):
             return True
         if result.lower() == "false":
             return False
+        if result.lower() in ("none", "null"):
+            return None
         if result.isdigit():
             return int(result)
         try:
