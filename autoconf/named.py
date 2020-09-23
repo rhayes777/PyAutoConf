@@ -35,10 +35,11 @@ class SectionConfig(AbstractConfig):
         if result.lower() == "false":
             return False
         if result.isdigit():
-            if "." in result:
-                return float(result)
             return int(result)
-        return result
+        try:
+            return float(result)
+        except ValueError:
+            return result
 
 
 class NamedConfig(AbstractConfig):
