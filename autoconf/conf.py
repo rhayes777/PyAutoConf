@@ -86,6 +86,14 @@ class Config(RecursiveConfig):
         # )
         self.output_path = output_path
 
+    @classmethod
+    def for_directory(cls, directory):
+        directory_path = Path(directory)
+        return Config(
+            directory_path / "config",
+            directory_path / "output"
+        )
+
 
 def is_config_in(folder):
     return os.path.isdir("{}/config".format(folder))
