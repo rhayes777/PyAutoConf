@@ -47,43 +47,23 @@ class Config(RecursiveConfig):
             convert(f"{config_path}/priors", json_config_path)
         self.prior_config = JSONPriorConfig.from_directory(json_config_path)
 
-        # self.non_linear = NamedConfig(
-        #     f"{config_path}/non_linear"
-        # )
-        # self.optimize = NamedConfig(
-        #     f"{config_path}/non_linear/optimize"
-        # )
-        # self.mcmc = NamedConfig(
-        #     f"{config_path}/non_linear/mcmc"
-        # )
-        # self.nest = NamedConfig(
-        #     f"{config_path}/non_linear/nest"
-        # )
-        # self.mock = NamedConfig(
-        #     f"{config_path}/non_linear/mock"
-        # )
+        # self.non_linear = NamedConfig(f"{config_path}/non_linear")
+        # self.optimize = NamedConfig(f"{config_path}/non_linear/optimize")
+        # self.mcmc = NamedConfig(f"{config_path}/non_linear/mcmc")
+        # self.nest = NamedConfig(f"{config_path}/non_linear/nest")
+        # self.mock = NamedConfig(f"{config_path}/non_linear/mock")
         #
         # self.label = NamedConfig("{}/notation/label.ini".format(config_path))
         # self.label_format = NamedConfig("{}/notation/label_format.ini".format(config_path))
         # self.settings_tag = NamedConfig("{}/notation/settings_tags.ini".format(config_path))
         # self.setup_tag = NamedConfig("{}/notation/setup_tags.ini".format(config_path))
         # self.general = NamedConfig("{}/general.ini".format(config_path))
-        # self.visualize_general = NamedConfig(
-        #     "{}/visualize/general.ini".format(config_path)
-        # )
+        # self.visualize_general = NamedConfig("{}/visualize/general.ini".format(config_path))
         # self.visualize_plots = NamedConfig("{}/visualize/plots.ini".format(config_path))
-        # self.visualize_figures = NamedConfig(
-        #     "{}/visualize/figures.ini".format(config_path)
-        # )
-        # self.visualize_subplots = NamedConfig(
-        #     "{}/visualize/subplots.ini".format(config_path)
-        # )
-        # self.interpolate = NamedConfig(
-        #     "{}/grids/interpolate.ini".format(config_path)
-        # )
-        # self.radial_min = NamedConfig(
-        #     "{}/grids/radial_minimum.ini".format(config_path)
-        # )
+        # self.visualize_figures = NamedConfig("{}/visualize/figures.ini".format(config_path))
+        # self.visualize_subplots = NamedConfig("{}/visualize/subplots.ini".format(config_path))
+        # self.interpolate = NamedConfig("{}/grids/interpolate.ini".format(config_path))
+        # self.radial_min = NamedConfig("{}/grids/radial_minimum.ini".format(config_path))
         self.output_path = output_path
 
     @classmethod
