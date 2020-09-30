@@ -21,15 +21,22 @@ class AbstractConfig(ABC):
 
 
 class SectionConfig(AbstractConfig):
-    def __init__(self, parser, section):
-        self.parser = parser
+    def __init__(self, path, section):
+        self.path = path
         self.section = section
+        self.parser = configparser.ConfigParser()
+        self.parser.read(path)
 
     def __getitem__(self, item):
-        result = self.parser.get(
-            self.section,
-            item
-        )
+        try:
+            result = self.parser.get(
+                self.section,
+                item
+            )
+        except (configparser.NoSectionError, configparser.NoOptionError):
+            raise KeyError(
+                f"No configuration found for {item} at path {self.path}"
+            )
         if result.lower() == "true":
             return True
         if result.lower() == "false":
@@ -68,7 +75,7 @@ class NamedConfig(AbstractConfig):
 
     def __getitem__(self, item):
         return SectionConfig(
-            self.parser,
+            self.path,
             item
         )
 
