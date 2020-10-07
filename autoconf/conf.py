@@ -53,10 +53,7 @@ class RecursiveConfig(AbstractConfig):
 class Config(RecursiveConfig):
     def __init__(self, config_path, output_path="output", default_config_paths=tuple()):
         super().__init__(config_path)
-        json_config_path = f"{config_path}/json_priors"
-        if not os.path.exists(json_config_path):
-            convert(f"{config_path}/priors", json_config_path)
-        self.prior_config = JSONPriorConfig.from_directory(json_config_path)
+        self._prior_config = None
 
         self._default_configs = list(map(
             RecursiveConfig,
@@ -82,9 +79,26 @@ class Config(RecursiveConfig):
         # self.radial_min = NamedConfig("{}/grids/radial_minimum.ini".format(config_path))
         self.output_path = output_path
 
+    @property
+    def prior_config(self):
+        if self._prior_config is None:
+            self._prior_config = JSONPriorConfig.from_directory(
+                self.path / "json_priors"
+            )
+        return self._prior_config
+
     def add_default(self, config_path):
         self._default_configs.append(
             RecursiveConfig(config_path)
+        )
+
+    def push(self, new_path):
+        return Config(
+            new_path,
+            output_path=self.output_path,
+            default_config_paths=(
+                self.path,
+            )
         )
 
     @classmethod
