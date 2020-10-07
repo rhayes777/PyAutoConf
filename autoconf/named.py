@@ -4,6 +4,20 @@ from copy import deepcopy
 
 
 class AbstractConfig(ABC):
+    def __init__(self, default_configs=tuple()):
+        self._default_configs = default_configs
+
+    def _default_configs_for_item(self, item):
+        _default_configs_for_item = list()
+        for config in self._default_configs:
+            try:
+                _default_configs_for_item.append(
+                    config[item]
+                )
+            except KeyError:
+                pass
+        return tuple(_default_configs_for_item)
+
     @abstractmethod
     def __getitem__(self, item):
         pass
@@ -21,7 +35,8 @@ class AbstractConfig(ABC):
 
 
 class SectionConfig(AbstractConfig):
-    def __init__(self, path, section):
+    def __init__(self, path, section, default_configs=tuple()):
+        super().__init__(default_configs)
         self.path = path
         self.section = section
         self.parser = configparser.ConfigParser()
@@ -33,34 +48,40 @@ class SectionConfig(AbstractConfig):
                 self.section,
                 item
             )
+            if result.lower() == "true":
+                return True
+            if result.lower() == "false":
+                return False
+            if result.lower() in ("none", "null"):
+                return None
+            if result.isdigit():
+                return int(result)
+            try:
+                return float(result)
+            except ValueError:
+                return result
         except (configparser.NoSectionError, configparser.NoOptionError):
+            for config in self._default_configs:
+                try:
+                    return config[item]
+                except KeyError:
+                    pass
             raise KeyError(
                 f"No configuration found for {item} at path {self.path}"
             )
-        if result.lower() == "true":
-            return True
-        if result.lower() == "false":
-            return False
-        if result.lower() in ("none", "null"):
-            return None
-        if result.isdigit():
-            return int(result)
-        try:
-            return float(result)
-        except ValueError:
-            return result
 
 
 class NamedConfig(AbstractConfig):
     """Parses generic config"""
 
-    def __init__(self, config_path):
+    def __init__(self, config_path, default_configs=tuple()):
         """
         Parameters
         ----------
         config_path: String
             The path to the config file
         """
+        super().__init__(default_configs)
         self.path = config_path
         self.parser = configparser.ConfigParser()
         self.parser.read(self.path)
@@ -76,7 +97,10 @@ class NamedConfig(AbstractConfig):
     def __getitem__(self, item):
         return SectionConfig(
             self.path,
-            item
+            item,
+            default_configs=self._default_configs_for_item(
+                item
+            )
         )
 
     def __eq__(self, other):

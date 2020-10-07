@@ -14,7 +14,8 @@ def get_matplotlib_backend():
 
 
 class RecursiveConfig(AbstractConfig):
-    def __init__(self, path):
+    def __init__(self, path, default_configs=tuple()):
+        super().__init__(default_configs)
         self.path = Path(path)
 
     def __str__(self):
@@ -26,13 +27,18 @@ class RecursiveConfig(AbstractConfig):
     def __getitem__(self, item):
         item_path = self.path / f"{item}"
         file_path = f"{item_path}.ini"
+        default_configs = self._default_configs_for_item(
+            item
+        )
         if os.path.isfile(file_path):
             return NamedConfig(
-                file_path
+                file_path,
+                default_configs=default_configs
             )
         if os.path.isdir(item_path):
             return RecursiveConfig(
-                item_path
+                item_path,
+                default_configs=default_configs
             )
         raise KeyError(
             f"No configuration found for {item} at path {self.path}"
@@ -40,12 +46,17 @@ class RecursiveConfig(AbstractConfig):
 
 
 class Config(RecursiveConfig):
-    def __init__(self, config_path, output_path="output"):
+    def __init__(self, config_path, output_path="output", default_config_paths=tuple()):
         super().__init__(config_path)
         json_config_path = f"{config_path}/json_priors"
         if not os.path.exists(json_config_path):
             convert(f"{config_path}/priors", json_config_path)
         self.prior_config = JSONPriorConfig.from_directory(json_config_path)
+
+        self._default_configs = list(map(
+            RecursiveConfig,
+            default_config_paths
+        ))
 
         # self.non_linear = NamedConfig(f"{config_path}/non_linear")
         # self.optimize = NamedConfig(f"{config_path}/non_linear/optimize")
@@ -65,6 +76,11 @@ class Config(RecursiveConfig):
         # self.interpolate = NamedConfig("{}/grids/interpolate.ini".format(config_path))
         # self.radial_min = NamedConfig("{}/grids/radial_minimum.ini".format(config_path))
         self.output_path = output_path
+
+    def add_default(self, config_path):
+        self._default_configs.append(
+            RecursiveConfig(config_path)
+        )
 
     @classmethod
     def for_directory(cls, directory):
