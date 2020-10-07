@@ -53,29 +53,11 @@ class Config(RecursiveConfig):
     def __init__(self, config_path, output_path="output", default_config_paths=tuple()):
         super().__init__(config_path)
         self._prior_config = None
-
+        self._default_config_paths = default_config_paths
         self._default_configs = list(map(
             RecursiveConfig,
             default_config_paths
         ))
-
-        # self.non_linear = NamedConfig(f"{config_path}/non_linear")
-        # self.optimize = NamedConfig(f"{config_path}/non_linear/optimize")
-        # self.mcmc = NamedConfig(f"{config_path}/non_linear/mcmc")
-        # self.nest = NamedConfig(f"{config_path}/non_linear/nest")
-        # self.mock = NamedConfig(f"{config_path}/non_linear/mock")
-        #
-        # self.label = NamedConfig("{}/notation/label.ini".format(config_path))
-        # self.label_format = NamedConfig("{}/notation/label_format.ini".format(config_path))
-        # self.settings_tag = NamedConfig("{}/notation/settings_tags.ini".format(config_path))
-        # self.setup_tag = NamedConfig("{}/notation/setup_tags.ini".format(config_path))
-        # self.general = NamedConfig("{}/general.ini".format(config_path))
-        # self.visualize_general = NamedConfig("{}/visualize/general.ini".format(config_path))
-        # self.visualize_plots = NamedConfig("{}/visualize/plots.ini".format(config_path))
-        # self.visualize_figures = NamedConfig("{}/visualize/figures.ini".format(config_path))
-        # self.visualize_subplots = NamedConfig("{}/visualize/subplots.ini".format(config_path))
-        # self.interpolate = NamedConfig("{}/grids/interpolate.ini".format(config_path))
-        # self.radial_min = NamedConfig("{}/grids/radial_minimum.ini".format(config_path))
         self.output_path = output_path
 
     @property
@@ -96,8 +78,8 @@ class Config(RecursiveConfig):
             new_path,
             output_path=self.output_path,
             default_config_paths=(
-                self.path,
-            )
+                                     self.path,
+                                 ) + self._default_config_paths
         )
 
     @classmethod
@@ -115,13 +97,9 @@ def is_config_in(folder):
 
 current_directory = os.getcwd()
 
-workspace_path = os.environ.get(
-    "WORKSPACE",
-    current_directory
-)
 default = Config(
-    f"{workspace_path}/config",
-    f"{workspace_path}/output/"
+    f"{current_directory}/config",
+    f"{current_directory}/output/"
 )
 
 instance = default
