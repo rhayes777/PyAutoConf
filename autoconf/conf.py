@@ -40,6 +40,11 @@ class RecursiveConfig(AbstractConfig):
                 item_path,
                 default_configs=default_configs
             )
+        for config in self._default_configs:
+            try:
+                return config[item]
+            except KeyError:
+                pass
         raise KeyError(
             f"No configuration found for {item} at path {self.path}"
         )

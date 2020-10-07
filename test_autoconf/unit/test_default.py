@@ -32,3 +32,11 @@ def test_override_in_directory(config):
 
     assert subscript["Galaxy"] == "g"
     assert subscript["default_field"] == "label default"
+
+
+def test_novel_directory(config):
+    assert config["default"]["other"]["section"]["key"] == "value"
+
+
+def test_novel_file(config):
+    assert config["default_file"]["section"]["key"] == "file value"
