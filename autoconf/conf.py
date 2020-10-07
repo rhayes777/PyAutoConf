@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from autoconf.json_prior.config import JSONPriorConfig
-from autoconf.json_prior.converter import convert
 from autoconf.named import NamedConfig, AbstractConfig
 
 
