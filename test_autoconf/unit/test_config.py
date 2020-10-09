@@ -3,7 +3,7 @@ from os import path
 import pytest
 
 import autoconf.named
-from test_autoconf.mock_real import EllipticalProfile, EllipticalGaussian
+from autoconf.mock_real import EllipticalProfile, EllipticalGaussian
 
 directory = path.dirname(path.realpath(__file__))
 
