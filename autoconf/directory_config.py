@@ -186,7 +186,7 @@ class ConfigWrapper(AbstractConfig):
     def _getitem(self, item):
         configs = self.__applicable(item)
         if len(configs) == 0:
-            paths = '\n'.join(self.paths)
+            paths = '\n'.join(map(str, self.paths))
             raise KeyError(
                 f"No configuration for {item} in {paths}"
             )
