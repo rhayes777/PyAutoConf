@@ -6,7 +6,6 @@ from glob import glob
 from typing import List, Type, Tuple
 
 from autoconf.directory_config import family
-from autoconf.exc import PriorException
 
 logger = logging.getLogger(__name__)
 
@@ -139,11 +138,6 @@ class JSONPriorConfig:
 
         return JSONPriorConfig(config_dict, directory=directory)
 
-    def save(self):
-        for key in self.obj.keys():
-            with open(f"{self.directory}/{key}.json", "w+") as f:
-                json.dump(self.obj[key], f, indent=4)
-
     def __str__(self):
         return json.dumps(self.obj)
 
@@ -177,81 +171,7 @@ class JSONPriorConfig:
         A configuration dictionary
         """
         for c in family(cls):
-            try:
-                return self(path_for_class(c) + suffix_path)
-            except PriorException:
-                pass
-
-        if not should_retry:
-            raise PriorException(f"No config found for {cls} and {suffix_path}")
-
-        self._path_value_map = None
-
-        path, value = make_config_for_class(cls)
-
-        self.obj[".".join(path)] = value
-
-        self.rearrange()
-        self.save()
-
-        return self.for_class_and_suffix_path(
-            cls,
-            suffix_path,
-            should_retry=False
-        )
-
-    def rearrange(self):
-        """
-        Rearrange the configuration trying to create a more embedded
-        dictionary structure rather than a big collection of paths
-        mapped to values.
-        """
-
-        class PathDict:
-            def __init__(self, value=None):
-                self.value = value
-                self.__dict = dict()
-
-            def __getitem__(self, item):
-                if item not in self.__dict:
-                    self.__dict[item] = PathDict()
-                return self.__dict[item]
-
-            def __setitem__(self, key, value):
-                self.__dict[key] = value
-
-            def collapsed(self, key=None):
-                if len(self.__dict) == 1:
-                    new_key = list(self.__dict.keys())[0]
-                    new_dict = self.__dict[new_key]
-                    if key is not None:
-                        new_key = f"{key}.{new_key}"
-                    return new_dict.collapsed(new_key)
-                if len(self.__dict) == 0:
-                    if key is not None:
-                        return {key: self.value}
-                    return self.value
-                if len(self.__dict) > 1:
-                    dicts = {k: value.collapsed() for k, value in self.__dict.items()}
-                    if key is not None:
-                        return {key: dicts}
-                    return dicts
-
-            @property
-            def dict(self):
-                return {key: value.dict for key, value in self.__dict.items()}
-
-            def add_path(self, path, value):
-                current = self
-                for item in path:
-                    current = current[item]
-                current.value = value
-
-        path_dict = PathDict()
-        for path_key in self.paths:
-            path_list = path_key.split(".")
-            path_dict.add_path(path_list, self(path_list))
-        self.obj = path_dict.collapsed()
+            return self(path_for_class(c) + suffix_path)
 
     def __call__(self, config_path: List[str]):
         """
@@ -279,7 +199,7 @@ class JSONPriorConfig:
         for path, value in self.path_value_tuples:
             if key.endswith(path):
                 return value
-        raise PriorException(
+        raise KeyError(
             f"No configuration was found for the path {config_path}"
             + ("" if self.directory is None else f" ({self.directory})")
         )
