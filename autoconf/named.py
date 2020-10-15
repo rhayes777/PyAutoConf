@@ -4,7 +4,19 @@ from abc import abstractmethod, ABC
 
 class AbstractConfig(ABC):
     @abstractmethod
+    def _getitem(self, item):
+        pass
+
     def __getitem__(self, item):
+        if isinstance(item, int):
+            return self.items()[item]
+        return self._getitem(item)
+
+    def __len__(self):
+        return len(self.items())
+
+    @abstractmethod
+    def items(self):
         pass
 
     def family(self, cls):
@@ -26,7 +38,10 @@ class SectionConfig(AbstractConfig):
         self.parser = configparser.ConfigParser()
         self.parser.read(path)
 
-    def __getitem__(self, item):
+    def items(self):
+        return self.parser.items(self.section)
+
+    def _getitem(self, item):
         try:
             result = self.parser.get(
                 self.section,
@@ -64,7 +79,10 @@ class NamedConfig(AbstractConfig):
         self.parser = configparser.ConfigParser()
         self.parser.read(self.path)
 
-    def __getitem__(self, item):
+    def items(self):
+        return self.parser.sections()
+
+    def _getitem(self, item):
         return SectionConfig(
             self.path,
             item,
