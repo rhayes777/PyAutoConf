@@ -33,10 +33,19 @@ class Config(ConfigWrapper):
             for path in self.paths
         ])
 
-    def push(self, new_path, output_path=None):
-        self.configs = [RecursiveConfig(
+    def push(
+            self,
+            new_path,
+            output_path=None,
+            keep_first=False
+    ):
+        new_config = RecursiveConfig(
             new_path
-        )] + self.configs
+        )
+        if keep_first:
+            self.configs = self.configs[:1] + [new_config] + self.configs[1:]
+        else:
+            self.configs = [new_config] + self.configs
         self.output_path = output_path or self.output_path
 
     @classmethod

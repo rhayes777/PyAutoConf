@@ -11,6 +11,15 @@ def test_push(config, files_directory):
     assert config["general"]["hpc"]["hpc_mode"] is True
 
 
+def test_keep_first(config, files_directory):
+    config.push(
+        files_directory / "default",
+        keep_first=True
+    )
+
+    assert config["general"]["hpc"]["hpc_mode"] is False
+
+
 def test_override_in_directory(config):
     subscript = config["text"]["label"]["subscript"]
 
