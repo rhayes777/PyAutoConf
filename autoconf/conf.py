@@ -100,7 +100,7 @@ class Config(ConfigWrapper):
     def prior_config(self):
         if self._prior_config is None:
             self._prior_config = JSONPriorConfig.from_directory(
-                self.path / "json_priors"
+                self.path / "priors"
             )
         return self._prior_config
 
