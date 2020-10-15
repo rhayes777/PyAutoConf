@@ -13,15 +13,12 @@ def get_matplotlib_backend():
 
 
 class RecursiveConfig(AbstractConfig):
-    def items(self):
-        items = list()
-        for path in os.listdir(self.path):
-            path = path.split(".")[0]
-            items.append((
-                path,
-                self[path]
-            ))
-        return items
+    def keys(self):
+        return [
+            path.split(".")[0]
+            for path
+            in os.listdir(self.path)
+        ]
 
     def __init__(self, path):
         self.path = Path(path)
@@ -69,6 +66,12 @@ class ConfigWrapper(AbstractConfig):
             for key, value in config.items():
                 item_dict[key] = value
         return list(item_dict.items())
+
+    def keys(self):
+        keys = set()
+        for config in self.configs:
+            keys.update(config.keys())
+        return list(keys)
 
     def _getitem(self, item):
         configs = self.__applicable(item)

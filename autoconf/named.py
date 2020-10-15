@@ -12,11 +12,14 @@ class AbstractConfig(ABC):
             return self.items()[item]
         return self._getitem(item)
 
+    def items(self):
+        return [(key, self[key]) for key in self.keys()]
+
     def __len__(self):
         return len(self.items())
 
     @abstractmethod
-    def items(self):
+    def keys(self):
         pass
 
     def family(self, cls):
@@ -38,8 +41,8 @@ class SectionConfig(AbstractConfig):
         self.parser = configparser.ConfigParser()
         self.parser.read(path)
 
-    def items(self):
-        return [(item[0], self[item[0]]) for item in self.parser.items(self.section)]
+    def keys(self):
+        return [item[0] for item in self.parser.items(self.section)]
 
     def _getitem(self, item):
         try:
@@ -79,12 +82,8 @@ class NamedConfig(AbstractConfig):
         self.parser = configparser.ConfigParser()
         self.parser.read(self.path)
 
-    def items(self):
-        return [
-            (section, self[section])
-            for section
-            in self.parser.sections()
-        ]
+    def keys(self):
+        return self.parser.sections()
 
     def _getitem(self, item):
         return SectionConfig(
