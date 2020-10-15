@@ -6,17 +6,21 @@ from autoconf import conf
 
 
 @pytest.fixture(
-    name="config"
+    name="files_directory"
 )
-def make_config():
-    files_directory = pathlib.Path(
+def make_files_directory():
+    return pathlib.Path(
         __file__
     ).parent / "files"
+
+
+@pytest.fixture(
+    name="config"
+)
+def make_config(files_directory):
     return conf.Config(
         files_directory / "config",
-        default_config_paths=(
-            files_directory / "default",
-        )
+        files_directory / "default",
     )
 
 
@@ -25,6 +29,12 @@ def test_override_file(config):
 
     assert hpc["hpc_mode"] is False
     assert hpc["default_field"] == "hello"
+
+
+def test_push(config, files_directory):
+    config.push(files_directory / "default")
+
+    assert config["general"]["hpc"]["hpc_mode"] is True
 
 
 def test_override_in_directory(config):
