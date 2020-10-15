@@ -1,5 +1,7 @@
 import configparser
+import os
 from abc import abstractmethod, ABC
+from pathlib import Path
 
 
 class AbstractConfig(ABC):
@@ -90,6 +92,82 @@ class NamedConfig(AbstractConfig):
             self.path,
             item,
         )
+
+
+class RecursiveConfig(AbstractConfig):
+    def keys(self):
+        return [
+            path.split(".")[0]
+            for path
+            in os.listdir(self.path)
+        ]
+
+    def __init__(self, path):
+        self.path = Path(path)
+
+    def __str__(self):
+        return str(self.path)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.path}>"
+
+    def _getitem(self, item):
+        item_path = self.path / f"{item}"
+        file_path = f"{item_path}.ini"
+        if os.path.isfile(file_path):
+            return NamedConfig(
+                file_path
+            )
+        if os.path.isdir(item_path):
+            return RecursiveConfig(
+                item_path
+            )
+        raise KeyError(
+            f"No configuration found for {item} at path {self.path}"
+        )
+
+
+class ConfigWrapper(AbstractConfig):
+    def __init__(self, configs):
+        self.configs = configs
+
+    def __applicable(self, item):
+        __applicable = list()
+        for config in self.configs:
+            try:
+                __applicable.append(config[item])
+            except KeyError:
+                pass
+        return __applicable
+
+    def items(self):
+        item_dict = {}
+        for config in reversed(
+                self.configs
+        ):
+            for key, value in config.items():
+                item_dict[key] = value
+        return list(item_dict.items())
+
+    def keys(self):
+        keys = set()
+        for config in self.configs:
+            keys.update(config.keys())
+        return list(keys)
+
+    def _getitem(self, item):
+        configs = self.__applicable(item)
+        if len(configs) == 0:
+            paths = '\n'.join(map(str, self.configs))
+            raise KeyError(
+                f"No configuration for {item} in {paths}"
+            )
+        for config in configs:
+            if not isinstance(
+                    config, AbstractConfig
+            ):
+                return config
+        return ConfigWrapper(configs)
 
 
 def family(current_class):

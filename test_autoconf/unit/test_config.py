@@ -2,7 +2,7 @@ from os import path
 
 import pytest
 
-import autoconf.named
+from autoconf.directory_config import NamedConfig
 from autoconf.mock_real import EllipticalProfile, EllipticalGaussian
 
 directory = path.dirname(path.realpath(__file__))
@@ -14,7 +14,7 @@ class MockClass:
 
 @pytest.fixture(name="label_config")
 def make_label_config():
-    return autoconf.named.NamedConfig(
+    return NamedConfig(
         "{}/files/config/label.ini".format(directory)
     )
 

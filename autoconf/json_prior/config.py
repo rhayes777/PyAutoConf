@@ -5,8 +5,8 @@ from collections import Sized
 from glob import glob
 from typing import List, Type, Tuple
 
+from autoconf.directory_config import family
 from autoconf.exc import PriorException
-from autoconf.named import family
 
 logger = logging.getLogger(__name__)
 
