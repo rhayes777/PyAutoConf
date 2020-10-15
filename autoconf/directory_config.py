@@ -127,6 +127,26 @@ class RecursiveConfig(AbstractConfig):
         )
 
 
+class PriorConfigWrapper:
+    def __init__(self, prior_configs):
+        self.prior_configs = prior_configs
+
+    def for_class_and_suffix_path(self, cls, path):
+        for config in self.prior_configs:
+            try:
+                return config.for_class_and_suffix_path(
+                    cls, path
+                )
+            except KeyError:
+                pass
+        directories = ' '.join(
+            str(config.directory) for config in self.prior_configs
+        )
+        raise KeyError(
+            f"No prior config found for class {cls.__name__} and path {'.'.join(path)} in directories {directories}"
+        )
+
+
 class ConfigWrapper(AbstractConfig):
     def __init__(self, configs):
         self.configs = configs
@@ -166,7 +186,7 @@ class ConfigWrapper(AbstractConfig):
     def _getitem(self, item):
         configs = self.__applicable(item)
         if len(configs) == 0:
-            paths = '\n'.join(map(str, self.configs))
+            paths = '\n'.join(self.paths)
             raise KeyError(
                 f"No configuration for {item} in {paths}"
             )

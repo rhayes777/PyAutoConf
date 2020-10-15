@@ -147,7 +147,7 @@ class JSONPriorConfig:
     def __contains__(self, item):
         return ".".join(item) in self.obj
 
-    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str], should_retry=True):
+    def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str]):
         """
         Get configuration for a prior.
 
@@ -160,7 +160,6 @@ class JSONPriorConfig:
 
         Parameters
         ----------
-        should_retry
         cls
             The class with which the prior is associated.
         suffix_path
@@ -171,7 +170,11 @@ class JSONPriorConfig:
         A configuration dictionary
         """
         for c in family(cls):
-            return self(path_for_class(c) + suffix_path)
+            try:
+                return self(path_for_class(c) + suffix_path)
+            except KeyError:
+                pass
+        raise KeyError(f"No config found for class {cls} and path {suffix_path} in {self.directory}")
 
     def __call__(self, config_path: List[str]):
         """

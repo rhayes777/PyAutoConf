@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from autoconf.directory_config import ConfigWrapper, RecursiveConfig
+from autoconf.directory_config import ConfigWrapper, RecursiveConfig, PriorConfigWrapper
 from autoconf.json_prior.config import JSONPriorConfig
 
 
@@ -26,7 +26,7 @@ class Config(ConfigWrapper):
 
     @property
     def prior_config(self):
-        return ConfigWrapper([
+        return PriorConfigWrapper([
             JSONPriorConfig.from_directory(
                 path / "priors"
             )
