@@ -18,7 +18,6 @@ class Config(ConfigWrapper):
             RecursiveConfig,
             config_paths
         )))
-        self._prior_config = None
         self.output_path = output_path
 
     @property
@@ -27,11 +26,12 @@ class Config(ConfigWrapper):
 
     @property
     def prior_config(self):
-        if self._prior_config is None:
-            self._prior_config = JSONPriorConfig.from_directory(
-                self.path / "priors"
+        return ConfigWrapper([
+            JSONPriorConfig.from_directory(
+                path / "priors"
             )
-        return self._prior_config
+            for path in self.paths
+        ])
 
     def push(self, new_path, output_path=None):
         self.configs = [RecursiveConfig(

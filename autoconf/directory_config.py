@@ -131,6 +131,14 @@ class ConfigWrapper(AbstractConfig):
     def __init__(self, configs):
         self.configs = configs
 
+    @property
+    def paths(self):
+        return [
+            config.path
+            for config
+            in self.configs
+        ]
+
     def __applicable(self, item):
         __applicable = list()
         for config in self.configs:
