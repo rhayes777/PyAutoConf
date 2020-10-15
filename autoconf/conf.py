@@ -63,7 +63,9 @@ class ConfigWrapper(AbstractConfig):
 
     def items(self):
         item_dict = {}
-        for config in self.configs:
+        for config in reversed(
+                self.configs
+        ):
             for key, value in config.items():
                 item_dict[key] = value
         return list(item_dict.items())

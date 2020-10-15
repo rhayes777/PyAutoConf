@@ -39,7 +39,7 @@ class SectionConfig(AbstractConfig):
         self.parser.read(path)
 
     def items(self):
-        return self.parser.items(self.section)
+        return [(item[0], self[item[0]]) for item in self.parser.items(self.section)]
 
     def _getitem(self, item):
         try:
@@ -80,7 +80,11 @@ class NamedConfig(AbstractConfig):
         self.parser.read(self.path)
 
     def items(self):
-        return self.parser.sections()
+        return [
+            (section, self[section])
+            for section
+            in self.parser.sections()
+        ]
 
     def _getitem(self, item):
         return SectionConfig(
