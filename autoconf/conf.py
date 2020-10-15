@@ -56,6 +56,12 @@ class Config(ConfigWrapper):
             output_path=directory_path / "output"
         )
 
+    def register(self, file):
+        self.push(
+            Path(file).parent / "config",
+            keep_first=True
+        )
+
 
 current_directory = os.getcwd()
 
