@@ -91,10 +91,6 @@ class Config(RecursiveConfig):
         )
 
 
-def is_config_in(folder):
-    return os.path.isdir("{}/config".format(folder))
-
-
 current_directory = os.getcwd()
 
 default = Config(
