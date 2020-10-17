@@ -7,7 +7,7 @@ from autoconf.json_prior.config import JSONPriorConfig
 
 def get_matplotlib_backend():
     try:
-        return instance["visualize_general"]["general"]["backend"]
+        return instance["visualize"]["general"]["general"]["backend"]
     except KeyError:
         return "default"
 
