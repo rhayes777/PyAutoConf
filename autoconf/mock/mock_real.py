@@ -10,6 +10,7 @@ class SphericalProfile():
         """
         self.centre = centre
 
+
 class EllipticalProfile(SphericalProfile):
     def __init__(self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0):
         """ Generic elliptical profiles class to contain functions shared by light

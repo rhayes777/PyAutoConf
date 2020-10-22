@@ -1,12 +1,12 @@
 import pytest
 
 import autoconf as aconf
-from autoconf.mock_real import SphericalProfile
+from autoconf.mock.mock_real import SphericalProfile
 
 
 @pytest.fixture(name="geometry_profile_path")
 def make_geometry_profile_path():
-    return ["autoconf", "mock_real", "SphericalProfile"]
+    return ["autoconf", "mock", "mock_real", "SphericalProfile"]
 
 
 def test_path_for_class(geometry_profile_path):
@@ -18,34 +18,36 @@ def test_path_for_class(geometry_profile_path):
     [
         (
             {
-                "autoconf.mock_real.SphericalProfile": "test",
-                "autoconf.mock_real.Other": "toast",
+                "autoconf.mock.mock_real.SphericalProfile": "test",
+                "autoconf.mock.mock_real.Other": "toast",
             },
-            ["autoconf.mock_real.SphericalProfile", "autoconf.mock_real.Other"],
+            ["autoconf.mock.mock_real.SphericalProfile", "autoconf.mock.mock_real.Other"],
         ),
         (
-            {"autoconf.mock_real": {"SphericalProfile": "test", "Other": "toast"}},
+            {"autoconf.mock.mock_real": {"SphericalProfile": "test", "Other": "toast"}},
             [
-                "autoconf.mock_real",
-                "autoconf.mock_real.SphericalProfile",
-                "autoconf.mock_real.Other",
+                "autoconf.mock.mock_real",
+                "autoconf.mock.mock_real.SphericalProfile",
+                "autoconf.mock.mock_real.Other",
             ],
         ),
         (
-            {"autoconf": {"mock_real": {"SphericalProfile": "test", "Other": "toast"}}},
+            {"autoconf": {"mock": {"mock_real": {"SphericalProfile": "test", "Other": "toast"}}}},
             [
                 "autoconf",
-                "autoconf.mock_real",
-                "autoconf.mock_real.SphericalProfile",
-                "autoconf.mock_real.Other",
+                "autoconf.mock",
+                "autoconf.mock.mock_real",
+                "autoconf.mock.mock_real.SphericalProfile",
+                "autoconf.mock.mock_real.Other",
             ],
         ),
         (
-            {"autoconf": {"mock_real.SphericalProfile": "test", "mock_real.Other": "toast"}},
+            {"autoconf": {"mock": {"mock_real.SphericalProfile": "test", "mock_real.Other": "toast"}}},
             [
                 "autoconf",
-                "autoconf.mock_real.SphericalProfile",
-                "autoconf.mock_real.Other",
+                "autoconf.mock",
+                "autoconf.mock.mock_real.SphericalProfile",
+                "autoconf.mock.mock_real.Other",
             ],
         ),
         ({"SphericalProfile": "test", "Other": "toast"}, ["SphericalProfile", "Other"]),
@@ -68,12 +70,12 @@ def test_paths(config_dict, paths):
     "config_dict",
     [
         {
-            "autoconf.mock_real.SphericalProfile": "test",
-            "autoconf.mock_real.Other": "toast",
+            "autoconf.mock.mock_real.SphericalProfile": "test",
+            "autoconf.mock.mock_real.Other": "toast",
         },
-        {"autoconf.mock_real": {"SphericalProfile": "test", "Other": "toast"}},
-        {"autoconf": {"mock_real": {"SphericalProfile": "test", "Other": "toast"}}},
-        {"autoconf": {"mock_real.SphericalProfile": "test", "mock_real.Other": "toast"}},
+        {"autoconf.mock.mock_real": {"SphericalProfile": "test", "Other": "toast"}},
+        {"autoconf":{"mock": {"mock_real": {"SphericalProfile": "test", "Other": "toast"}}}},
+        {"autoconf":{"mock": {"mock_real.SphericalProfile": "test", "mock_real.Other": "toast"}}},
         {"SphericalProfile": "test", "Other": "toast"},
         {"mock_real": {"SphericalProfile": "test", "Other": "toast"}},
     ],
@@ -81,7 +83,7 @@ def test_paths(config_dict, paths):
 def test_config_for_path(geometry_profile_path, config_dict):
     config = aconf.JSONPriorConfig(config_dict)
     assert config(geometry_profile_path) == "test"
-    assert config(["autoconf", "mock_real", "Other"]) == "toast"
+    assert config(["autoconf", "mock", "mock_real", "Other"]) == "toast"
 
 
 def test_path_double():
