@@ -9,7 +9,20 @@ from .config import make_config_for_class
 logger = logging.getLogger(__name__)
 
 
-def for_file(module_path):
+def for_file(module_path: str) -> dict:
+    """
+    Generate JSON priors for all classes in a file, using default
+    prior configuration for each constructor argument.
+
+    Parameters
+    ----------
+    module_path
+        The path to the file.
+
+    Returns
+    -------
+    JSON configuration, where class names are mapped to their prior configs.
+    """
     spec = util.spec_from_file_location(
         "module.name",
         module_path
@@ -25,7 +38,20 @@ def for_file(module_path):
     }
 
 
-def generate(directory):
+def generate(directory: str):
+    """
+    Generate prior configuration for a given directory, recursively.
+
+    A directory "priors" is created if it does not exists. A new JSON file is created
+    in priors for each python module found that contains at least one class.
+
+    If an output file already exists then prior generation is skipped.
+
+    Parameters
+    ----------
+    directory
+        The directory for which prior are generated
+    """
     try:
         os.mkdir(f"{directory}/priors")
     except FileExistsError:
