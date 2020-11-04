@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Optional
 
 from autoconf.directory_config import ConfigWrapper, RecursiveConfig, PriorConfigWrapper
 from autoconf.json_prior.config import JSONPriorConfig
@@ -41,7 +42,11 @@ class Config(ConfigWrapper):
         self.output_path = output_path
 
     @property
-    def prior_config(self):
+    def prior_config(self) -> PriorConfigWrapper:
+        """
+        Configuration for priors. This indicates, for example, the mean and the width of priors
+        for the attributes of given classes.
+        """
         return PriorConfigWrapper([
             JSONPriorConfig.from_directory(
                 path / "priors"
@@ -51,10 +56,25 @@ class Config(ConfigWrapper):
 
     def push(
             self,
-            new_path,
-            output_path=None,
-            keep_first=False
+            new_path: str,
+            output_path: Optional[str] = None,
+            keep_first: bool = False
     ):
+        """
+        Push a new configuration path. This overrides the existing config
+        paths, with existing configs being used as a backup when a value
+        cannot be found in an overriding config.
+
+        Parameters
+        ----------
+        new_path
+            A path to config directory
+        output_path
+            The path at which data should be output. If this is None then it remains
+            unchanged
+        keep_first
+            If True the current priority configuration mains such.
+        """
         new_config = RecursiveConfig(
             new_path
         )
@@ -64,15 +84,15 @@ class Config(ConfigWrapper):
             self.configs = [new_config] + self.configs
         self.output_path = output_path or self.output_path
 
-    @classmethod
-    def for_directory(cls, directory):
-        directory_path = Path(directory)
-        return Config(
-            directory_path / "config",
-            output_path=directory_path / "output"
-        )
+    def register(self, file: str):
+        """
+        Add defaults for a given project
 
-    def register(self, file):
+        Parameters
+        ----------
+        file
+            The path to the project's __init__
+        """
         self.push(
             Path(file).parent / "config",
             keep_first=True
