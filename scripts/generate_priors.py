@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Generate prior configuration for all classes in a package, recursively
 """
