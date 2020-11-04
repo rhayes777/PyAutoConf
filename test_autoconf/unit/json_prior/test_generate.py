@@ -61,5 +61,5 @@ def test_generate_for_file(prior_json):
 def test_generate(prior_json):
     g.generate(package_directory)
 
-    with open("priors/module.json") as f:
+    with open(f"priors/module.json") as f:
         assert json.load(f) == prior_json

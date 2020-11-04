@@ -53,7 +53,7 @@ def generate(directory: str):
         The directory for which prior are generated
     """
     try:
-        os.mkdir(f"{directory}/priors")
+        os.mkdir(f"priors")
     except FileExistsError:
         pass
     for directory, _, files in os.walk(directory):
