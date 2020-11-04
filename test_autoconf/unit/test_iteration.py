@@ -4,11 +4,10 @@ def test_iterate_directory(config):
         'default',
         'default_file',
         'general',
-        'json_priors',
+        'priors',
         'label',
         'label_format',
         'non_linear',
-        'priors',
         'text',
         'visualize'
     }

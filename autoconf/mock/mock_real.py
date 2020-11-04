@@ -1,4 +1,9 @@
-class SphericalProfile():
+class Redshift:
+    def __init__(self, redshift=0.0):
+        self.redshift = redshift
+
+
+class SphericalProfile:
     def __init__(self, centre=(0.0, 0.0)):
         """ Generic circular profiles class to contain functions shared by light and
         mass profiles.
@@ -32,7 +37,7 @@ class EllipticalProfile(SphericalProfile):
 
 class EllipticalGaussian(EllipticalProfile):
     def __init__(
-        self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
+            self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
     ):
         """ The elliptical Gaussian profile.
 

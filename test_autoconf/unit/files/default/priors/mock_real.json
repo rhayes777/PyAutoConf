@@ -1,0 +1,14 @@
+{
+  "Redshift": {
+    "redshift": {
+      "type": "Uniform",
+      "lower_limit": 0.0,
+      "upper_limit": 4.0
+    },
+    "rodshift": {
+      "type": "Uniform",
+      "lower_limit": 0.0,
+      "upper_limit": 4.0
+    }
+  }
+}
