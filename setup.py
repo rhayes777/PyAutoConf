@@ -1,3 +1,4 @@
+import glob
 from codecs import open
 from os.path import abspath, dirname, join
 
@@ -46,4 +47,5 @@ setup(
     install_requires=[],
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
+    scripts=glob.glob("scripts/*.py") + glob.glob("scripts/*.sh")
 )

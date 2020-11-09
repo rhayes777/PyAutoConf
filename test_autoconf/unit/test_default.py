@@ -1,3 +1,6 @@
+from autoconf.mock.mock_real import SphericalProfile, Redshift
+
+
 def test_override_file(config):
     hpc = config["general"]["hpc"]
 
@@ -33,3 +36,12 @@ def test_novel_directory(config):
 
 def test_novel_file(config):
     assert config["default_file"]["section"]["key"] == "file value"
+
+
+def test_json(config):
+    assert config.prior_config.for_class_and_suffix_path(
+        Redshift, ["redshift"]
+    )["upper_limit"] == 3.0
+    assert config.prior_config.for_class_and_suffix_path(
+        Redshift, ["rodshift"]
+    )["upper_limit"] == 4.0
