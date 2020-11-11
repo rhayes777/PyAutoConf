@@ -52,8 +52,9 @@ def generate(directory: str):
     directory
         The directory for which prior are generated
     """
+    cwd = os.getcwd()
     try:
-        os.mkdir(f"priors")
+        os.mkdir(f"{cwd}/priors")
     except FileExistsError:
         pass
     for directory, _, files in os.walk(directory):
@@ -61,7 +62,7 @@ def generate(directory: str):
             if file.endswith(".py"):
                 full_path = f"{directory}/{file}"
                 spec = for_file(full_path)
-                config_path = f"priors/{file.replace('.py', '.json')}"
+                config_path = f"{cwd}/priors/{file.replace('.py', '.json')}"
                 if len(spec) > 0:
                     if os.path.exists(config_path):
                         logger.info(f"{config_path} already exists")
