@@ -1,3 +1,5 @@
+test_autoconf/unit/json_prior/code/priors/
+
 test/autofit/test_fit
 # Byte-compiled / optimized / DLL files
 __pycache__/
