@@ -3,6 +3,7 @@ import json
 import logging
 import os
 from importlib import util
+from pathlib import Path
 
 from .config import make_config_for_class
 
@@ -52,17 +53,18 @@ def generate(directory: str):
     directory
         The directory for which prior are generated
     """
-    cwd = os.getcwd()
+    cwd = Path(os.getcwd())
     try:
         os.mkdir(f"{cwd}/priors")
     except FileExistsError:
         pass
     for directory, _, files in os.walk(directory):
+        directory = Path(directory)
         for file in files:
             if file.endswith(".py"):
-                full_path = f"{directory}/{file}"
+                full_path = directory / file
                 spec = for_file(full_path)
-                config_path = f"{cwd}/priors/{file.replace('.py', '.json')}"
+                config_path = cwd / "priors" / file.replace('.py', '.json')
                 if len(spec) > 0:
                     if os.path.exists(config_path):
                         logger.info(f"{config_path} already exists")

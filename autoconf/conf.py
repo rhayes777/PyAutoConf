@@ -99,11 +99,11 @@ class Config(ConfigWrapper):
         )
 
 
-current_directory = os.getcwd()
+current_directory = Path(os.getcwd())
 
 default = Config(
-    f"{current_directory}/config",
-    f"{current_directory}/output/"
+    current_directory / "config",
+    current_directory / "output/"
 )
 
 instance = default
