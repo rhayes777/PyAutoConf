@@ -2,6 +2,7 @@ import inspect
 import json
 import logging
 import os
+from os import path
 from importlib import util
 from pathlib import Path
 
@@ -55,7 +56,7 @@ def generate(directory: str):
     """
     cwd = Path(os.getcwd())
     try:
-        os.mkdir(f"{cwd}/priors")
+        os.mkdir(path.join(cwd, "priors"))
     except FileExistsError:
         pass
     for directory, _, files in os.walk(directory):

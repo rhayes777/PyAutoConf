@@ -4,6 +4,8 @@ import logging
 from collections import Sized
 from glob import glob
 from typing import List, Type, Tuple
+import ntpath
+from os import path
 
 from autoconf.directory_config import family
 
@@ -132,9 +134,9 @@ class JSONPriorConfig:
         A configuration instance.
         """
         config_dict = dict()
-        for file in glob(f"{directory}/*.json"):
+        for file in glob(path.join(directory, "*.json")):
             with open(file) as f:
-                config_dict[file.split("/")[-1].split(".")[0]] = json.load(f)
+                config_dict[ntpath.basename(file).split(".")[0]] = json.load(f)
 
         return JSONPriorConfig(config_dict, directory=directory)
 
