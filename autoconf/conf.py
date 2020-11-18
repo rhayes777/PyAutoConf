@@ -1,9 +1,12 @@
+import logging
 import os
 from pathlib import Path
 from typing import Optional
 
 from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig
 from autoconf.json_prior.config import JSONPriorConfig
+
+logger = logging.getLogger(__name__)
 
 
 def get_matplotlib_backend():
@@ -92,8 +95,8 @@ class Config:
                         )
                     else:
                         d[key] = value
-            except KeyError:
-                pass
+            except KeyError as e:
+                logger.exception(e)
 
         for config_ in reversed(configs):
             recurse_config(config_, self._dict)
