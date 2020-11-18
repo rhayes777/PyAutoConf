@@ -1,4 +1,4 @@
-from autoconf.mock.mock_real import SphericalProfile, Redshift
+from autoconf.mock.mock_real import Redshift
 
 
 def test_override_file(config):

@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from autoconf.directory_config import ConfigWrapper, RecursiveConfig, PriorConfigWrapper
+from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig
 from autoconf.json_prior.config import JSONPriorConfig
 
 
@@ -13,7 +13,28 @@ def get_matplotlib_backend():
         return "default"
 
 
-class Config(ConfigWrapper):
+class DictWrapper:
+    def __init__(self):
+        self._dict = dict()
+
+    def __contains__(self, item):
+        return item in self._dict
+
+    def __setitem__(self, key, value):
+        if isinstance(key, str):
+            key = key.lower()
+        self._dict[key] = value
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            key = key.lower()
+        return self._dict[key]
+
+    def __repr__(self):
+        return repr(self._dict)
+
+
+class Config:
     def __init__(self, *config_paths, output_path="output"):
         """
         Singleton to manage configuration.
@@ -35,11 +56,58 @@ class Config(ConfigWrapper):
         output_path
             The path where data should be saved.
         """
-        super().__init__(list(map(
+        self._dict = DictWrapper()
+        self._configs = list()
+
+        self.configs = list(map(
             RecursiveConfig,
             config_paths
-        )))
+        ))
+
         self.output_path = output_path
+
+    @property
+    def configs(self):
+        return self._configs
+
+    @configs.setter
+    def configs(self, configs):
+        self._configs = configs
+
+        def recurse_config(
+                config,
+                d
+        ):
+            try:
+                for key, value in config.items():
+                    if isinstance(
+                            value,
+                            AbstractConfig
+                    ):
+                        if key not in d:
+                            d[key] = DictWrapper()
+                        recurse_config(
+                            value,
+                            d=d[key]
+                        )
+                    else:
+                        d[key] = value
+            except KeyError:
+                pass
+
+        for config_ in reversed(configs):
+            recurse_config(config_, self._dict)
+
+    def __getitem__(self, item):
+        return self._dict[item]
+
+    @property
+    def paths(self):
+        return [
+            config.path
+            for config
+            in self._configs
+        ]
 
     @property
     def prior_config(self) -> PriorConfigWrapper:

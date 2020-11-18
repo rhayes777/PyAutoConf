@@ -96,11 +96,16 @@ class NamedConfig(AbstractConfig):
 
 class RecursiveConfig(AbstractConfig):
     def keys(self):
-        return [
-            path.split(".")[0]
-            for path
-            in os.listdir(self.path)
-        ]
+        try:
+            return [
+                path.split(".")[0]
+                for path
+                in os.listdir(self.path)
+            ]
+        except FileNotFoundError as e:
+            raise KeyError(
+                f"No configuration found at {self.path}"
+            ) from e
 
     def __init__(self, path):
         self.path = Path(path)
