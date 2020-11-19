@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig
+from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
 from autoconf.json_prior.config import JSONPriorConfig
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,9 @@ class DictWrapper:
     def __contains__(self, item):
         return item in self._dict
 
+    def items(self):
+        return self._dict.items()
+
     def __setitem__(self, key, value):
         if isinstance(key, str):
             key = key.lower()
@@ -35,6 +38,9 @@ class DictWrapper:
 
     def __repr__(self):
         return repr(self._dict)
+
+    def family(self, cls):
+        return self[family(cls)]
 
 
 class Config:
