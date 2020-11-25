@@ -85,7 +85,8 @@ class Config:
 
         def recurse_config(
                 config,
-                d
+                d,
+                depth=0
         ):
             try:
                 for key, value in config.items():
@@ -97,7 +98,8 @@ class Config:
                             d[key] = DictWrapper()
                         recurse_config(
                             value,
-                            d=d[key]
+                            d=d[key],
+                            depth=depth + 1
                         )
                     else:
                         d[key] = value

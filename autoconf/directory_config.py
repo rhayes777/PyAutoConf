@@ -37,11 +37,10 @@ class AbstractConfig(ABC):
 
 
 class SectionConfig(AbstractConfig):
-    def __init__(self, path, section):
+    def __init__(self, path, parser, section):
         self.path = path
         self.section = section
-        self.parser = configparser.ConfigParser()
-        self.parser.read(path)
+        self.parser = parser
 
     def keys(self):
         return [item[0] for item in self.parser.items(self.section)]
@@ -90,6 +89,7 @@ class NamedConfig(AbstractConfig):
     def _getitem(self, item):
         return SectionConfig(
             self.path,
+            self.parser,
             item,
         )
 
@@ -101,7 +101,10 @@ class RecursiveConfig(AbstractConfig):
                 path.split(".")[0]
                 for path
                 in os.listdir(self.path)
-                if not path == "priors"
+                if all([
+                    path != "priors",
+                    len(path.split(".")[0]) != 0
+                ])
             ]
         except FileNotFoundError as e:
             raise KeyError(
