@@ -125,7 +125,7 @@ class Config:
                     else:
                         d[key] = value
             except KeyError as e:
-                logger.exception(e)
+                logger.debug(e)
 
         for config_ in reversed(configs):
             recurse_config(config_, self._dict)
