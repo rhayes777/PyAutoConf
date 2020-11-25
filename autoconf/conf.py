@@ -154,7 +154,7 @@ class Config:
         """
         self.output_path = output_path or self.output_path
 
-        if self.configs[0].path == new_path:
+        if str(self.configs[0].path) == str(new_path):
             return
         new_config = RecursiveConfig(
             new_path
