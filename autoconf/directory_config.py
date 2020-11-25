@@ -101,6 +101,7 @@ class RecursiveConfig(AbstractConfig):
                 path.split(".")[0]
                 for path
                 in os.listdir(self.path)
+                if not path == "priors"
             ]
         except FileNotFoundError as e:
             raise KeyError(
