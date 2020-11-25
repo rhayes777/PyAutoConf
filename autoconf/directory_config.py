@@ -114,6 +114,9 @@ class RecursiveConfig(AbstractConfig):
     def __init__(self, path):
         self.path = Path(path)
 
+    def __eq__(self, other):
+        return str(self) == str(other)
+
     def __str__(self):
         return str(self.path)
 

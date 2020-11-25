@@ -17,8 +17,9 @@ def get_matplotlib_backend():
 
 
 class DictWrapper:
-    def __init__(self):
+    def __init__(self, paths):
         self._dict = dict()
+        self.paths = paths
 
     def __contains__(self, item):
         return item in self._dict
@@ -34,13 +35,31 @@ class DictWrapper:
     def __getitem__(self, key):
         if isinstance(key, str):
             key = key.lower()
-        return self._dict[key]
+        try:
+            return self._dict[key]
+        except KeyError:
+            raise KeyError(
+                f"key {key} not found in paths {self.paths_string}"
+            )
+
+    @property
+    def paths_string(self):
+        return "\n".join(
+            map(str, self.paths)
+        )
 
     def __repr__(self):
         return repr(self._dict)
 
     def family(self, cls):
-        return self[family(cls)]
+        for item in family(cls):
+            try:
+                return self[item]
+            except KeyError:
+                pass
+        raise KeyError(
+            f"config for {cls} or its parents not found in paths {self.paths_string}"
+        )
 
 
 class Config:
@@ -65,8 +84,10 @@ class Config:
         output_path
             The path where data should be saved.
         """
-        self._dict = DictWrapper()
         self._configs = list()
+        self._dict = DictWrapper(
+            self.paths
+        )
 
         self.configs = list(map(
             RecursiveConfig,
@@ -85,8 +106,7 @@ class Config:
 
         def recurse_config(
                 config,
-                d,
-                depth=0
+                d
         ):
             try:
                 for key, value in config.items():
@@ -95,11 +115,12 @@ class Config:
                             AbstractConfig
                     ):
                         if key not in d:
-                            d[key] = DictWrapper()
+                            d[key] = DictWrapper(
+                                self.paths
+                            )
                         recurse_config(
                             value,
-                            d=d[key],
-                            depth=depth + 1
+                            d=d[key]
                         )
                     else:
                         d[key] = value
@@ -156,15 +177,22 @@ class Config:
         """
         self.output_path = output_path or self.output_path
 
-        if str(self.configs[0].path) == str(new_path):
+        if self.configs[0] == new_path or (
+                keep_first and len(self.configs) > 1 and self.configs[1] == new_path
+        ):
             return
         new_config = RecursiveConfig(
             new_path
         )
+
+        configs = list(filter(
+            lambda config: config != new_config,
+            self.configs
+        ))
         if keep_first:
-            self.configs = self.configs[:1] + [new_config] + self.configs[1:]
+            self.configs = configs[:1] + [new_config] + configs[1:]
         else:
-            self.configs = [new_config] + self.configs
+            self.configs = [new_config] + configs
 
     def register(self, file: str):
         """

@@ -10,14 +10,17 @@ def test_override_file(config):
 
 def test_push(config, files_directory):
     assert len(config.configs) == 2
+    assert config["general"]["hpc"]["hpc_mode"] is False
 
     config.push(files_directory / "default")
-    assert len(config.configs) == 3
 
-    config.push(files_directory / "default")
-    assert len(config.configs) == 3
-
+    assert len(config.configs) == 2
     assert config["general"]["hpc"]["hpc_mode"] is True
+
+    config.push(files_directory / "config")
+
+    assert len(config.configs) == 2
+    assert config["general"]["hpc"]["hpc_mode"] is False
 
 
 def test_keep_first(config, files_directory):
