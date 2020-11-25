@@ -9,7 +9,13 @@ def test_override_file(config):
 
 
 def test_push(config, files_directory):
+    assert len(config.configs) == 2
+
     config.push(files_directory / "default")
+    assert len(config.configs) == 3
+
+    config.push(files_directory / "default")
+    assert len(config.configs) == 3
 
     assert config["general"]["hpc"]["hpc_mode"] is True
 

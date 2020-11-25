@@ -152,6 +152,10 @@ class Config:
         keep_first
             If True the current priority configuration mains such.
         """
+        self.output_path = output_path or self.output_path
+
+        if self.configs[0].path == new_path:
+            return
         new_config = RecursiveConfig(
             new_path
         )
@@ -159,7 +163,6 @@ class Config:
             self.configs = self.configs[:1] + [new_config] + self.configs[1:]
         else:
             self.configs = [new_config] + self.configs
-        self.output_path = output_path or self.output_path
 
     def register(self, file: str):
         """
