@@ -103,7 +103,10 @@ class RecursiveConfig(AbstractConfig):
                 in os.listdir(self.path)
                 if all([
                     path != "priors",
-                    len(path.split(".")[0]) != 0
+                    len(path.split(".")[0]) != 0,
+                    os.path.isdir(
+                        f"{self.path}/{path}"
+                    ) or path.endswith(".ini")
                 ])
             ]
         except FileNotFoundError as e:
