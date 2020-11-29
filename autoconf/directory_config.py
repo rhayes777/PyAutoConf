@@ -37,11 +37,10 @@ class AbstractConfig(ABC):
 
 
 class SectionConfig(AbstractConfig):
-    def __init__(self, path, section):
+    def __init__(self, path, parser, section):
         self.path = path
         self.section = section
-        self.parser = configparser.ConfigParser()
-        self.parser.read(path)
+        self.parser = parser
 
     def keys(self):
         return [item[0] for item in self.parser.items(self.section)]
@@ -90,20 +89,36 @@ class NamedConfig(AbstractConfig):
     def _getitem(self, item):
         return SectionConfig(
             self.path,
+            self.parser,
             item,
         )
 
 
 class RecursiveConfig(AbstractConfig):
     def keys(self):
-        return [
-            path.split(".")[0]
-            for path
-            in os.listdir(self.path)
-        ]
+        try:
+            return [
+                path.split(".")[0]
+                for path
+                in os.listdir(self.path)
+                if all([
+                    path != "priors",
+                    len(path.split(".")[0]) != 0,
+                    os.path.isdir(
+                        f"{self.path}/{path}"
+                    ) or path.endswith(".ini")
+                ])
+            ]
+        except FileNotFoundError as e:
+            raise KeyError(
+                f"No configuration found at {self.path}"
+            ) from e
 
     def __init__(self, path):
         self.path = Path(path)
+
+    def __eq__(self, other):
+        return str(self) == str(other)
 
     def __str__(self):
         return str(self.path)

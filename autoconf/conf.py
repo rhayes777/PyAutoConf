@@ -1,9 +1,12 @@
+import logging
 import os
 from pathlib import Path
 from typing import Optional
 
-from autoconf.directory_config import ConfigWrapper, RecursiveConfig, PriorConfigWrapper
+from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
 from autoconf.json_prior.config import JSONPriorConfig
+
+logger = logging.getLogger(__name__)
 
 
 def get_matplotlib_backend():
@@ -13,7 +16,53 @@ def get_matplotlib_backend():
         return "default"
 
 
-class Config(ConfigWrapper):
+class DictWrapper:
+    def __init__(self, paths):
+        self._dict = dict()
+        self.paths = paths
+
+    def __contains__(self, item):
+        return item in self._dict
+
+    def items(self):
+        return self._dict.items()
+
+    def __setitem__(self, key, value):
+        if isinstance(key, str):
+            key = key.lower()
+        self._dict[key] = value
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            key = key.lower()
+        try:
+            return self._dict[key]
+        except KeyError:
+            raise KeyError(
+                f"key {key} not found in paths {self.paths_string}"
+            )
+
+    @property
+    def paths_string(self):
+        return "\n".join(
+            map(str, self.paths)
+        )
+
+    def __repr__(self):
+        return repr(self._dict)
+
+    def family(self, cls):
+        for item in family(cls):
+            try:
+                return self[item]
+            except KeyError:
+                pass
+        raise KeyError(
+            f"config for {cls} or its parents not found in paths {self.paths_string}"
+        )
+
+
+class Config:
     def __init__(self, *config_paths, output_path="output"):
         """
         Singleton to manage configuration.
@@ -35,11 +84,62 @@ class Config(ConfigWrapper):
         output_path
             The path where data should be saved.
         """
-        super().__init__(list(map(
+        self._configs = list()
+        self._dict = DictWrapper(
+            self.paths
+        )
+
+        self.configs = list(map(
             RecursiveConfig,
             config_paths
-        )))
+        ))
+
         self.output_path = output_path
+
+    @property
+    def configs(self):
+        return self._configs
+
+    @configs.setter
+    def configs(self, configs):
+        self._configs = configs
+
+        def recurse_config(
+                config,
+                d
+        ):
+            try:
+                for key, value in config.items():
+                    if isinstance(
+                            value,
+                            AbstractConfig
+                    ):
+                        if key not in d:
+                            d[key] = DictWrapper(
+                                self.paths
+                            )
+                        recurse_config(
+                            value,
+                            d=d[key]
+                        )
+                    else:
+                        d[key] = value
+            except KeyError as e:
+                logger.debug(e)
+
+        for config_ in reversed(configs):
+            recurse_config(config_, self._dict)
+
+    def __getitem__(self, item):
+        return self._dict[item]
+
+    @property
+    def paths(self):
+        return [
+            config.path
+            for config
+            in self._configs
+        ]
 
     @property
     def prior_config(self) -> PriorConfigWrapper:
@@ -75,14 +175,24 @@ class Config(ConfigWrapper):
         keep_first
             If True the current priority configuration mains such.
         """
+        self.output_path = output_path or self.output_path
+
+        if self.configs[0] == new_path or (
+                keep_first and len(self.configs) > 1 and self.configs[1] == new_path
+        ):
+            return
         new_config = RecursiveConfig(
             new_path
         )
+
+        configs = list(filter(
+            lambda config: config != new_config,
+            self.configs
+        ))
         if keep_first:
-            self.configs = self.configs[:1] + [new_config] + self.configs[1:]
+            self.configs = configs[:1] + [new_config] + configs[1:]
         else:
-            self.configs = [new_config] + self.configs
-        self.output_path = output_path or self.output_path
+            self.configs = [new_config] + configs
 
     def register(self, file: str):
         """
