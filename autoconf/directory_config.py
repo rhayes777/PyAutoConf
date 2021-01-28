@@ -158,7 +158,9 @@ class PriorConfigWrapper:
             str(config.directory) for config in self.prior_configs
         )
         raise KeyError(
-            f"No prior config found for class {cls.__name__} and path {'.'.join(path)} in directories {directories}"
+            f"No prior config found for class {cls.__name__} and path {'.'.join(path)} in directories {directories} \n\n"
+            "The following readthedocs page explains prior configuration files in PyAutoFit and will help you fix"
+            "the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
         )
 
 
