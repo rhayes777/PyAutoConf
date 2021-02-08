@@ -2,6 +2,7 @@ import configparser
 import os
 from abc import abstractmethod, ABC
 from pathlib import Path
+from autoconf import exc
 
 
 class AbstractConfig(ABC):
@@ -157,10 +158,20 @@ class PriorConfigWrapper:
         directories = ' '.join(
             str(config.directory) for config in self.prior_configs
         )
-        raise KeyError(
-            f"No prior config found for class {cls.__name__} and path {'.'.join(path)} in directories {directories} \n\n"
-            "The following readthedocs page explains prior configuration files in PyAutoFit and will help you fix"
-            "the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
+
+        print(
+
+        )
+
+        raise exc.ConfigException(
+            f"No prior config found for class: \n\n"
+            f"{cls.__name__} \n\n"
+            f"For parameter name and path: \n\n "
+            f"{'.'.join(path)} \n\n "
+            f"In any of the following directories:\n\n"
+            f"{directories}\n\n"
+            f"The following readthedocs page explains prior configuration files in PyAutoFit and will help you fix "
+            f"the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
         )
 
 
