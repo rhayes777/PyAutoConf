@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 
-export PACKAGE_NAME=autoconf
+export PACKAGE_NAME=autoconfig
 
 rm -rf $p/dist
 rm -rf $p/build
 
 set -e
 
-VERSION=$1
-
-git flow release start $VERSION
+export VERSION=$1
 
 cat $PACKAGE_NAME/__init__.py | grep -v __version__ > temp
 
@@ -23,15 +21,11 @@ set +e
 git commit -m "Incremented version number"
 set -e
 
-python3 setup.py test sdist bdist_wheel
+python3 setup.py sdist bdist_wheel
 twine upload dist/* --skip-existing --username $PYPI_USERNAME --password $PYPI_PASSWORD
 
-git flow release finish $VERSION
 
-git checkout master
-git push
-git checkout develop
-git push
+git push --tags
 
 rm -rf $p/dist
 rm -rf $p/build

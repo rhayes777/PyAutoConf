@@ -1,29 +1,23 @@
-import glob
 from codecs import open
 from os.path import abspath, dirname, join
+from os import environ
 
 from setuptools import find_packages, setup
 
-
-def version():
-    with open("autoconf/__init__.py") as f:
-        lines = f.read().split("\n")
-    for line in lines:
-        if "__version__" in line:
-            return line.split("=")[1].strip(" '\"")
-
-
 this_dir = abspath(dirname(__file__))
-with open(join(this_dir, "README.md"), encoding="utf-8") as file:
+with open(join(this_dir, "README.rst"), encoding="utf-8") as file:
     long_description = file.read()
 
+with open(join(this_dir, "requirements.txt")) as f:
+    requirements = f.read().split("\n")
+
 setup(
-    name="autoconf",
-    version=version(),
-    description="Configuration parsing for the auto* family",
+    name="autofit",
+    version=environ.get("VERSION", "1.0.dev0"),
+    description="Classy Probabilistic Programming",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/rhayes777/PyAutoConfig",
+    url="https://github.com/rhayes777/AutoFit",
     author="James Nightingale and Richard Hayes",
     author_email="richard@rghsoftware.co.uk",
     include_package_data=True,
@@ -44,8 +38,7 @@ setup(
     ],
     keywords="cli",
     packages=find_packages(exclude=["docs"]),
-    install_requires=[],
+    install_requires=requirements,
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
-    scripts=glob.glob("scripts/*.py") + glob.glob("scripts/*.sh")
 )
