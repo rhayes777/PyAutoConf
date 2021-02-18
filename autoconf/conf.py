@@ -40,7 +40,7 @@ class DictWrapper:
         except KeyError:
             raise KeyError(
                 f"key {key} not found in paths {self.paths_string}"
-            )
+            ) 
 
     @property
     def paths_string(self):
