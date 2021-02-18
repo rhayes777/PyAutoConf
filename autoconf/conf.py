@@ -53,6 +53,7 @@ class DictWrapper:
 
     def family(self, cls):
         for item in family(cls):
+            print(item)
             try:
                 return self[item]
             except KeyError:

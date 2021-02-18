@@ -1,7 +1,7 @@
 import inspect
 import json
 import logging
-from collections import Sized
+from collections.abc import Sized
 from glob import glob
 from typing import List, Type, Tuple
 import ntpath
