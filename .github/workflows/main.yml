@@ -22,4 +22,4 @@ jobs:
         export ROOT_DIR=`pwd`
         export PYTHONPATH=$PYTHONPATH:$ROOT_DIR/PyAutoConf
         pushd PyAutoConf
-        pytest
+        python -m pytest
