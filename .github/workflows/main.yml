@@ -19,7 +19,5 @@ jobs:
         pip install -r PyAutoConf/requirements.txt
     - name: Run tests
       run: |
-        export ROOT_DIR=`pwd`
-        export PYTHONPATH=$PYTHONPATH:$ROOT_DIR/PyAutoConf
         pushd PyAutoConf
         python -m pytest
