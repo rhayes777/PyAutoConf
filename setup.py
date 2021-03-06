@@ -12,12 +12,12 @@ with open(join(this_dir, "requirements.txt")) as f:
     requirements = f.read().split("\n")
 
 setup(
-    name="autofit",
+    name="autoconf",
     version=environ.get("VERSION", "1.0.dev0"),
-    description="Classy Probabilistic Programming",
+    description="PyAuto Configration",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/rhayes777/AutoFit",
+    url="https://github.com/rhayes777/PyAutoConf",
     author="James Nightingale and Richard Hayes",
     author_email="richard@rghsoftware.co.uk",
     include_package_data=True,
