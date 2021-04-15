@@ -73,7 +73,7 @@
             "upper_limit": 2.0
         }
     },
-    "EllipticalSersic": {
+    "EllSersic": {
         "intensity": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -84,7 +84,7 @@
             }
         }
     },
-    "AbstractEllipticalSersic": {
+    "AbstractEllSersic": {
         "centre_0": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -128,7 +128,7 @@
             "upper_limit": 10.0
         }
     },
-    "EllipticalExponential": {
+    "EllExponential": {
         "centre_0": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -171,7 +171,7 @@
             "upper_limit": 10.0
         }
     },
-    "SphericalIsothermal": {
+    "SphIsothermal": {
         "centre_0": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -188,7 +188,7 @@
             "upper_limit": 2.0
         }
     },
-    "SphericalNFW": {
+    "SphNFW": {
         "centre_0": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -210,7 +210,7 @@
             "upper_limit": 2.0
         }
     },
-    "EllipticalGeneralizedNFW": {
+    "EllNFWGeneralized": {
         "kappa_s": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -227,7 +227,7 @@
             "upper_limit": 1.0
         }
     },
-    "EllipticalCoredIsothermal": {
+    "EllIsothermalCored": {
         "einstein_radius": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -239,7 +239,7 @@
             "upper_limit": 1.0
         }
     },
-    "EllipticalCoreSersic": {
+    "EllSersicCore": {
         "radius_break": {
             "type": "Uniform",
             "lower_limit": 0.0,
@@ -289,8 +289,8 @@
             }
         }
     },
-    "SphericallProfile": {},
-    "EllipticalProfile": {
+    "SphlProfile": {},
+    "EllProfile": {
         "axis_ratio": {
             "type": "Uniform",
             "lower_limit": 0.0,

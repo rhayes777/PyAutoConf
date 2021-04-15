@@ -3,7 +3,7 @@ from os import path
 import pytest
 
 from autoconf.directory_config import NamedConfig
-from autoconf.mock.mock_real import EllipticalProfile, EllipticalGaussian
+from autoconf.mock.mock_real import EllProfile, EllGaussian
 
 directory = path.dirname(path.realpath(__file__))
 
@@ -29,10 +29,10 @@ class TestLabel:
         assert label_config["label"]["contribution_factor"] == r"\omega0"
 
     def test_subscript(self, label_config):
-        assert label_config["subscript"].family(EllipticalProfile) == "l"
+        assert label_config["subscript"].family(EllProfile) == "l"
 
     def test_inheritance(self, label_config):
-        assert label_config["subscript"].family(EllipticalGaussian) == "l"
+        assert label_config["subscript"].family(EllGaussian) == "l"
 
     def test_exception(self, label_config):
         with pytest.raises(KeyError):

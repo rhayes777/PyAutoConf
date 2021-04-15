@@ -3,7 +3,7 @@ class Redshift:
         self.redshift = redshift
 
 
-class SphericalProfile:
+class SphProfile:
     def __init__(self, centre=(0.0, 0.0)):
         """ Generic circular profiles class to contain functions shared by light and
         mass profiles.
@@ -16,7 +16,7 @@ class SphericalProfile:
         self.centre = centre
 
 
-class EllipticalProfile(SphericalProfile):
+class EllProfile(SphProfile):
     def __init__(self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0):
         """ Generic elliptical profiles class to contain functions shared by light
         and mass profiles.
@@ -30,12 +30,12 @@ class EllipticalProfile(SphericalProfile):
         phi : float
             Rotational angle of profiles ellipse counter-clockwise from positive x-axis
         """
-        super(EllipticalProfile, self).__init__(centre)
+        super(EllProfile, self).__init__(centre)
         self.axis_ratio = axis_ratio
         self.phi = phi
 
 
-class EllipticalGaussian(EllipticalProfile):
+class EllGaussian(EllProfile):
     def __init__(
             self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
     ):
@@ -55,7 +55,7 @@ class EllipticalGaussian(EllipticalProfile):
         sigma : float
             The full-width half-maximum of the Gaussian.
         """
-        super(EllipticalGaussian, self).__init__(centre, axis_ratio, phi)
+        super(EllGaussian, self).__init__(centre, axis_ratio, phi)
 
         self.intensity = intensity
         self.sigma = sigma
