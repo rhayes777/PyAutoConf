@@ -1,5 +1,7 @@
 import logging
 import os
+import shutil
+from functools import wraps
 from pathlib import Path
 from typing import Optional
 
@@ -40,7 +42,7 @@ class DictWrapper:
         except KeyError:
             raise KeyError(
                 f"key {key} not found in paths {self.paths_string}"
-            ) 
+            )
 
     @property
     def paths_string(self):
@@ -217,3 +219,42 @@ default = Config(
 )
 
 instance = default
+
+
+def output_path_for_test(
+        temporary_path="temp"
+):
+    """
+    Temporarily change the output path for the scope of a function
+    (e.g. a test). Remove the files after the test has completed
+    execution.
+
+    Parameters
+    ----------
+    temporary_path
+        The path to temporarily output files to
+
+    Returns
+    -------
+    The original function, decorated
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            original_path = instance.output_path
+            instance.output_path = temporary_path
+
+            result = func(*args, **kwargs)
+
+            shutil.rmtree(
+                temporary_path,
+                ignore_errors=True
+            )
+            instance.output_path = original_path
+
+            return result
+
+        return wrapper
+
+    return decorator
