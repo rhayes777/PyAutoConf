@@ -222,7 +222,8 @@ instance = default
 
 
 def output_path_for_test(
-        temporary_path="temp"
+        temporary_path="temp",
+        remove=True
 ):
     """
     Temporarily change the output path for the scope of a function
@@ -233,24 +234,31 @@ def output_path_for_test(
     ----------
     temporary_path
         The path to temporarily output files to
+    remove
+        Should the path be removed?
 
     Returns
     -------
     The original function, decorated
     """
 
+    def remove_():
+        if remove:
+            shutil.rmtree(
+                temporary_path,
+                ignore_errors=True
+            )
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            remove_()
             original_path = instance.output_path
             instance.output_path = temporary_path
 
             result = func(*args, **kwargs)
 
-            shutil.rmtree(
-                temporary_path,
-                ignore_errors=True
-            )
+            remove_()
             instance.output_path = original_path
 
             return result
