@@ -10,7 +10,7 @@ class SphProfile:
 
         Parameters
         ----------
-        centre: (float, float)
+        centre
             The (y,x) coordinates of the origin of the profile.
         """
         self.centre = centre
@@ -23,9 +23,9 @@ class EllProfile(SphProfile):
 
         Parameters
         ----------
-        centre: (float, float)
+        centre
             The (y,x) coordinates of the origin of the profiles
-        axis_ratio : float
+        axis_ratio
             Ratio of profiles ellipse's minor and major axes (b/a)
         phi : float
             Rotational angle of profiles ellipse counter-clockwise from positive x-axis
@@ -43,13 +43,13 @@ class EllGaussian(EllProfile):
 
         Parameters
         ----------
-        centre: (float, float)
+        centre
             The (y,x) origin of the light profile.
-        axis_ratio : float
+        axis_ratio
             Ratio of light profiles ellipse's minor and major axes (b/a).
         phi : float
             Rotation angle of light profile counter-clockwise from positive x-axis.
-        intensity : float
+        intensity
             Overall intensity normalisation of the light profiles (electrons per
             second).
         sigma : float
