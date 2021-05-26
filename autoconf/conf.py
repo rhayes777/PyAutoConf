@@ -1,4 +1,5 @@
 import logging
+import logging.config
 import os
 import shutil
 from functools import wraps
@@ -212,6 +213,10 @@ class Config:
             self.configs = configs[:1] + [new_config] + configs[1:]
         else:
             self.configs = [new_config] + configs
+
+        logging.config.dictConfig(
+            self.logging_config
+        )
 
     def register(self, file: str):
         """
