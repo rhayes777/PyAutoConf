@@ -5,10 +5,14 @@ from functools import wraps
 from pathlib import Path
 from typing import Optional
 
+import yaml
+
 from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
 from autoconf.json_prior.config import JSONPriorConfig
 
 logger = logging.getLogger(__name__)
+
+LOGGING_CONFIG_FILE = "logging.yaml"
 
 
 def get_matplotlib_backend():
@@ -97,6 +101,19 @@ class Config:
         ))
 
         self.output_path = output_path
+
+    @property
+    def logging_config(self):
+        for config in self.configs:
+            path = config.path
+            if LOGGING_CONFIG_FILE in os.listdir(
+                    config.path
+            ):
+                with open(
+                        path / LOGGING_CONFIG_FILE
+                ) as f:
+                    return yaml.safe_load(f)
+        return None
 
     @property
     def configs(self):
