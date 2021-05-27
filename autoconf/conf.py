@@ -1,14 +1,19 @@
 import logging
+import logging.config
 import os
 import shutil
 from functools import wraps
 from pathlib import Path
 from typing import Optional
 
+import yaml
+
 from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
 from autoconf.json_prior.config import JSONPriorConfig
 
 logger = logging.getLogger(__name__)
+
+LOGGING_CONFIG_FILE = "logging.yaml"
 
 
 def get_matplotlib_backend():
@@ -99,6 +104,19 @@ class Config:
         self.output_path = output_path
 
     @property
+    def logging_config(self):
+        for config in self.configs:
+            path = config.path
+            if LOGGING_CONFIG_FILE in os.listdir(
+                    config.path
+            ):
+                with open(
+                        path / LOGGING_CONFIG_FILE
+                ) as f:
+                    return yaml.safe_load(f)
+        return None
+
+    @property
     def configs(self):
         return self._configs
 
@@ -177,6 +195,10 @@ class Config:
         keep_first
             If True the current priority configuration mains such.
         """
+        logger.warning(
+            f"Pushing new config with path {new_path}"
+        )
+
         self.output_path = output_path or self.output_path
 
         if self.configs[0] == new_path or (
@@ -195,6 +217,10 @@ class Config:
             self.configs = configs[:1] + [new_config] + configs[1:]
         else:
             self.configs = [new_config] + configs
+
+        logging.config.dictConfig(
+            self.logging_config
+        )
 
     def register(self, file: str):
         """
