@@ -107,13 +107,16 @@ class Config:
     def logging_config(self):
         for config in self.configs:
             path = config.path
-            if LOGGING_CONFIG_FILE in os.listdir(
-                    config.path
-            ):
-                with open(
-                        path / LOGGING_CONFIG_FILE
-                ) as f:
-                    return yaml.safe_load(f)
+            try:
+                if LOGGING_CONFIG_FILE in os.listdir(
+                        config.path
+                ):
+                    with open(
+                            path / LOGGING_CONFIG_FILE
+                    ) as f:
+                        return yaml.safe_load(f)
+            except FileNotFoundError:
+                pass
         return None
 
     @property
