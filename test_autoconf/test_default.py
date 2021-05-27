@@ -8,6 +8,13 @@ def test_override_file(config):
     assert hpc["default_field"] == "hello"
 
 
+def test_logging_config(config, files_directory):
+    assert config.logging_config["name"] == "config"
+
+    config.push(files_directory / "default")
+    assert config.logging_config["name"] == "default"
+
+
 def test_push(config, files_directory):
     assert len(config.configs) == 2
     assert config["general"]["hpc"]["hpc_mode"] is False

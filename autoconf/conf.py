@@ -1,14 +1,19 @@
 import logging
+import logging.config
 import os
 import shutil
 from functools import wraps
 from pathlib import Path
 from typing import Optional
 
+import yaml
+
 from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
 from autoconf.json_prior.config import JSONPriorConfig
 
 logger = logging.getLogger(__name__)
+
+LOGGING_CONFIG_FILE = "logging.yaml"
 
 
 def get_matplotlib_backend():
@@ -99,6 +104,19 @@ class Config:
         self.output_path = output_path
 
     @property
+    def logging_config(self):
+        for config in self.configs:
+            path = config.path
+            if LOGGING_CONFIG_FILE in os.listdir(
+                    config.path
+            ):
+                with open(
+                        path / LOGGING_CONFIG_FILE
+                ) as f:
+                    return yaml.safe_load(f)
+        return None
+
+    @property
     def configs(self):
         return self._configs
 
@@ -177,6 +195,10 @@ class Config:
         keep_first
             If True the current priority configuration mains such.
         """
+        logger.warning(
+            f"Pushing new config with path {new_path}"
+        )
+
         self.output_path = output_path or self.output_path
 
         if self.configs[0] == new_path or (
@@ -195,6 +217,10 @@ class Config:
             self.configs = configs[:1] + [new_config] + configs[1:]
         else:
             self.configs = [new_config] + configs
+
+        logging.config.dictConfig(
+            self.logging_config
+        )
 
     def register(self, file: str):
         """
@@ -222,7 +248,8 @@ instance = default
 
 
 def output_path_for_test(
-        temporary_path="temp"
+        temporary_path="temp",
+        remove=True
 ):
     """
     Temporarily change the output path for the scope of a function
@@ -233,24 +260,31 @@ def output_path_for_test(
     ----------
     temporary_path
         The path to temporarily output files to
+    remove
+        Should the path be removed?
 
     Returns
     -------
     The original function, decorated
     """
 
+    def remove_():
+        if remove:
+            shutil.rmtree(
+                temporary_path,
+                ignore_errors=True
+            )
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            remove_()
             original_path = instance.output_path
             instance.output_path = temporary_path
 
             result = func(*args, **kwargs)
 
-            shutil.rmtree(
-                temporary_path,
-                ignore_errors=True
-            )
+            remove_()
             instance.output_path = original_path
 
             return result
