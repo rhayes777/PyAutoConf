@@ -195,6 +195,10 @@ class Config:
         keep_first
             If True the current priority configuration mains such.
         """
+        logger.warning(
+            f"Pushing new config with path {new_path}"
+        )
+
         self.output_path = output_path or self.output_path
 
         if self.configs[0] == new_path or (
