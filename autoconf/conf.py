@@ -104,6 +104,9 @@ class Config:
         self.output_path = output_path
 
     def configure_logging(self):
+        """
+        Set the most up to date logging configuration
+        """
         logging_config = self.logging_config
         if logging_config is not None:
             logging.config.dictConfig(
