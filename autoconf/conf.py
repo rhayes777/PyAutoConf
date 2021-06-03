@@ -104,7 +104,12 @@ class Config:
         self.output_path = output_path
 
     @property
-    def logging_config(self):
+    def logging_config(self) -> Optional[dict]:
+        """
+        Loading logging configuration from a YAML file
+        from the most recently added config directory
+        for which it exists.
+        """
         for config in self.configs:
             path = config.path
             try:
@@ -116,7 +121,9 @@ class Config:
                     ) as f:
                         return yaml.safe_load(f)
             except FileNotFoundError:
-                pass
+                logger.warning(
+                    f"No configuration found at path {config.path}"
+                )
         return None
 
     @property

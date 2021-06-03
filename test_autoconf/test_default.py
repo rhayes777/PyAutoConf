@@ -8,6 +8,11 @@ def test_override_file(config):
     assert hpc["default_field"] == "hello"
 
 
+def test_doesnt_exist(config):
+    config.push("/non/existent/path")
+    assert config.logging_config["name"] == "config"
+
+
 def test_logging_config(config, files_directory):
     assert config.logging_config["name"] == "config"
 
