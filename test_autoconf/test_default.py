@@ -1,4 +1,14 @@
+from autoconf import conf
 from autoconf.mock.mock_real import Redshift
+
+
+def test_missing_logging_config(
+        files_directory
+):
+    config = conf.Config(
+        files_directory / "no_logging",
+    )
+    config.push(new_path=files_directory / "no_logging")
 
 
 def test_override_file(config):

@@ -103,6 +103,13 @@ class Config:
 
         self.output_path = output_path
 
+    def configure_logging(self):
+        logging_config = self.logging_config
+        if logging_config is not None:
+            logging.config.dictConfig(
+                logging_config
+            )
+
     @property
     def logging_config(self) -> Optional[dict]:
         """
@@ -228,9 +235,7 @@ class Config:
         else:
             self.configs = [new_config] + configs
 
-        logging.config.dictConfig(
-            self.logging_config
-        )
+        self.configure_logging()
 
     def register(self, file: str):
         """
