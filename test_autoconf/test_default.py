@@ -1,4 +1,14 @@
+from autoconf import conf
 from autoconf.mock.mock_real import Redshift
+
+
+def test_missing_logging_config(
+        files_directory
+):
+    config = conf.Config(
+        files_directory / "no_logging",
+    )
+    config.push(new_path=files_directory / "no_logging")
 
 
 def test_override_file(config):
@@ -6,6 +16,11 @@ def test_override_file(config):
 
     assert hpc["hpc_mode"] is False
     assert hpc["default_field"] == "hello"
+
+
+def test_doesnt_exist(config):
+    config.push("/non/existent/path")
+    assert config.logging_config["name"] == "config"
 
 
 def test_logging_config(config, files_directory):

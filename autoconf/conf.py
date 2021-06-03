@@ -103,8 +103,23 @@ class Config:
 
         self.output_path = output_path
 
+    def configure_logging(self):
+        """
+        Set the most up to date logging configuration
+        """
+        logging_config = self.logging_config
+        if logging_config is not None:
+            logging.config.dictConfig(
+                logging_config
+            )
+
     @property
-    def logging_config(self):
+    def logging_config(self) -> Optional[dict]:
+        """
+        Loading logging configuration from a YAML file
+        from the most recently added config directory
+        for which it exists.
+        """
         for config in self.configs:
             path = config.path
             try:
@@ -116,7 +131,9 @@ class Config:
                     ) as f:
                         return yaml.safe_load(f)
             except FileNotFoundError:
-                pass
+                logger.warning(
+                    f"No configuration found at path {config.path}"
+                )
         return None
 
     @property
@@ -221,9 +238,7 @@ class Config:
         else:
             self.configs = [new_config] + configs
 
-        logging.config.dictConfig(
-            self.logging_config
-        )
+        self.configure_logging()
 
     def register(self, file: str):
         """
