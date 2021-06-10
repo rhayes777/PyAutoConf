@@ -310,3 +310,41 @@ def output_path_for_test(
         return wrapper
 
     return decorator
+
+
+def with_config(*path: str, value):
+    """
+    Create a decorator that swaps a value in configuration
+    defined by path for the scope of a test.
+
+    Parameters
+    ----------
+    path
+        A path through config. e.g. "general", "output", "identifier_version"
+    value
+        The value to temporarily set for the config field
+
+    Returns
+    -------
+    A decorator
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            config = instance
+            for string in path[:-1]:
+                config = config[string]
+
+            original_value = config[path[-1]]
+            config[path[-1]] = value
+
+            result = func(*args, **kwargs)
+
+            config[path[-1]] = original_value
+
+            return result
+
+        return wrapper
+
+    return decorator
