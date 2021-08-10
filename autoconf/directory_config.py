@@ -71,13 +71,14 @@ class SectionConfig(AbstractConfig):
 
 
 class NamedConfig(AbstractConfig):
-    """Parses generic config"""
 
-    def __init__(self, config_path):
+    def __init__(self, config_path : str):
         """
+        Parses generic config
+
         Parameters
         ----------
-        config_path: String
+        config_path
             The path to the config file
         """
         self.path = config_path

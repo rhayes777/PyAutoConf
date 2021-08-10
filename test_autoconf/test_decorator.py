@@ -25,4 +25,4 @@ def test_with_config():
 
 
 def test_config():
-    assert conf.instance["general"]["output"]["identifier_version"] == 1
+    assert conf.instance["general"]["output"]["identifier_version"] == 4
