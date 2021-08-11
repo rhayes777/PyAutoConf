@@ -1,2 +1,2 @@
-ppyaml==5.3.1
+pyaml==5.3.1
 typing-inspect>=0.4.0
