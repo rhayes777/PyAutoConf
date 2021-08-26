@@ -27,7 +27,7 @@ class EllProfile(SphProfile):
             The (y,x) coordinates of the origin of the profiles
         axis_ratio
             Ratio of profiles ellipse's minor and major axes (b/a)
-        phi : float
+        phi
             Rotational angle of profiles ellipse counter-clockwise from positive x-axis
         """
         super(EllProfile, self).__init__(centre)
@@ -47,12 +47,12 @@ class EllGaussian(EllProfile):
             The (y,x) origin of the light profile.
         axis_ratio
             Ratio of light profiles ellipse's minor and major axes (b/a).
-        phi : float
+        phi
             Rotation angle of light profile counter-clockwise from positive x-axis.
         intensity
             Overall intensity normalisation of the light profiles (electrons per
             second).
-        sigma : float
+        sigma
             The full-width half-maximum of the Gaussian.
         """
         super(EllGaussian, self).__init__(centre, axis_ratio, phi)
