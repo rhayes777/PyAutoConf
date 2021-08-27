@@ -32,6 +32,9 @@ def profile_func(func: Callable):
             The result of the function being timed.
         """
 
+        if not conf.instance["general"]["profiling"]["global"]:
+            return
+
         if not conf.instance["general"]["profiling"]["perform"]:
             return
 
