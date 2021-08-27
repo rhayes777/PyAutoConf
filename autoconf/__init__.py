@@ -1,5 +1,6 @@
 from . import exc
-from .cached_property import cached_property
+from .tools.decorators import profile_func
+from .tools.decorators import cached_property
 from .conf import Config
 from .conf import instance
 from .json_prior.config import default_prior
