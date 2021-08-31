@@ -1,5 +1,5 @@
 from autoconf import conf
-from autoconf.tools.decorators import profile_func
+from autoconf.tools.decorators import cached_property
 
 class MockClass:
 
@@ -7,8 +7,7 @@ class MockClass:
 
         self._value = value
 
-    @property
-    @profile_func
+    @cached_property
     def value(self):
         return self._value
 
@@ -19,4 +18,4 @@ def test__profile_decorator_times_decorated_function(files_directory):
     cls = MockClass(value=1.0)
     cls.value
 
-    assert "value" in cls._profiling_dict
+    assert cls.__dict__["value"] == 1.0

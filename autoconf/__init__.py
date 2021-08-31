@@ -1,5 +1,4 @@
 from . import exc
-from .tools.decorators import profile_func
 from .tools.decorators import cached_property
 from .conf import Config
 from .conf import instance
