@@ -13,7 +13,7 @@ with open(join(this_dir, "requirements.txt")) as f:
 
 setup(
     name="autoconf",
-    version=environ.get("VERSION", "2021.9.12.1"),
+    version=environ.get("VERSION", "2021.10.14.1"),
     description="PyAuto Configration",
     long_description=long_description,
     long_description_content_type="text/markdown",
