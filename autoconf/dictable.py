@@ -6,6 +6,13 @@ from autoconf.class_path import get_class_path, get_class
 def as_dict(
         obj
 ):
+    if isinstance(
+            obj, list
+    ):
+        return list(map(
+            as_dict,
+            obj
+        ))
     if obj.__class__.__module__ == 'builtins':
         return obj
     argument_dict = {
@@ -57,6 +64,14 @@ class Dictable:
         An instance of the geometry profile specified by the type field in
         the profile_dict
         """
+        if isinstance(
+                profile_dict,
+                list
+        ):
+            return list(map(
+                Dictable.from_dict,
+                profile_dict
+            ))
         if not isinstance(
                 profile_dict,
                 dict
