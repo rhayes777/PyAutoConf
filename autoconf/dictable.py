@@ -1,6 +1,6 @@
 import inspect
 
-from autofit.tools.util import get_class_path, get_class
+from autoconf.class_path import get_class_path, get_class
 
 
 def as_dict(
@@ -71,9 +71,9 @@ class Dictable:
         # noinspection PyArgumentList
         return cls(
             **{
-                Dictable.from_dict(
-                    name
-                ): value
+                name: Dictable.from_dict(
+                    value
+                )
                 for name, value
                 in profile_dict.items()
             }
