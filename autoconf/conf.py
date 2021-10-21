@@ -131,7 +131,7 @@ class Config:
                     ) as f:
                         return yaml.safe_load(f)
             except FileNotFoundError:
-                logger.warning(
+                logger.debug(
                     f"No configuration found at path {config.path}"
                 )
         return None
@@ -215,7 +215,7 @@ class Config:
         keep_first
             If True the current priority configuration mains such.
         """
-        logger.warning(
+        logger.debug(
             f"Pushing new config with path {new_path}"
         )
 
