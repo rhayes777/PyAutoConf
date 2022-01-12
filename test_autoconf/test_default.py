@@ -55,10 +55,10 @@ def test_keep_first(config, files_directory):
 
 
 def test_override_in_directory(config):
-    subscript = config["text"]["label"]["subscript"]
+    superscript = config["text"]["label"]["superscript"]
 
-    assert subscript["Galaxy"] == "g"
-    assert subscript["default_field"] == "label default"
+    assert superscript["Galaxy"] == "g"
+    assert superscript["default_field"] == "label default"
 
 
 def test_novel_directory(config):
