@@ -93,3 +93,6 @@ class Dictable:
                 in profile_dict.items()
             }
         )
+
+    def __eq__(self, other):
+        return self.dict() == other.dict()
