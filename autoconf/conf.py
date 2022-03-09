@@ -105,6 +105,11 @@ class Config:
 
     @property
     def dict(self):
+        """
+        A dictionary containing configuration loaded from directories and files.
+
+        Lazily recurse directories to load configuration.
+        """
         if self._dict is None:
             self._dict = DictWrapper(
                 self.paths
@@ -176,6 +181,10 @@ class Config:
 
     @configs.setter
     def configs(self, configs):
+        """
+        When the list of configs is updated this invalidates the current config
+        dictionary
+        """
         self._dict = None
         self._configs = configs
 
