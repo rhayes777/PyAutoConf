@@ -70,7 +70,7 @@ class DictWrapper:
 
 
 class Config:
-    def __init__(self, *config_paths, output_path="output"):
+    def __init__(self, *config_paths, output_path: Union[str, Path] = "output"):
         """
         Singleton to manage configuration.
 
@@ -91,6 +91,12 @@ class Config:
         output_path
             The path where data should be saved.
         """
+        for config_path in config_paths:
+            if Path(config_path).name == "output":
+                logger.warning(
+                    f"{config_path} passed as config path. Did you mean to use output_path={config_path}?"
+                )
+
         self._configs = list()
         self._dict = DictWrapper(
             self.paths
@@ -277,7 +283,7 @@ current_directory = Path(os.getcwd())
 
 default = Config(
     current_directory / "config",
-    current_directory / "output/"
+    output_path=current_directory / "output/"
 )
 
 instance = default
