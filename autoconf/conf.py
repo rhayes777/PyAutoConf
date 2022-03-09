@@ -4,7 +4,7 @@ import os
 import shutil
 from functools import wraps
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union, Dict
 
 import yaml
 
@@ -70,7 +70,7 @@ class DictWrapper:
 
 
 class Config:
-    def __init__(self, *config_paths, output_path="output"):
+    def __init__(self, *config_paths, output_path: Union[str, Path] = "output"):
         """
         Singleton to manage configuration.
 
@@ -91,6 +91,12 @@ class Config:
         output_path
             The path where data should be saved.
         """
+        for config_path in config_paths:
+            if Path(config_path).name == "output":
+                logger.warning(
+                    f"{config_path} passed as config path. Did you mean to use output_path={config_path}?"
+                )
+
         self._configs = list()
         self._dict = DictWrapper(
             self.paths
@@ -103,6 +109,45 @@ class Config:
 
         self.output_path = output_path
 
+    @property
+    def dict(self):
+        """
+        A dictionary containing configuration loaded from directories and files.
+
+        Lazily recurse directories to load configuration.
+        """
+        if self._dict is None:
+            self._dict = DictWrapper(
+                self.paths
+            )
+
+            def recurse_config(
+                    config,
+                    d
+            ):
+                try:
+                    for key, value in config.items():
+                        if isinstance(
+                                value,
+                                AbstractConfig
+                        ):
+                            if key not in d:
+                                d[key] = DictWrapper(
+                                    self.paths
+                                )
+                            recurse_config(
+                                value,
+                                d=d[key]
+                            )
+                        else:
+                            d[key] = value
+                except KeyError as e:
+                    logger.debug(e)
+
+            for config_ in reversed(self._configs):
+                recurse_config(config_, self._dict)
+        return self._dict
+
     def configure_logging(self):
         """
         Set the most up to date logging configuration
@@ -114,7 +159,7 @@ class Config:
             )
 
     @property
-    def logging_config(self) -> Optional[dict]:
+    def logging_config(self) -> Optional[Dict]:
         """
         Loading logging configuration from a YAML file
         from the most recently added config directory
@@ -142,36 +187,15 @@ class Config:
 
     @configs.setter
     def configs(self, configs):
+        """
+        When the list of configs is updated this invalidates the current config
+        dictionary
+        """
+        self._dict = None
         self._configs = configs
 
-        def recurse_config(
-                config,
-                d
-        ):
-            try:
-                for key, value in config.items():
-                    if isinstance(
-                            value,
-                            AbstractConfig
-                    ):
-                        if key not in d:
-                            d[key] = DictWrapper(
-                                self.paths
-                            )
-                        recurse_config(
-                            value,
-                            d=d[key]
-                        )
-                    else:
-                        d[key] = value
-            except KeyError as e:
-                logger.debug(e)
-
-        for config_ in reversed(configs):
-            recurse_config(config_, self._dict)
-
     def __getitem__(self, item):
-        return self._dict[item]
+        return self.dict[item]
 
     @property
     def paths(self):
@@ -196,7 +220,7 @@ class Config:
 
     def push(
             self,
-            new_path: str,
+            new_path: Union[str, Path],
             output_path: Optional[str] = None,
             keep_first: bool = False
     ):
@@ -259,7 +283,7 @@ current_directory = Path(os.getcwd())
 
 default = Config(
     current_directory / "config",
-    current_directory / "output/"
+    output_path=current_directory / "output/"
 )
 
 instance = default
