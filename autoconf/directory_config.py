@@ -72,7 +72,7 @@ class SectionConfig(AbstractConfig):
 
 class NamedConfig(AbstractConfig):
 
-    def __init__(self, config_path : str):
+    def __init__(self, config_path):
         """
         Parses generic config
 
