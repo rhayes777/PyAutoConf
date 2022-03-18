@@ -13,7 +13,7 @@ with open(join(this_dir, "requirements.txt")) as f:
 
 setup(
     name="autoconf",
-    version=environ.get("VERSION", "1.0.dev0"),
+    version=environ.get("VERSION", "2022.03.18.1"),
     description="PyAuto Configration",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -35,6 +35,7 @@ setup(
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     keywords="cli",
     packages=find_packages(exclude=["docs"]),
