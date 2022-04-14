@@ -6,7 +6,12 @@ import numpy as np
 from autoconf.class_path import get_class_path, get_class
 
 
-def nd_array_as_dict(obj):
+def nd_array_as_dict(
+        obj: np.ndarray
+) -> dict:
+    """
+    Converts a numpy array to a dictionary representation.
+    """
     return {
         "type": "numpy.ndarray",
         "array": obj.tolist(),
@@ -14,7 +19,12 @@ def nd_array_as_dict(obj):
     }
 
 
-def nd_array_from_dict(nd_array_dict):
+def nd_array_from_dict(
+        nd_array_dict: dict
+) -> np.ndarray:
+    """
+    Converts a dictionary representation back to a numpy array.
+    """
     return np.array(
         nd_array_dict["array"],
         dtype=getattr(
