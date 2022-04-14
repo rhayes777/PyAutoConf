@@ -36,3 +36,18 @@ def test_from_dict(
     assert Dictable.from_dict(
         array_dict
     ) == array
+
+
+@pytest.mark.parametrize(
+    "array",
+    [
+        np.array([True]),
+        np.array([[1.0]]),
+        np.array([[1.0, 2.0], [3.0, 4.0]]),
+        np.array([[1, 2], [3, 4]]),
+    ]
+)
+def test_multiple(array):
+    assert (Dictable.from_dict(
+        as_dict(array)
+    ) == array).all()
