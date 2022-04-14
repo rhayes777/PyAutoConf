@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import pytest
 
@@ -51,3 +53,11 @@ def test_multiple(array):
     assert (Dictable.from_dict(
         as_dict(array)
     ) == array).all()
+
+
+def test_as_json(array):
+    assert Dictable.from_dict(
+        json.loads(json.dumps(
+            as_dict(array)
+        ))
+    ) == array
