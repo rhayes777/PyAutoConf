@@ -1,12 +1,36 @@
 import inspect
 import json
 
+import numpy as np
+
 from autoconf.class_path import get_class_path, get_class
+
+
+def nd_array_as_dict(obj):
+    return {
+        "type": "numpy.ndarray",
+        "array": obj.tolist(),
+        "dtype": str(obj.dtype),
+    }
+
+
+def nd_array_from_dict(nd_array_dict):
+    return np.array(
+        nd_array_dict["array"],
+        dtype=getattr(
+            np, nd_array_dict["dtype"]
+        )
+    )
 
 
 def as_dict(
         obj
 ):
+    if isinstance(
+            obj, np.ndarray
+    ):
+        return nd_array_as_dict(obj)
+
     if isinstance(
             obj, list
     ):
@@ -25,6 +49,7 @@ def as_dict(
             obj.__init__
         ).args[1:]
     }
+
     return {
         "type": get_class_path(
             obj.__class__
@@ -84,6 +109,10 @@ class Dictable:
                 "type"
             )
         )
+
+        if cls is np.ndarray:
+            return nd_array_from_dict(cls_dict)
+
         # noinspection PyArgumentList
         return cls(
             **{
@@ -112,7 +141,6 @@ class Dictable:
             cls_dict = json.load(f)
 
         return cls.from_dict(cls_dict=cls_dict)
-
 
     def output_to_json(self, file_path: str):
         """
