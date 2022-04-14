@@ -17,6 +17,7 @@ jobs:
       run: |
         pip3 install --upgrade pip
         pip3 install wheel
+        pip3 install numpy
         pip3 install pytest==6.1.2
         pip3 install -r PyAutoConf/requirements.txt
     - name: Run tests
