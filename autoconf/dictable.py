@@ -1,9 +1,14 @@
 import inspect
 import json
+import logging
 
 import numpy as np
 
 from autoconf.class_path import get_class_path, get_class
+
+logger = logging.getLogger(
+    __name__
+)
 
 
 def nd_array_as_dict(
@@ -39,7 +44,10 @@ def as_dict(
     if isinstance(
             obj, np.ndarray
     ):
-        return nd_array_as_dict(obj)
+        try:
+            return nd_array_as_dict(obj)
+        except Exception as e:
+            logger.info(e)
 
     if isinstance(
             obj, list
