@@ -158,7 +158,7 @@ class Dictable:
         with open(file_path, "r+") as f:
             cls_dict = json.load(f)
 
-        return cls.from_dict(cls_dict=cls_dict)
+        return cls.from_dict(cls_dict)
 
     def output_to_json(self, file_path: str):
         """
