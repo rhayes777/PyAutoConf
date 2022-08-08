@@ -9,6 +9,7 @@ from typing import Optional, Union, Dict
 import yaml
 
 from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
+from autoconf.exc import ConfigException
 from autoconf.json_prior.config import JSONPriorConfig
 
 logger = logging.getLogger(__name__)
@@ -243,12 +244,41 @@ class Config:
             f"Pushing new config with path {new_path}"
         )
 
+        if not Path(new_path).exists():
+            raise ConfigException(f"{new_path} does not exist")
+
+        suffixes = {
+            Path(file).suffix
+            for _, _, files
+            in os.walk(new_path)
+            for file in files
+        }
+
+        CONFIG_SUFFIXES = [
+            ".yml",
+            ".ini",
+            ".json",
+            ".yaml",
+        ]
+
+        if not any((
+            suffix in suffixes
+            for suffix in CONFIG_SUFFIXES
+        )):
+            raise ConfigException(
+                f"{new_path} does not contain any files ending with {'/'.join(CONFIG_SUFFIXES)} recursively"
+            )
+
         self.output_path = output_path or self.output_path
 
-        if self.configs[0] == new_path or (
-                keep_first and len(self.configs) > 1 and self.configs[1] == new_path
-        ):
-            return
+        try:
+            if self.configs[0] == new_path or (
+                    keep_first and len(self.configs) > 1 and self.configs[1] == new_path
+            ):
+                return
+        except IndexError:
+            pass
+
         new_config = RecursiveConfig(
             new_path
         )
