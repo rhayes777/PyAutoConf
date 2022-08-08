@@ -239,6 +239,12 @@ class Config:
             unchanged
         keep_first
             If True the current priority configuration mains such.
+
+        Raises
+        ------
+        ConfigException
+            If the pushed path does not exist or does not contain at least one file
+            with an expected configuration suffix
         """
         logger.debug(
             f"Pushing new config with path {new_path}"
