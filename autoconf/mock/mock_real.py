@@ -35,7 +35,7 @@ class EllProfile(SphProfile):
         self.phi = phi
 
 
-class EllGaussian(EllProfile):
+class Gaussian(EllProfile):
     def __init__(
             self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
     ):
@@ -55,7 +55,7 @@ class EllGaussian(EllProfile):
         sigma
             The full-width half-maximum of the Gaussian.
         """
-        super(EllGaussian, self).__init__(centre, axis_ratio, phi)
+        super(Gaussian, self).__init__(centre, axis_ratio, phi)
 
         self.intensity = intensity
         self.sigma = sigma

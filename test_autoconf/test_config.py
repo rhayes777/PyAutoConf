@@ -3,7 +3,7 @@ from os import path
 import pytest
 
 from autoconf.directory_config import NamedConfig
-from autoconf.mock.mock_real import EllProfile, EllGaussian
+from autoconf.mock.mock_real import EllProfile, Gaussian
 
 directory = path.dirname(path.realpath(__file__))
 
@@ -32,7 +32,7 @@ class TestLabel:
         assert label_config["superscript"].family(EllProfile) == "l"
 
     def test_inheritance(self, label_config):
-        assert label_config["superscript"].family(EllGaussian) == "l"
+        assert label_config["superscript"].family(Gaussian) == "l"
 
     def test_exception(self, label_config):
         with pytest.raises(KeyError):
