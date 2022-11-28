@@ -9,3 +9,8 @@ def test_load_yaml_config(config):
         "type": "Uniform",
         "upper_limit": 3.0,
     }
+
+
+def test_embedded_path(config):
+    path_value_map = config.prior_config.prior_configs[0].path_value_map
+    assert "subdirectory.subconfig.SubClass.variable.type" in path_value_map

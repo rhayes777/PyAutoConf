@@ -7,7 +7,7 @@ import pytest
 from autoconf.json_prior import generate as g
 
 directory = Path(__file__).parent
-package_directory = directory / "code"
+package_directory = directory / "source_code"
 module_path = package_directory / "module.py"
 
 
