@@ -37,16 +37,25 @@ class AbstractConfig(ABC):
                 pass
         raise KeyError(f"No configuration found for {cls.__name__}")
 
+    def dict(self):
+        d = {}
+        for key in self.keys():
+            value = self[key]
+            if isinstance(value, AbstractConfig):
+                value = value.dict()
+            d[key] = value
+        return d
+
 
 class YAMLConfig(AbstractConfig):
     def __init__(self, path):
-        self.dict = yaml.safe_load(path)
+        self._dict = yaml.safe_load(path)
 
     def _getitem(self, item):
-        return self.dict[item]
+        return self._dict[item]
 
     def keys(self):
-        return self.dict.keys()
+        return self._dict.keys()
 
 
 class SectionConfig(AbstractConfig):
