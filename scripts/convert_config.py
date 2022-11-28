@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+"""
+Converts the configuration files and directories in a given directory into YAML configs.
+
+Usage:
+./convert_config.py path/to/directory
+"""
+
 import os
 import shutil
 import sys
