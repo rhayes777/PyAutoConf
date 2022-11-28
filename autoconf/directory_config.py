@@ -49,7 +49,8 @@ class AbstractConfig(ABC):
 
 class YAMLConfig(AbstractConfig):
     def __init__(self, path):
-        self._dict = yaml.safe_load(path)
+        with open(path) as f:
+            self._dict = yaml.safe_load(f)
 
     def _getitem(self, item):
         return self._dict[item]
