@@ -1,0 +1,9 @@
+{
+  "JSONClass": {
+    "variable": {
+      "type": "Uniform",
+      "lower_limit": 0.0,
+      "upper_limit": 3.0
+    }
+  }
+}
