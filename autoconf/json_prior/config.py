@@ -3,6 +3,7 @@ import json
 import logging
 from collections.abc import Sized
 from glob import glob
+from pathlib import Path
 from typing import List, Type, Tuple
 import ntpath
 from os import path
@@ -134,14 +135,17 @@ class JSONPriorConfig:
         """
         config_dict = dict()
 
+        config_path = Path(directory)
+
         for suffix, parser in [
             ("json", json.load),
             ("yaml", yaml.safe_load),
             ("yml", yaml.safe_load),
         ]:
-            for file in glob(path.join(directory, f"*.{suffix}")):
+            for file in config_path.rglob(f"*.{suffix}"):
+                parts = file.relative_to(config_path).with_suffix("").parts
                 with open(file) as f:
-                    config_dict[ntpath.basename(file).split(".")[0]] = parser(f)
+                    config_dict[".".join(parts)] = parser(f)
 
         return JSONPriorConfig(config_dict, directory=directory)
 
