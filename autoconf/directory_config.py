@@ -150,47 +150,6 @@ class PriorConfigWrapper:
         )
 
 
-class ConfigWrapper(AbstractConfig):
-    def __init__(self, configs):
-        self.configs = configs
-
-    @property
-    def paths(self):
-        return [config.path for config in self.configs]
-
-    def __applicable(self, item):
-        __applicable = list()
-        for config in self.configs:
-            try:
-                __applicable.append(config[item])
-            except KeyError:
-                pass
-        return __applicable
-
-    def items(self):
-        item_dict = {}
-        for config in reversed(self.configs):
-            for key, value in config.items():
-                item_dict[key] = value
-        return list(item_dict.items())
-
-    def keys(self):
-        keys = set()
-        for config in self.configs:
-            keys.update(config.keys())
-        return list(keys)
-
-    def _getitem(self, item):
-        configs = self.__applicable(item)
-        if len(configs) == 0:
-            paths = "\n".join(map(str, self.paths))
-            raise KeyError(f"No configuration for {item} in {paths}")
-        for config in configs:
-            if not isinstance(config, AbstractConfig):
-                return config
-        return ConfigWrapper(configs)
-
-
 def family(current_class):
     yield current_class
     for next_class in current_class.__bases__:
