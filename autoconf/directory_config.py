@@ -3,6 +3,8 @@ import os
 from abc import abstractmethod, ABC
 from pathlib import Path
 
+import yaml
+
 from autoconf import exc
 
 
@@ -34,6 +36,17 @@ class AbstractConfig(ABC):
             except (KeyError, configparser.NoOptionError):
                 pass
         raise KeyError(f"No configuration found for {cls.__name__}")
+
+
+class YAMLConfig(AbstractConfig):
+    def __init__(self, path):
+        self.dict = yaml.safe_load(path)
+
+    def _getitem(self, item):
+        return self.dict[item]
+
+    def keys(self):
+        return self.dict.keys()
 
 
 class SectionConfig(AbstractConfig):
@@ -95,7 +108,10 @@ class RecursiveConfig(AbstractConfig):
                     [
                         path != "priors",
                         len(path.split(".")[0]) != 0,
-                        os.path.isdir(f"{self.path}/{path}") or path.endswith(".ini"),
+                        os.path.isdir(f"{self.path}/{path}")
+                        or path.endswith(".ini")
+                        or path.endswith(".yaml")
+                        or path.endswith(".yml"),
                     ]
                 )
             ]
@@ -119,6 +135,12 @@ class RecursiveConfig(AbstractConfig):
         file_path = f"{item_path}.ini"
         if os.path.isfile(file_path):
             return NamedConfig(file_path)
+        yml_path = item_path.with_suffix(".yml")
+        if yml_path.exists():
+            return YAMLConfig(yml_path)
+        yaml_path = item_path.with_suffix(".yaml")
+        if yaml_path.exists():
+            return YAMLConfig(yaml_path)
         if os.path.isdir(item_path):
             return RecursiveConfig(item_path)
         raise KeyError(f"No configuration found for {item} at path {self.path}")
