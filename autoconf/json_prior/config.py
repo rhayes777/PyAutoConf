@@ -3,9 +3,12 @@ import json
 import logging
 from collections.abc import Sized
 from glob import glob
+from pathlib import Path
 from typing import List, Type, Tuple
 import ntpath
 from os import path
+
+import yaml
 
 from autoconf.directory_config import family
 
@@ -16,7 +19,7 @@ default_prior = {
     "lower_limit": 0.0,
     "upper_limit": 1.0,
     "width_modifier": {"type": "Absolute", "value": 0.2},
-    "gaussian_limits": {"lower": 0.0, "upper": 1.0}
+    "gaussian_limits": {"lower": 0.0, "upper": 1.0},
 }
 
 
@@ -30,10 +33,7 @@ def make_config_for_class(cls):
     for i, argument in enumerate(reversed(arguments)):
         if i < len(defaults):
             default = defaults[i]
-            if isinstance(
-                    default,
-                    Sized
-            ):
+            if isinstance(default, Sized):
                 for j in range(len(default)):
                     config[f"{argument}_{j}"] = default_prior
                 continue
@@ -134,9 +134,18 @@ class JSONPriorConfig:
         A configuration instance.
         """
         config_dict = dict()
-        for file in glob(path.join(directory, "*.json")):
-            with open(file) as f:
-                config_dict[ntpath.basename(file).split(".")[0]] = json.load(f)
+
+        config_path = Path(directory)
+
+        for suffix, parser in [
+            ("json", json.load),
+            ("yaml", yaml.safe_load),
+            ("yml", yaml.safe_load),
+        ]:
+            for file in config_path.rglob(f"*.{suffix}"):
+                parts = file.relative_to(config_path).with_suffix("").parts
+                with open(file) as f:
+                    config_dict[".".join(parts)] = parser(f)
 
         return JSONPriorConfig(config_dict, directory=directory)
 
@@ -176,7 +185,9 @@ class JSONPriorConfig:
                 return self(path_for_class(c) + suffix_path)
             except KeyError:
                 pass
-        raise KeyError(f"No config found for class {cls} and path {suffix_path} in {self.directory}")
+        raise KeyError(
+            f"No config found for class {cls} and path {suffix_path} in {self.directory}"
+        )
 
     def __call__(self, config_path: List[str]):
         """
