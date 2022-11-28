@@ -2,6 +2,7 @@ import configparser
 import os
 from abc import abstractmethod, ABC
 from pathlib import Path
+
 from autoconf import exc
 
 
@@ -32,9 +33,7 @@ class AbstractConfig(ABC):
                 return self[key]
             except (KeyError, configparser.NoOptionError):
                 pass
-        raise KeyError(
-            f"No configuration found for {cls.__name__}"
-        )
+        raise KeyError(f"No configuration found for {cls.__name__}")
 
 
 class SectionConfig(AbstractConfig):
@@ -48,10 +47,7 @@ class SectionConfig(AbstractConfig):
 
     def _getitem(self, item):
         try:
-            result = self.parser.get(
-                self.section,
-                item
-            )
+            result = self.parser.get(self.section, item)
             if result.lower() == "true":
                 return True
             if result.lower() == "false":
@@ -65,13 +61,10 @@ class SectionConfig(AbstractConfig):
             except ValueError:
                 return result
         except (configparser.NoSectionError, configparser.NoOptionError):
-            raise KeyError(
-                f"No configuration found for {item} at path {self.path}"
-            )
+            raise KeyError(f"No configuration found for {item} at path {self.path}")
 
 
 class NamedConfig(AbstractConfig):
-
     def __init__(self, config_path):
         """
         Parses generic config
@@ -89,11 +82,7 @@ class NamedConfig(AbstractConfig):
         return self.parser.sections()
 
     def _getitem(self, item):
-        return SectionConfig(
-            self.path,
-            self.parser,
-            item,
-        )
+        return SectionConfig(self.path, self.parser, item,)
 
 
 class RecursiveConfig(AbstractConfig):
@@ -101,20 +90,17 @@ class RecursiveConfig(AbstractConfig):
         try:
             return [
                 path.split(".")[0]
-                for path
-                in os.listdir(self.path)
-                if all([
-                    path != "priors",
-                    len(path.split(".")[0]) != 0,
-                    os.path.isdir(
-                        f"{self.path}/{path}"
-                    ) or path.endswith(".ini")
-                ])
+                for path in os.listdir(self.path)
+                if all(
+                    [
+                        path != "priors",
+                        len(path.split(".")[0]) != 0,
+                        os.path.isdir(f"{self.path}/{path}") or path.endswith(".ini"),
+                    ]
+                )
             ]
         except FileNotFoundError as e:
-            raise KeyError(
-                f"No configuration found at {self.path}"
-            ) from e
+            raise KeyError(f"No configuration found at {self.path}") from e
 
     def __init__(self, path):
         self.path = Path(path)
@@ -132,16 +118,10 @@ class RecursiveConfig(AbstractConfig):
         item_path = self.path / f"{item}"
         file_path = f"{item_path}.ini"
         if os.path.isfile(file_path):
-            return NamedConfig(
-                file_path
-            )
+            return NamedConfig(file_path)
         if os.path.isdir(item_path):
-            return RecursiveConfig(
-                item_path
-            )
-        raise KeyError(
-            f"No configuration found for {item} at path {self.path}"
-        )
+            return RecursiveConfig(item_path)
+        raise KeyError(f"No configuration found for {item} at path {self.path}")
 
 
 class PriorConfigWrapper:
@@ -151,18 +131,12 @@ class PriorConfigWrapper:
     def for_class_and_suffix_path(self, cls, path):
         for config in self.prior_configs:
             try:
-                return config.for_class_and_suffix_path(
-                    cls, path
-                )
+                return config.for_class_and_suffix_path(cls, path)
             except KeyError:
                 pass
-        directories = ' '.join(
-            str(config.directory) for config in self.prior_configs
-        )
+        directories = " ".join(str(config.directory) for config in self.prior_configs)
 
-        print(
-
-        )
+        print()
 
         raise exc.ConfigException(
             f"No prior config found for class: \n\n"
@@ -182,11 +156,7 @@ class ConfigWrapper(AbstractConfig):
 
     @property
     def paths(self):
-        return [
-            config.path
-            for config
-            in self.configs
-        ]
+        return [config.path for config in self.configs]
 
     def __applicable(self, item):
         __applicable = list()
@@ -199,9 +169,7 @@ class ConfigWrapper(AbstractConfig):
 
     def items(self):
         item_dict = {}
-        for config in reversed(
-                self.configs
-        ):
+        for config in reversed(self.configs):
             for key, value in config.items():
                 item_dict[key] = value
         return list(item_dict.items())
@@ -215,14 +183,10 @@ class ConfigWrapper(AbstractConfig):
     def _getitem(self, item):
         configs = self.__applicable(item)
         if len(configs) == 0:
-            paths = '\n'.join(map(str, self.paths))
-            raise KeyError(
-                f"No configuration for {item} in {paths}"
-            )
+            paths = "\n".join(map(str, self.paths))
+            raise KeyError(f"No configuration for {item} in {paths}")
         for config in configs:
-            if not isinstance(
-                    config, AbstractConfig
-            ):
+            if not isinstance(config, AbstractConfig):
                 return config
         return ConfigWrapper(configs)
 
