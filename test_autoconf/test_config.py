@@ -18,9 +18,7 @@ class MockClass:
 
 @pytest.fixture(name="label_config")
 def make_label_config():
-    return NamedConfig(
-        "{}/files/config/label.ini".format(directory)
-    )
+    return NamedConfig(f"{directory}/files/config/label.ini")
 
 
 class TestLabel:
@@ -48,14 +46,11 @@ BAD_PATH = "bad/path"
 
 def remove_path():
     shutil.rmtree(
-        BAD_PATH,
-        ignore_errors=True,
+        BAD_PATH, ignore_errors=True,
     )
 
 
-@pytest.fixture(
-    name="config"
-)
+@pytest.fixture(name="config")
 def make_config():
     return conf.Config()
 

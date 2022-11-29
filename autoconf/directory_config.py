@@ -2,6 +2,9 @@ import configparser
 import os
 from abc import abstractmethod, ABC
 from pathlib import Path
+
+import yaml
+
 from autoconf import exc
 
 
@@ -32,9 +35,28 @@ class AbstractConfig(ABC):
                 return self[key]
             except (KeyError, configparser.NoOptionError):
                 pass
-        raise KeyError(
-            f"No configuration found for {cls.__name__}"
-        )
+        raise KeyError(f"No configuration found for {cls.__name__}")
+
+    def dict(self):
+        d = {}
+        for key in self.keys():
+            value = self[key]
+            if isinstance(value, AbstractConfig):
+                value = value.dict()
+            d[key] = value
+        return d
+
+
+class YAMLConfig(AbstractConfig):
+    def __init__(self, path):
+        with open(path) as f:
+            self._dict = yaml.safe_load(f)
+
+    def _getitem(self, item):
+        return self._dict[item]
+
+    def keys(self):
+        return self._dict.keys()
 
 
 class SectionConfig(AbstractConfig):
@@ -48,10 +70,7 @@ class SectionConfig(AbstractConfig):
 
     def _getitem(self, item):
         try:
-            result = self.parser.get(
-                self.section,
-                item
-            )
+            result = self.parser.get(self.section, item)
             if result.lower() == "true":
                 return True
             if result.lower() == "false":
@@ -65,13 +84,10 @@ class SectionConfig(AbstractConfig):
             except ValueError:
                 return result
         except (configparser.NoSectionError, configparser.NoOptionError):
-            raise KeyError(
-                f"No configuration found for {item} at path {self.path}"
-            )
+            raise KeyError(f"No configuration found for {item} at path {self.path}")
 
 
 class NamedConfig(AbstractConfig):
-
     def __init__(self, config_path):
         """
         Parses generic config
@@ -89,11 +105,7 @@ class NamedConfig(AbstractConfig):
         return self.parser.sections()
 
     def _getitem(self, item):
-        return SectionConfig(
-            self.path,
-            self.parser,
-            item,
-        )
+        return SectionConfig(self.path, self.parser, item,)
 
 
 class RecursiveConfig(AbstractConfig):
@@ -101,20 +113,20 @@ class RecursiveConfig(AbstractConfig):
         try:
             return [
                 path.split(".")[0]
-                for path
-                in os.listdir(self.path)
-                if all([
-                    path != "priors",
-                    len(path.split(".")[0]) != 0,
-                    os.path.isdir(
-                        f"{self.path}/{path}"
-                    ) or path.endswith(".ini")
-                ])
+                for path in os.listdir(self.path)
+                if all(
+                    [
+                        path != "priors",
+                        len(path.split(".")[0]) != 0,
+                        os.path.isdir(f"{self.path}/{path}")
+                        or path.endswith(".ini")
+                        or path.endswith(".yaml")
+                        or path.endswith(".yml"),
+                    ]
+                )
             ]
         except FileNotFoundError as e:
-            raise KeyError(
-                f"No configuration found at {self.path}"
-            ) from e
+            raise KeyError(f"No configuration found at {self.path}") from e
 
     def __init__(self, path):
         self.path = Path(path)
@@ -132,16 +144,16 @@ class RecursiveConfig(AbstractConfig):
         item_path = self.path / f"{item}"
         file_path = f"{item_path}.ini"
         if os.path.isfile(file_path):
-            return NamedConfig(
-                file_path
-            )
+            return NamedConfig(file_path)
+        yml_path = item_path.with_suffix(".yml")
+        if yml_path.exists():
+            return YAMLConfig(yml_path)
+        yaml_path = item_path.with_suffix(".yaml")
+        if yaml_path.exists():
+            return YAMLConfig(yaml_path)
         if os.path.isdir(item_path):
-            return RecursiveConfig(
-                item_path
-            )
-        raise KeyError(
-            f"No configuration found for {item} at path {self.path}"
-        )
+            return RecursiveConfig(item_path)
+        raise KeyError(f"No configuration found for {item} at path {self.path}")
 
 
 class PriorConfigWrapper:
@@ -151,18 +163,12 @@ class PriorConfigWrapper:
     def for_class_and_suffix_path(self, cls, path):
         for config in self.prior_configs:
             try:
-                return config.for_class_and_suffix_path(
-                    cls, path
-                )
+                return config.for_class_and_suffix_path(cls, path)
             except KeyError:
                 pass
-        directories = ' '.join(
-            str(config.directory) for config in self.prior_configs
-        )
+        directories = " ".join(str(config.directory) for config in self.prior_configs)
 
-        print(
-
-        )
+        print()
 
         raise exc.ConfigException(
             f"No prior config found for class: \n\n"
@@ -174,57 +180,6 @@ class PriorConfigWrapper:
             f"The following readthedocs page explains prior configuration files in PyAutoFit and will help you fix "
             f"the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
         )
-
-
-class ConfigWrapper(AbstractConfig):
-    def __init__(self, configs):
-        self.configs = configs
-
-    @property
-    def paths(self):
-        return [
-            config.path
-            for config
-            in self.configs
-        ]
-
-    def __applicable(self, item):
-        __applicable = list()
-        for config in self.configs:
-            try:
-                __applicable.append(config[item])
-            except KeyError:
-                pass
-        return __applicable
-
-    def items(self):
-        item_dict = {}
-        for config in reversed(
-                self.configs
-        ):
-            for key, value in config.items():
-                item_dict[key] = value
-        return list(item_dict.items())
-
-    def keys(self):
-        keys = set()
-        for config in self.configs:
-            keys.update(config.keys())
-        return list(keys)
-
-    def _getitem(self, item):
-        configs = self.__applicable(item)
-        if len(configs) == 0:
-            paths = '\n'.join(map(str, self.paths))
-            raise KeyError(
-                f"No configuration for {item} in {paths}"
-            )
-        for config in configs:
-            if not isinstance(
-                    config, AbstractConfig
-            ):
-                return config
-        return ConfigWrapper(configs)
 
 
 def family(current_class):
