@@ -7,44 +7,40 @@ import pytest
 from autoconf.json_prior import generate as g
 
 directory = Path(__file__).parent
-package_directory = directory / "code"
+package_directory = directory / "source_code"
 module_path = package_directory / "module.py"
 
 
-@pytest.fixture(
-    name="prior_json"
-)
+@pytest.fixture(name="prior_json")
 def make_prior_json():
     return {
-        'MyClass': {
-            'simple': {
-                'gaussian_limits': {'lower': 0.0, 'upper': 1.0},
-                'lower_limit': 0.0,
-                'type': 'Uniform',
-                'upper_limit': 1.0,
-                'width_modifier': {'type': 'Absolute', 'value': 0.2}
+        "MyClass": {
+            "simple": {
+                "gaussian_limits": {"lower": 0.0, "upper": 1.0},
+                "lower_limit": 0.0,
+                "type": "Uniform",
+                "upper_limit": 1.0,
+                "width_modifier": {"type": "Absolute", "value": 0.2},
             },
-            'tup_0': {
-                'gaussian_limits': {'lower': 0.0, 'upper': 1.0},
-                'lower_limit': 0.0,
-                'type': 'Uniform',
-                'upper_limit': 1.0,
-                'width_modifier': {'type': 'Absolute', 'value': 0.2}
+            "tup_0": {
+                "gaussian_limits": {"lower": 0.0, "upper": 1.0},
+                "lower_limit": 0.0,
+                "type": "Uniform",
+                "upper_limit": 1.0,
+                "width_modifier": {"type": "Absolute", "value": 0.2},
             },
-            'tup_1': {
-                'gaussian_limits': {'lower': 0.0, 'upper': 1.0},
-                'lower_limit': 0.0,
-                'type': 'Uniform',
-                'upper_limit': 1.0,
-                'width_modifier': {'type': 'Absolute', 'value': 0.2}
-            }
+            "tup_1": {
+                "gaussian_limits": {"lower": 0.0, "upper": 1.0},
+                "lower_limit": 0.0,
+                "type": "Uniform",
+                "upper_limit": 1.0,
+                "width_modifier": {"type": "Absolute", "value": 0.2},
+            },
         }
     }
 
 
-@pytest.fixture(
-    autouse=True
-)
+@pytest.fixture(autouse=True)
 def cleanup():
     yield
     try:
