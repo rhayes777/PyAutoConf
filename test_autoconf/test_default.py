@@ -31,10 +31,7 @@ def test_push(config, files_directory):
 
 
 def test_keep_first(config, files_directory):
-    config.push(
-        files_directory / "default",
-        keep_first=True
-    )
+    config.push(files_directory / "default", keep_first=True)
 
     assert config["general"]["hpc"]["hpc_mode"] is False
 
@@ -55,9 +52,30 @@ def test_novel_file(config):
 
 
 def test_json(config):
-    assert config.prior_config.for_class_and_suffix_path(
-        Redshift, ["redshift"]
-    )["upper_limit"] == 3.0
-    assert config.prior_config.for_class_and_suffix_path(
-        Redshift, ["rodshift"]
-    )["upper_limit"] == 4.0
+    assert (
+        config.prior_config.for_class_and_suffix_path(Redshift, ["redshift"])[
+            "upper_limit"
+        ]
+        == 3.0
+    )
+    assert (
+        config.prior_config.for_class_and_suffix_path(Redshift, ["rodshift"])[
+            "upper_limit"
+        ]
+        == 4.0
+    )
+
+
+def test_embedded_yaml_default(config):
+    embedded_dict = config["embedded"]["first"]["first_a"]
+
+    assert embedded_dict["first_a_a"] == "one"
+    assert embedded_dict["first_a_b"] == "two"
+    assert embedded_dict["first_a_c"] == "three"
+
+
+def test_as_dict(config):
+    embedded_dict = config["embedded"]["first"]["first_a"]
+
+    print(type(embedded_dict))
+    print({**embedded_dict})

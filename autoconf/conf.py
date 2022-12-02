@@ -4,7 +4,7 @@ import os
 import shutil
 from functools import wraps
 from pathlib import Path
-from typing import Optional, Union, Dict
+from typing import Optional, Union, Dict, MutableMapping
 
 import yaml
 
@@ -29,7 +29,16 @@ def get_matplotlib_backend():
         return "default"
 
 
-class DictWrapper:
+class DictWrapper(MutableMapping):
+    def __delitem__(self, v) -> None:
+        del self._dict[v]
+
+    def __len__(self) -> int:
+        return len(self._dict)
+
+    def __iter__(self):
+        return iter(self._dict)
+
     def __init__(self, paths):
         self._dict = dict()
         self.paths = paths
@@ -175,6 +184,9 @@ class Config:
 
     def __getitem__(self, item):
         return self.dict[item]
+
+    def __iter__(self):
+        return iter(self.dict)
 
     @property
     def paths(self):
