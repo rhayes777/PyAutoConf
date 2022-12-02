@@ -10,7 +10,17 @@ import os
 import sys
 from pathlib import Path
 
-import yaml
+import oyaml as yaml
+
+ORDER = [
+    "type",
+    "mean",
+    "sigma",
+    "lower_limit",
+    "upper_limit",
+    "width_modifier",
+    "gaussian_limits",
+]
 
 for path in Path(sys.argv[1]).rglob("*.json"):
     with open(path) as f:
@@ -22,9 +32,24 @@ for path in Path(sys.argv[1]).rglob("*.json"):
     os.remove(path)
 
 
+def sort_dict(obj):
+    if isinstance(obj, dict):
+        return {
+            key: sort_dict(value)
+            for key, value in sorted(
+                obj.items(),
+                key=lambda item: ORDER.index(item[0]) if item[0] in ORDER else 999,
+            )
+        }
+    if isinstance(obj, list):
+        return list(map(sort_dict, obj))
+    return obj
+
+
 for path in Path(sys.argv[1]).rglob("*.yaml"):
     with open(path) as f:
         d = yaml.safe_load(f)
 
+    print(sort_dict(d))
     with open(path, "w") as f:
-        yaml.dump(d, f)
+        yaml.dump(sort_dict(d), f)
