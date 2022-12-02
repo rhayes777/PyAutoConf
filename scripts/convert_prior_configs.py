@@ -20,3 +20,11 @@ for path in Path(sys.argv[1]).rglob("*.json"):
         yaml.dump(d, f)
 
     os.remove(path)
+
+
+for path in Path(sys.argv[1]).rglob("*.yaml"):
+    with open(path) as f:
+        d = yaml.safe_load(f)
+
+    with open(path, "w") as f:
+        yaml.dump(d, f)

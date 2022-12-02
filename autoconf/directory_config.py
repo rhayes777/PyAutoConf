@@ -47,13 +47,37 @@ class AbstractConfig(ABC):
         return d
 
 
+class DictConfig(AbstractConfig):
+    def keys(self):
+        return self.d.keys()
+
+    def __init__(self, d):
+        self.d = d
+
+    def __getitem__(self, item):
+        value = self.d[item]
+        if isinstance(value, dict):
+            return DictConfig(value)
+        return value
+
+    def _getitem(self, item):
+        return self[item]
+
+    def items(self):
+        for key in self.d:
+            yield key, self[key]
+
+
 class YAMLConfig(AbstractConfig):
     def __init__(self, path):
         with open(path) as f:
             self._dict = yaml.safe_load(f)
 
     def _getitem(self, item):
-        return self._dict[item]
+        value = self._dict[item]
+        if isinstance(value, dict):
+            return DictConfig(value)
+        return value
 
     def keys(self):
         return self._dict.keys()
