@@ -8,7 +8,12 @@ from typing import Optional, Union, Dict
 
 import yaml
 
-from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
+from autoconf.directory_config import (
+    RecursiveConfig,
+    PriorConfigWrapper,
+    AbstractConfig,
+    family,
+)
 from autoconf.exc import ConfigException
 from autoconf.json_prior.config import JSONPriorConfig
 
@@ -46,15 +51,11 @@ class DictWrapper:
         try:
             return self._dict[key]
         except KeyError:
-            raise KeyError(
-                f"key {key} not found in paths {self.paths_string}"
-            )
+            raise KeyError(f"key {key} not found in paths {self.paths_string}")
 
     @property
     def paths_string(self):
-        return "\n".join(
-            map(str, self.paths)
-        )
+        return "\n".join(map(str, self.paths))
 
     def __repr__(self):
         return repr(self._dict)
@@ -98,15 +99,12 @@ class Config:
                     f"{config_path} passed as config path. Did you mean to use output_path={config_path}?"
                 )
 
-        self._configs = list()
-        self._dict = DictWrapper(
-            self.paths
-        )
+        self._prior_config = None
 
-        self.configs = list(map(
-            RecursiveConfig,
-            config_paths
-        ))
+        self._configs = list()
+        self._dict = DictWrapper(self.paths)
+
+        self.configs = list(map(RecursiveConfig, config_paths))
 
         self.output_path = output_path
 
@@ -118,28 +116,15 @@ class Config:
         Lazily recurse directories to load configuration.
         """
         if self._dict is None:
-            self._dict = DictWrapper(
-                self.paths
-            )
+            self._dict = DictWrapper(self.paths)
 
-            def recurse_config(
-                    config,
-                    d
-            ):
+            def recurse_config(config, d):
                 try:
                     for key, value in config.items():
-                        if isinstance(
-                                value,
-                                AbstractConfig
-                        ):
+                        if isinstance(value, AbstractConfig):
                             if key not in d:
-                                d[key] = DictWrapper(
-                                    self.paths
-                                )
-                            recurse_config(
-                                value,
-                                d=d[key]
-                            )
+                                d[key] = DictWrapper(self.paths)
+                            recurse_config(value, d=d[key])
                         else:
                             d[key] = value
                 except KeyError as e:
@@ -155,9 +140,7 @@ class Config:
         """
         logging_config = self.logging_config
         if logging_config is not None:
-            logging.config.dictConfig(
-                logging_config
-            )
+            logging.config.dictConfig(logging_config)
 
     @property
     def logging_config(self) -> Optional[Dict]:
@@ -169,17 +152,11 @@ class Config:
         for config in self.configs:
             path = config.path
             try:
-                if LOGGING_CONFIG_FILE in os.listdir(
-                        config.path
-                ):
-                    with open(
-                            path / LOGGING_CONFIG_FILE
-                    ) as f:
+                if LOGGING_CONFIG_FILE in os.listdir(config.path):
+                    with open(path / LOGGING_CONFIG_FILE) as f:
                         return yaml.safe_load(f)
             except FileNotFoundError:
-                logger.debug(
-                    f"No configuration found at path {config.path}"
-                )
+                logger.debug(f"No configuration found at path {config.path}")
         return None
 
     @property
@@ -192,6 +169,7 @@ class Config:
         When the list of configs is updated this invalidates the current config
         dictionary
         """
+        self._prior_config = None
         self._dict = None
         self._configs = configs
 
@@ -200,11 +178,7 @@ class Config:
 
     @property
     def paths(self):
-        return [
-            config.path
-            for config
-            in self._configs
-        ]
+        return [config.path for config in self._configs]
 
     @property
     def prior_config(self) -> PriorConfigWrapper:
@@ -212,18 +186,17 @@ class Config:
         Configuration for priors. This indicates, for example, the mean and the width of priors
         for the attributes of given classes.
         """
-        return PriorConfigWrapper([
-            JSONPriorConfig.from_directory(
-                path / "priors"
+        if self._prior_config is None:
+            self._prior_config = PriorConfigWrapper(
+                [JSONPriorConfig.from_directory(path / "priors") for path in self.paths]
             )
-            for path in self.paths
-        ])
+        return self._prior_config
 
     def push(
-            self,
-            new_path: Union[str, Path],
-            output_path: Optional[str] = None,
-            keep_first: bool = False
+        self,
+        new_path: Union[str, Path],
+        output_path: Optional[str] = None,
+        keep_first: bool = False,
     ):
         """
         Push a new configuration path. This overrides the existing config
@@ -246,18 +219,13 @@ class Config:
             If the pushed path does not exist or does not contain at least one file
             with an expected configuration suffix
         """
-        logger.debug(
-            f"Pushing new config with path {new_path}"
-        )
+        logger.debug(f"Pushing new config with path {new_path}")
 
         if not Path(new_path).exists():
             raise ConfigException(f"{new_path} does not exist")
 
         suffixes = {
-            Path(file).suffix
-            for _, _, files
-            in os.walk(new_path)
-            for file in files
+            Path(file).suffix for _, _, files in os.walk(new_path) for file in files
         }
 
         CONFIG_SUFFIXES = [
@@ -267,10 +235,7 @@ class Config:
             ".yaml",
         ]
 
-        if not any((
-            suffix in suffixes
-            for suffix in CONFIG_SUFFIXES
-        )):
+        if not any((suffix in suffixes for suffix in CONFIG_SUFFIXES)):
             raise ConfigException(
                 f"{new_path} does not contain any files ending with {'/'.join(CONFIG_SUFFIXES)} recursively"
             )
@@ -279,20 +244,15 @@ class Config:
 
         try:
             if self.configs[0] == new_path or (
-                    keep_first and len(self.configs) > 1 and self.configs[1] == new_path
+                keep_first and len(self.configs) > 1 and self.configs[1] == new_path
             ):
                 return
         except IndexError:
             pass
 
-        new_config = RecursiveConfig(
-            new_path
-        )
+        new_config = RecursiveConfig(new_path)
 
-        configs = list(filter(
-            lambda config: config != new_config,
-            self.configs
-        ))
+        configs = list(filter(lambda config: config != new_config, self.configs))
         if keep_first:
             self.configs = configs[:1] + [new_config] + configs[1:]
         else:
@@ -309,26 +269,19 @@ class Config:
         file
             The path to the project's __init__
         """
-        self.push(
-            Path(file).parent / "config",
-            keep_first=True
-        )
+        self.push(Path(file).parent / "config", keep_first=True)
 
 
 current_directory = Path(os.getcwd())
 
 default = Config(
-    current_directory / "config",
-    output_path=current_directory / "output/"
+    current_directory / "config", output_path=current_directory / "output/"
 )
 
 instance = default
 
 
-def output_path_for_test(
-        temporary_path="temp",
-        remove=True
-):
+def output_path_for_test(temporary_path="temp", remove=True):
     """
     Temporarily change the output path for the scope of a function
     (e.g. a test). Remove the files after the test has completed
@@ -348,10 +301,7 @@ def output_path_for_test(
 
     def remove_():
         if remove:
-            shutil.rmtree(
-                temporary_path,
-                ignore_errors=True
-            )
+            shutil.rmtree(temporary_path, ignore_errors=True)
 
     def decorator(func):
         @wraps(func)
