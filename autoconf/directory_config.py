@@ -66,7 +66,20 @@ class SectionConfig(AbstractConfig):
         self.parser = parser
 
     def keys(self):
-        return [item[0] for item in self.parser.items(self.section)]
+        with open(self.path) as f:
+            string = f.read()
+
+        lines = string.split("\n")
+        is_section = False
+        for line in lines:
+            if line == f"[{self.section}]":
+                is_section = True
+                continue
+            if line.startswith("["):
+                is_section = False
+                continue
+            if is_section and "=" in line:
+                yield line.split("=")[0]
 
     def _getitem(self, item):
         try:
