@@ -77,5 +77,12 @@ def test_embedded_yaml_default(config):
 def test_as_dict(config):
     embedded_dict = config["embedded"]["first"]["first_a"]
 
-    print(type(embedded_dict))
-    print({**embedded_dict})
+    assert {**embedded_dict}
+
+
+def test_mix_files(config):
+    embedded_dict = config["one"]["two"]["three"]
+
+    assert embedded_dict["four"] == "five"
+    assert embedded_dict["six"] == "seven"
+    assert embedded_dict["eight"] == "nine"
