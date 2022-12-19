@@ -18,12 +18,14 @@ jobs:
         pip3 install --upgrade pip
         pip3 install wheel
         pip3 install numpy
-        pip3 install pytest==6.2.5
+        pip3 install pytest==6.2.5 coverage pytest-cov
         pip3 install -r PyAutoConf/requirements.txt
     - name: Run tests
       run: |
         pushd PyAutoConf
-        python3 -m pytest
+        python3 -m pytest --cov autoconf --cov-report xml:coverage.xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
     - name: Slack send
       if: ${{ failure() }}
       id: slack
