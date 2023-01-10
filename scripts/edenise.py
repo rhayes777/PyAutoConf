@@ -6,19 +6,13 @@ from sys import argv
 from autofit.tools import edenise
 
 
-def main(
-        root_directory
-):
+def main(root_directory):
     try:
         config = ConfigParser()
-        config.read(
-            f"{root_directory}/eden.ini"
-        )
+        config.read(f"{root_directory}/eden.ini")
 
         edenise.edenise(
-            root_directory,
-            config.get("eden", "name"),
-            config.get("eden", "prefix")
+            root_directory, config.get("eden", "name"), config.get("eden", "prefix")
         )
     except ValueError:
         print("Usage: ./edenise.py root_directory")
@@ -26,6 +20,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main(
-        argv[1]
-    )
+    main(argv[1])

@@ -32,7 +32,11 @@ def test_path_for_class(geometry_profile_path):
             ],
         ),
         (
-            {"autoconf": {"mock": {"mock_real": {"SphProfile": "test", "Other": "toast"}}}},
+            {
+                "autoconf": {
+                    "mock": {"mock_real": {"SphProfile": "test", "Other": "toast"}}
+                }
+            },
             [
                 "autoconf",
                 "autoconf.mock",
@@ -42,7 +46,11 @@ def test_path_for_class(geometry_profile_path):
             ],
         ),
         (
-            {"autoconf": {"mock": {"mock_real.SphProfile": "test", "mock_real.Other": "toast"}}},
+            {
+                "autoconf": {
+                    "mock": {"mock_real.SphProfile": "test", "mock_real.Other": "toast"}
+                }
+            },
             [
                 "autoconf",
                 "autoconf.mock",
@@ -74,8 +82,12 @@ def test_paths(config_dict, paths):
             "autoconf.mock.mock_real.Other": "toast",
         },
         {"autoconf.mock.mock_real": {"SphProfile": "test", "Other": "toast"}},
-        {"autoconf":{"mock": {"mock_real": {"SphProfile": "test", "Other": "toast"}}}},
-        {"autoconf":{"mock": {"mock_real.SphProfile": "test", "mock_real.Other": "toast"}}},
+        {"autoconf": {"mock": {"mock_real": {"SphProfile": "test", "Other": "toast"}}}},
+        {
+            "autoconf": {
+                "mock": {"mock_real.SphProfile": "test", "mock_real.Other": "toast"}
+            }
+        },
         {"SphProfile": "test", "Other": "toast"},
         {"mock_real": {"SphProfile": "test", "Other": "toast"}},
     ],

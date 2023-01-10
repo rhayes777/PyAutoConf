@@ -2,7 +2,6 @@ from autoconf.tools.decorators import cached_property
 
 
 class MockClass:
-
     def __init__(self, value):
         self._value = value
 

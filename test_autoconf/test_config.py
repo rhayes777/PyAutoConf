@@ -46,7 +46,8 @@ BAD_PATH = "bad/path"
 
 def remove_path():
     shutil.rmtree(
-        BAD_PATH, ignore_errors=True,
+        BAD_PATH,
+        ignore_errors=True,
     )
 
 

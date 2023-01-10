@@ -5,7 +5,7 @@ class Redshift:
 
 class SphProfile:
     def __init__(self, centre=(0.0, 0.0)):
-        """ Generic circular profiles class to contain functions shared by light and
+        """Generic circular profiles class to contain functions shared by light and
         mass profiles.
 
         Parameters
@@ -18,7 +18,7 @@ class SphProfile:
 
 class EllProfile(SphProfile):
     def __init__(self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0):
-        """ Generic elliptical profiles class to contain functions shared by light
+        """Generic elliptical profiles class to contain functions shared by light
         and mass profiles.
 
         Parameters
@@ -37,9 +37,9 @@ class EllProfile(SphProfile):
 
 class Gaussian(EllProfile):
     def __init__(
-            self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
+        self, centre=(0.0, 0.0), axis_ratio=1.0, phi=0.0, intensity=0.1, sigma=0.01
     ):
-        """ The elliptical Gaussian profile.
+        """The elliptical Gaussian profile.
 
         Parameters
         ----------

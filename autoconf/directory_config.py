@@ -142,7 +142,11 @@ class NamedConfig(AbstractConfig):
         return self.parser.sections()
 
     def _getitem(self, item):
-        return SectionConfig(self.path, self.parser, item,)
+        return SectionConfig(
+            self.path,
+            self.parser,
+            item,
+        )
 
 
 class RecursiveConfig(AbstractConfig):

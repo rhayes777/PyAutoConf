@@ -25,10 +25,7 @@ def for_file(module_path: str) -> dict:
     -------
     JSON configuration, where class names are mapped to their prior configs.
     """
-    spec = util.spec_from_file_location(
-        "module.name",
-        module_path
-    )
+    spec = util.spec_from_file_location("module.name", module_path)
     module = util.module_from_spec(spec)
     spec.loader.exec_module(module)
     classes = inspect.getmembers(module)
@@ -65,7 +62,7 @@ def generate(directory: str):
             if file.endswith(".py"):
                 full_path = directory / file
                 spec = for_file(full_path)
-                config_path = cwd / "priors" / file.replace('.py', '.json')
+                config_path = cwd / "priors" / file.replace(".py", ".json")
                 if len(spec) > 0:
                     if os.path.exists(config_path):
                         logger.info(f"{config_path} already exists")

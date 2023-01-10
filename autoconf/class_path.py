@@ -8,18 +8,13 @@ def get_class_path(cls: type) -> str:
     """
     The full import path of the type
     """
-    if hasattr(
-            cls,
-            "__class_path__"
-    ):
+    if hasattr(cls, "__class_path__"):
         cls = cls.__class_path__
     return re.search("'(.*)'", str(cls))[1]
 
 
 def get_class(class_path: str) -> Type[object]:
-    return GetClass(
-        class_path
-    ).cls
+    return GetClass(class_path).cls
 
 
 class GetClass:
@@ -54,9 +49,7 @@ class GetClass:
         The module containing the real class
         """
         try:
-            return importlib.import_module(
-                self._module_path
-            )
+            return importlib.import_module(self._module_path)
         except ValueError:
             return builtins
 
@@ -65,7 +58,4 @@ class GetClass:
         """
         The class of the real object
         """
-        return getattr(
-            self._module,
-            self._class_name
-        )
+        return getattr(self._module, self._class_name)
