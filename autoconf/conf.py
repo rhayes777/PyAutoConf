@@ -44,7 +44,7 @@ class DictWrapper(MutableMapping):
         self.paths = paths
 
     def __contains__(self, item):
-        return item in self._dict
+        return item.lower() in self._dict
 
     def items(self):
         return self._dict.items()
