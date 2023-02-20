@@ -48,8 +48,7 @@ def as_dict(obj):
     }
 
     return {
-        "type": "instance",
-        "class_path": get_class_path(obj.__class__),
+        "type": get_class_path(obj.__class__),
         **{key: as_dict(value) for key, value in argument_dict.items()},
     }
 
