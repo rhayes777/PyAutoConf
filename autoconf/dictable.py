@@ -36,6 +36,11 @@ def as_dict(obj):
 
     if isinstance(obj, list):
         return list(map(as_dict, obj))
+    if isinstance(obj, dict):
+        return {
+            "type": "dict",
+            **{key: as_dict(value) for key, value in obj.items()},
+        }
     if obj.__class__.__module__ == "builtins":
         return obj
     argument_dict = {
@@ -55,6 +60,7 @@ class Dictable:
         field which contains the entire class path by which the type
         can be imported and constructor arguments.
         """
+        # noinspection PyTypeChecker
         return as_dict(self)
 
     @staticmethod
