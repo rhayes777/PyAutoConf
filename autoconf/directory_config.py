@@ -142,7 +142,11 @@ class NamedConfig(AbstractConfig):
         return self.parser.sections()
 
     def _getitem(self, item):
-        return SectionConfig(self.path, self.parser, item,)
+        return SectionConfig(
+            self.path,
+            self.parser,
+            item,
+        )
 
 
 class RecursiveConfig(AbstractConfig):
@@ -214,6 +218,7 @@ class PriorConfigWrapper:
             f"{'.'.join(path)} \n\n "
             f"In any of the following directories:\n\n"
             f"{directories}\n\n"
+            f"Either add configuration for the parameter or a type annotation for a class with valid configuration.\n\n"
             f"The following readthedocs page explains prior configuration files in PyAutoFit and will help you fix "
             f"the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
         )
