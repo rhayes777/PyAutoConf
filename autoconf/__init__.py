@@ -7,4 +7,4 @@ from .json_prior.config import make_config_for_class
 from .json_prior.config import path_for_class
 from .json_prior.config import JSONPriorConfig
 
-__version__ = "2023.7.5.3"
+__version__ = "2023.7.5.2"
