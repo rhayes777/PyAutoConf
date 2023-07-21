@@ -34,6 +34,12 @@ def as_dict(obj):
         except Exception as e:
             logger.info(e)
 
+    if inspect.isclass(obj):
+        return {
+            "type": "type",
+            "class_path": get_class_path(obj),
+        }
+
     if isinstance(obj, list):
         return list(map(as_dict, obj))
     if isinstance(obj, dict):
@@ -85,7 +91,12 @@ class Dictable:
         if not isinstance(cls_dict, dict):
             return cls_dict
 
-        cls = get_class(cls_dict.pop("type"))
+        type_ = cls_dict.pop("type")
+
+        if type_ == "type":
+            return get_class(cls_dict["class_path"])
+
+        cls = get_class(type_)
 
         if cls is np.ndarray:
             return nd_array_from_dict(cls_dict)

@@ -39,3 +39,9 @@ def test_multiple(array):
 
 def test_as_json(array):
     assert Dictable.from_dict(json.loads(json.dumps(as_dict(array)))) == array
+
+
+def test_with_type_attribute():
+    float_dict = {"class_path": "float", "type": "type"}
+    assert as_dict(float) == float_dict
+    assert Dictable.from_dict(float_dict) is float
