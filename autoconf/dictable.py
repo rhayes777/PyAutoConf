@@ -3,6 +3,8 @@ import json
 import logging
 
 import numpy as np
+from pathlib import Path
+from typing import Union
 
 from autoconf.class_path import get_class_path, get_class
 
@@ -113,7 +115,7 @@ class Dictable:
 
         return cls.from_dict(cls_dict)
 
-    def output_to_json(self, file_path: str):
+    def output_to_json(self, file_path: Union[Path, str]):
         """
         Output the dictable object to a .json file, whereby all attributes are converted to a dictionary representation
         first.
