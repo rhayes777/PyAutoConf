@@ -30,6 +30,9 @@ def nd_array_from_dict(nd_array_dict: dict) -> np.ndarray:
 
 
 def as_dict(obj):
+    if hasattr(obj, "dict"):
+        return obj.dict()
+
     if isinstance(obj, np.ndarray):
         try:
             return nd_array_as_dict(obj)
@@ -51,6 +54,11 @@ def as_dict(obj):
         }
     if obj.__class__.__module__ == "builtins":
         return obj
+
+    return instance_as_dict(obj)
+
+
+def instance_as_dict(obj):
     argument_dict = {
         arg: getattr(obj, arg) for arg in inspect.getfullargspec(obj.__init__).args[1:]
     }
@@ -62,95 +70,79 @@ def as_dict(obj):
     }
 
 
-class Dictable:
-    def dict(self) -> dict:
-        """
+def from_dict(cls_dict):
+    """
+    Instantiate an instance of a class from its dictionary representation.
+
+    Parameters
+    ----------
+    cls_dict
         A dictionary representation of the instance comprising a type
         field which contains the entire class path by which the type
         can be imported and constructor arguments.
-        """
-        # noinspection PyTypeChecker
-        return as_dict(self)
 
-    @staticmethod
-    def from_dict(cls_dict):
-        """
-        Instantiate an instance of a class from its dictionary representation.
+    Returns
+    -------
+    An instance of the geometry profile specified by the type field in
+    the cls_dict
+    """
+    if isinstance(cls_dict, list):
+        return list(map(from_dict, cls_dict))
+    if not isinstance(cls_dict, dict):
+        return cls_dict
+    type_ = cls_dict["type"]
 
-        Parameters
-        ----------
-        cls_dict
-            A dictionary representation of the instance comprising a type
-            field which contains the entire class path by which the type
-            can be imported and constructor arguments.
+    if type_ == "ndarray":
+        return nd_array_from_dict(cls_dict)
 
-        Returns
-        -------
-        An instance of the geometry profile specified by the type field in
-        the cls_dict
-        """
-        if isinstance(cls_dict, list):
-            return list(map(Dictable.from_dict, cls_dict))
-        if not isinstance(cls_dict, dict):
-            return cls_dict
-        type_ = cls_dict["type"]
+    if type_ == "list":
+        return list(map(from_dict, cls_dict["values"]))
+    if type_ == "dict":
+        return {key: from_dict(value) for key, value in cls_dict.items()}
 
-        if type_ == "ndarray":
-            return nd_array_from_dict(cls_dict)
+    if type_ == "type":
+        return get_class(cls_dict["class_path"])
 
-        if type_ == "list":
-            return list(map(Dictable.from_dict, cls_dict["values"]))
-        if type_ == "dict":
-            return {key: Dictable.from_dict(value) for key, value in cls_dict.items()}
+    cls = get_class(cls_dict["class_path"])
 
-        if type_ == "type":
-            return get_class(cls_dict["class_path"])
+    if cls is np.ndarray:
+        return nd_array_from_dict(cls_dict)
 
-        cls = get_class(cls_dict["class_path"])
+    # noinspection PyArgumentList
+    return cls(
+        **{name: from_dict(value) for name, value in cls_dict["arguments"].items()}
+    )
 
-        if cls is np.ndarray:
-            return nd_array_from_dict(cls_dict)
 
-        # noinspection PyArgumentList
-        return cls(
-            **{
-                name: Dictable.from_dict(value)
-                for name, value in cls_dict["arguments"].items()
-            }
-        )
+def from_json(file_path: str) -> "Dictable":
+    """
+    Load the dictable object to a .json file, whereby all attributes are converted from the .json file's dictionary
+    representation to create the instance of the object
 
-    @classmethod
-    def from_json(cls, file_path: str) -> "Dictable":
-        """
-        Load the dictable object to a .json file, whereby all attributes are converted from the .json file's dictionary
-        representation to create the instance of the object
+    A json file of the instance can be created from the .json file via the `output_to_json` method.
 
-        A json file of the instance can be created from the .json file via the `output_to_json` method.
+    Parameters
+    ----------
+    file_path
+        The path to the .json file that the dictionary representation of the object is loaded from.
+    """
+    with open(file_path, "r+") as f:
+        cls_dict = json.load(f)
 
-        Parameters
-        ----------
-        file_path
-            The path to the .json file that the dictionary representation of the object is loaded from.
-        """
-        with open(file_path, "r+") as f:
-            cls_dict = json.load(f)
+    return from_dict(cls_dict)
 
-        return cls.from_dict(cls_dict)
 
-    def output_to_json(self, file_path: Union[Path, str]):
-        """
-        Output the dictable object to a .json file, whereby all attributes are converted to a dictionary representation
-        first.
+def output_to_json(obj, file_path: Union[Path, str]):
+    """
+    Output the dictable object to a .json file, whereby all attributes are converted to a dictionary representation
+    first.
 
-        An instane of the object can be created from the .json file via the `from_json` method.
+    An instance of the object can be created from the .json file via the `from_json` method.
 
-        Parameters
-        ----------
-        file_path
-            The path to the .json file that the dictionary representation of the object is written too.
-        """
-        with open(file_path, "w+") as f:
-            json.dump(self.dict(), f, indent=4)
-
-    def __eq__(self, other):
-        return self.dict() == other.dict()
+    Parameters
+    ----------
+    file_path
+        The path to the .json file that the dictionary representation of the object is written too.
+    """
+    with open(file_path, "w+") as f:
+        json.dump(as_dict(obj), f, indent=4)

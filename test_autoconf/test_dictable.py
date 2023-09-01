@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pytest
 
-from autoconf.dictable import as_dict, Dictable
+from autoconf.dictable import as_dict, from_dict
 
 
 @pytest.fixture(name="array_dict")
@@ -21,7 +21,7 @@ def test_array_as_dict(array_dict, array):
 
 
 def test_from_dict(array_dict, array):
-    assert Dictable.from_dict(array_dict) == array
+    assert from_dict(array_dict) == array
 
 
 @pytest.mark.parametrize(
@@ -34,14 +34,14 @@ def test_from_dict(array_dict, array):
     ],
 )
 def test_multiple(array):
-    assert (Dictable.from_dict(as_dict(array)) == array).all()
+    assert (from_dict(as_dict(array)) == array).all()
 
 
 def test_as_json(array):
-    assert Dictable.from_dict(json.loads(json.dumps(as_dict(array)))) == array
+    assert from_dict(json.loads(json.dumps(as_dict(array)))) == array
 
 
 def test_with_type_attribute():
     float_dict = {"class_path": "float", "type": "type"}
     assert as_dict(float) == float_dict
-    assert Dictable.from_dict(float_dict) is float
+    assert from_dict(float_dict) is float
