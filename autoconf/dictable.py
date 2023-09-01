@@ -16,7 +16,7 @@ def nd_array_as_dict(obj: np.ndarray) -> dict:
     Converts a numpy array to a dictionary representation.
     """
     return {
-        "type": "numpy.ndarray",
+        "type": "ndarray",
         "array": obj.tolist(),
         "dtype": str(obj.dtype),
     }
@@ -43,11 +43,11 @@ def as_dict(obj):
         }
 
     if isinstance(obj, list):
-        return list(map(as_dict, obj))
+        return {"type": "list", "values": list(map(as_dict, obj))}
     if isinstance(obj, dict):
         return {
             "type": "dict",
-            **{key: as_dict(value) for key, value in obj.items()},
+            "arguments": {key: as_dict(value) for key, value in obj.items()},
         }
     if obj.__class__.__module__ == "builtins":
         return obj
@@ -56,8 +56,9 @@ def as_dict(obj):
     }
 
     return {
-        "type": get_class_path(obj.__class__),
-        **{key: as_dict(value) for key, value in argument_dict.items()},
+        "type": "instance",
+        "class_path": get_class_path(obj.__class__),
+        "arguments": {key: as_dict(value) for key, value in argument_dict.items()},
     }
 
 
@@ -93,12 +94,20 @@ class Dictable:
         if not isinstance(cls_dict, dict):
             return cls_dict
 
-        type_ = cls_dict.pop("type")
+        type_ = cls_dict["type"]
+
+        if type_ == "ndarray":
+            return nd_array_from_dict(cls_dict)
+
+        if type_ == "list":
+            return list(map(Dictable.from_dict, cls_dict["values"]))
+        if type_ == "dict":
+            return {key: Dictable.from_dict(value) for key, value in cls_dict.items()}
 
         if type_ == "type":
             return get_class(cls_dict["class_path"])
 
-        cls = get_class(type_)
+        cls = get_class(cls_dict["class_path"])
 
         if cls is np.ndarray:
             return nd_array_from_dict(cls_dict)
