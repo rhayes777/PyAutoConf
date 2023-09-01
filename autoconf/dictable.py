@@ -93,7 +93,6 @@ class Dictable:
             return list(map(Dictable.from_dict, cls_dict))
         if not isinstance(cls_dict, dict):
             return cls_dict
-
         type_ = cls_dict["type"]
 
         if type_ == "ndarray":
@@ -114,7 +113,10 @@ class Dictable:
 
         # noinspection PyArgumentList
         return cls(
-            **{name: Dictable.from_dict(value) for name, value in cls_dict.items()}
+            **{
+                name: Dictable.from_dict(value)
+                for name, value in cls_dict["arguments"].items()
+            }
         )
 
     @classmethod
