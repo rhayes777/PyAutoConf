@@ -78,7 +78,9 @@ def instance_as_dict(obj):
     }
 
 
-__parsers = {}
+__parsers = {
+    "ndarray": nd_array_from_dict,
+}
 
 
 def register_parser(type_: str, parser: Callable[[dict], object]):
@@ -111,9 +113,6 @@ def from_dict(dictionary):
 
     if type_ in __parsers:
         return __parsers[type_](dictionary)
-
-    if type_ == "ndarray":
-        return nd_array_from_dict(dictionary)
 
     if type_ == "list":
         return list(map(from_dict, dictionary["values"]))
