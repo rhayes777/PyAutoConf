@@ -112,7 +112,11 @@ def from_dict(dictionary, **kwargs):
     if isinstance(dictionary, list):
         return list(map(from_dict, dictionary))
 
-    type_ = dictionary["type"]
+    try:
+        type_ = dictionary["type"]
+    except KeyError:
+        logger.debug("No type field in dictionary")
+        return None
 
     if type_ in __parsers:
         return __parsers[type_](dictionary, **kwargs)
