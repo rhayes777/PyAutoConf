@@ -34,7 +34,10 @@ def to_dict(obj):
         return obj
 
     if hasattr(obj, "dict"):
-        return obj.dict()
+        try:
+            return obj.dict()
+        except TypeError as e:
+            logger.debug(e)
 
     if isinstance(obj, np.ndarray):
         try:
