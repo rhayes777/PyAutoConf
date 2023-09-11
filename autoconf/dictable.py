@@ -90,7 +90,7 @@ def register_parser(type_: str, parser: Callable[[dict], object]):
     __parsers[type_] = parser
 
 
-def from_dict(dictionary):
+def from_dict(dictionary, **kwargs):
     """
     Instantiate an instance of a class from its dictionary representation.
 
@@ -115,12 +115,12 @@ def from_dict(dictionary):
     type_ = dictionary["type"]
 
     if type_ in __parsers:
-        return __parsers[type_](dictionary)
+        return __parsers[type_](dictionary, **kwargs)
 
     if type_ == "list":
         return list(map(from_dict, dictionary["values"]))
     if type_ == "dict":
-        return {key: from_dict(value) for key, value in dictionary.items()}
+        return {key: from_dict(value, **kwargs) for key, value in dictionary.items()}
 
     if type_ == "type":
         return get_class(dictionary["class_path"])
@@ -130,11 +130,14 @@ def from_dict(dictionary):
     if cls is np.ndarray:
         return nd_array_from_dict(dictionary)
     if hasattr(cls, "from_dict"):
-        return cls.from_dict(dictionary)
+        return cls.from_dict(dictionary, **kwargs)
 
     # noinspection PyArgumentList
     return cls(
-        **{name: from_dict(value) for name, value in dictionary["arguments"].items()}
+        **{
+            name: from_dict(value, **kwargs)
+            for name, value in dictionary["arguments"].items()
+        }
     )
 
 
