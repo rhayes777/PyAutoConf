@@ -30,6 +30,9 @@ def nd_array_from_dict(nd_array_dict: dict) -> np.ndarray:
 
 
 def to_dict(obj):
+    if isinstance(obj, (int, float, str, bool, type(None))):
+        return obj
+
     if hasattr(obj, "dict"):
         return obj.dict()
 
@@ -55,13 +58,18 @@ def to_dict(obj):
     if obj.__class__.__module__ == "builtins":
         return obj
 
-    return instance_as_dict(obj)
+    if inspect.isclass(type(obj)):
+        return instance_as_dict(obj)
+    return obj
 
 
 def instance_as_dict(obj):
-    argument_dict = {
-        arg: getattr(obj, arg) for arg in inspect.getfullargspec(obj.__init__).args[1:]
-    }
+    arguments = set(inspect.getfullargspec(obj.__init__).args[1:])
+    try:
+        arguments |= set(obj.__identifier_fields__)
+    except (AttributeError, TypeError):
+        pass
+    argument_dict = {arg: getattr(obj, arg) for arg in arguments if hasattr(obj, arg)}
 
     return {
         "type": "instance",
