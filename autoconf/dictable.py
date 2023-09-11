@@ -115,6 +115,9 @@ def from_dict(dictionary, **kwargs):
     if isinstance(dictionary, list):
         return list(map(from_dict, dictionary))
 
+    if isinstance(dictionary, tuple):
+        return tuple(map(from_dict, dictionary))
+
     try:
         type_ = dictionary["type"]
     except KeyError:
