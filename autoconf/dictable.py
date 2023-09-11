@@ -29,7 +29,7 @@ def nd_array_from_dict(nd_array_dict: dict) -> np.ndarray:
     return np.array(nd_array_dict["array"], dtype=getattr(np, nd_array_dict["dtype"]))
 
 
-def as_dict(obj):
+def to_dict(obj):
     if hasattr(obj, "dict"):
         return obj.dict()
 
@@ -46,11 +46,11 @@ def as_dict(obj):
         }
 
     if isinstance(obj, list):
-        return {"type": "list", "values": list(map(as_dict, obj))}
+        return {"type": "list", "values": list(map(to_dict, obj))}
     if isinstance(obj, dict):
         return {
             "type": "dict",
-            "arguments": {key: as_dict(value) for key, value in obj.items()},
+            "arguments": {key: to_dict(value) for key, value in obj.items()},
         }
     if obj.__class__.__module__ == "builtins":
         return obj
@@ -66,7 +66,7 @@ def instance_as_dict(obj):
     return {
         "type": "instance",
         "class_path": get_class_path(obj.__class__),
-        "arguments": {key: as_dict(value) for key, value in argument_dict.items()},
+        "arguments": {key: to_dict(value) for key, value in argument_dict.items()},
     }
 
 
@@ -145,4 +145,4 @@ def output_to_json(obj, file_path: Union[Path, str]):
         The path to the .json file that the dictionary representation of the object is written too.
     """
     with open(file_path, "w+") as f:
-        json.dump(as_dict(obj), f, indent=4)
+        json.dump(to_dict(obj), f, indent=4)
