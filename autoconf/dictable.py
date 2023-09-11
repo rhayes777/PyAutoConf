@@ -22,7 +22,7 @@ def nd_array_as_dict(obj: np.ndarray) -> dict:
     }
 
 
-def nd_array_from_dict(nd_array_dict: dict) -> np.ndarray:
+def nd_array_from_dict(nd_array_dict: dict, **_) -> np.ndarray:
     """
     Converts a dictionary representation back to a numpy array.
     """
@@ -58,11 +58,14 @@ def to_dict(obj):
             "type": "dict",
             "arguments": {key: to_dict(value) for key, value in obj.items()},
         }
+    if obj.__class__.__name__ == "method":
+        return to_dict(obj())
     if obj.__class__.__module__ == "builtins":
         return obj
 
     if inspect.isclass(type(obj)):
         return instance_as_dict(obj)
+
     return obj
 
 
