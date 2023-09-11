@@ -90,6 +90,21 @@ __parsers = {
 
 
 def register_parser(type_: str, parser: Callable[[dict], object]):
+    """
+    Register a parser for a given type.
+
+    This parser will be used to instantiate objects of the given type from a
+    dictionary representation.
+
+    Parameters
+    ----------
+    type_
+        The type of the object to be parsed. This is a string uniquely
+        identifying the type.
+    parser
+        A function which takes a dictionary representation of an object and
+        returns an instance of the object.
+    """
     __parsers[type_] = parser
 
 
@@ -100,14 +115,24 @@ def from_dict(dictionary, **kwargs):
     Parameters
     ----------
     dictionary
-        A dictionary representation of the instance comprising a type
-        field which contains the entire class path by which the type
-        can be imported and constructor arguments.
+        An object which may be a dictionary representation of an object.
+
+        This may contain the following keys:
+        type: str
+            The type of the object. This may be a built-in type, a numpy array,
+            a list, a dictionary, a class, or an instance of a class.
+
+            If a parser has been registered for the given type that parser will
+            be used to instantiate the object.
+        class_path: str
+            The path to the class of the object. This is used to instantiate
+            the object if it is not a built-in type.
+        arguments: dict
+            A dictionary of arguments to pass to the class constructor.
 
     Returns
     -------
-    An instance of the geometry profile specified by the type field in
-    the cls_dict
+    An object that was represented by the dictionary.
     """
     if isinstance(dictionary, (int, float, str, bool, type(None))):
         return dictionary
