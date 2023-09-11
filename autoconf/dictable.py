@@ -126,6 +126,8 @@ def from_dict(dictionary):
 
     if cls is np.ndarray:
         return nd_array_from_dict(dictionary)
+    if hasattr(cls, "from_dict"):
+        return cls.from_dict(dictionary)
 
     # noinspection PyArgumentList
     return cls(
