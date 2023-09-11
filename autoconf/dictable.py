@@ -135,7 +135,7 @@ def from_dict(dictionary):
     )
 
 
-def from_json(file_path: str) -> "Dictable":
+def from_json(file_path: str):
     """
     Load the dictable object to a .json file, whereby all attributes are converted from the .json file's dictionary
     representation to create the instance of the object
