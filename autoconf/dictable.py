@@ -4,7 +4,7 @@ import logging
 
 import numpy as np
 from pathlib import Path
-from typing import Union
+from typing import Union, Callable
 
 from autoconf.class_path import get_class_path, get_class
 
@@ -78,6 +78,13 @@ def instance_as_dict(obj):
     }
 
 
+__parsers = {}
+
+
+def register_parser(type_: str, parser: Callable[[dict], object]):
+    __parsers[type_] = parser
+
+
 def from_dict(dictionary):
     """
     Instantiate an instance of a class from its dictionary representation.
@@ -101,6 +108,9 @@ def from_dict(dictionary):
         return list(map(from_dict, dictionary))
 
     type_ = dictionary["type"]
+
+    if type_ in __parsers:
+        return __parsers[type_](dictionary)
 
     if type_ == "ndarray":
         return nd_array_from_dict(dictionary)

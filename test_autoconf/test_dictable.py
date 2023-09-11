@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pytest
 
-from autoconf.dictable import to_dict, from_dict
+from autoconf.dictable import to_dict, from_dict, register_parser
 
 
 @pytest.fixture(name="array_dict")
@@ -45,3 +45,8 @@ def test_with_type_attribute():
     float_dict = {"class_path": "float", "type": "type"}
     assert to_dict(float) == float_dict
     assert from_dict(float_dict) is float
+
+
+def test_register_parser():
+    register_parser("test", lambda x: x["value"])
+    assert from_dict({"type": "test", "value": 1}) == 1
