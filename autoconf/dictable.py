@@ -11,14 +11,20 @@ from autoconf.class_path import get_class_path, get_class
 logger = logging.getLogger(__name__)
 
 
+np_type_map = {
+    "bool": "bool_",
+}
+
+
 def nd_array_as_dict(obj: np.ndarray) -> dict:
     """
     Converts a numpy array to a dictionary representation.
     """
+    np_type = str(obj.dtype)
     return {
         "type": "ndarray",
         "array": obj.tolist(),
-        "dtype": str(obj.dtype),
+        "dtype": np_type_map.get(np_type, np_type),
     }
 
 
