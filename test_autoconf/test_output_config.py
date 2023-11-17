@@ -1,6 +1,7 @@
 import pytest
 
 from autoconf import instance
+from autoconf.conf import with_config
 from autoconf.output import conditional_output
 
 
@@ -30,4 +31,16 @@ def test_output(output_class):
 
 def test_no_output(output_class):
     output_class.output_function("should_not_output")
+    assert output_class.output_names == []
+
+
+@with_config("output", "default", value=True)
+def test_default_true(output_class):
+    output_class.output_function("other")
+    assert output_class.output_names == ["other"]
+
+
+@with_config("output", "default", value=False)
+def test_default_false(output_class):
+    output_class.output_function("other")
     assert output_class.output_names == []
