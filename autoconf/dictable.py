@@ -153,7 +153,7 @@ def from_dict(dictionary, **kwargs):
         type_ = dictionary["type"]
     except KeyError:
         logger.debug("No type field in dictionary")
-        return None
+        return dictionary
     except TypeError as e:
         logger.debug(e)
         return None

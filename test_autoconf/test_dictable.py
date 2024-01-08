@@ -50,3 +50,7 @@ def test_with_type_attribute():
 def test_register_parser():
     register_parser("test", lambda x: x["value"])
     assert from_dict({"type": "test", "value": 1}) == 1
+
+
+def test_no_type():
+    assert from_dict({"hi": "there"}) == {"hi": "there"}
