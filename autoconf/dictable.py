@@ -81,7 +81,14 @@ def instance_as_dict(obj):
         arguments |= set(obj.__identifier_fields__)
     except (AttributeError, TypeError):
         pass
-    argument_dict = {arg: getattr(obj, arg) for arg in arguments if hasattr(obj, arg)}
+    argument_dict = {
+        arg: getattr(obj, arg)
+        for arg in arguments
+        if hasattr(obj, arg)
+        and not inspect.ismethod(
+            getattr(obj, arg),
+        )
+    }
 
     return {
         "type": "instance",
