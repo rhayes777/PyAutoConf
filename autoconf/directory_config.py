@@ -87,20 +87,21 @@ class SectionConfig(AbstractConfig):
         self.section = section
         self.parser = parser
 
-    def keys(self):
+    def section_lines(self):
         with open(self.path, encoding="utf-8") as f:
-            string = f.read()
-        lines = string.split("\n")
+            lines = f.read().split("\n")
         is_section = False
         for line in lines:
             if line == f"[{self.section}]":
                 is_section = True
-                continue
-            if line.startswith("["):
+            elif line.startswith("["):
                 is_section = False
-                continue
-            if is_section and "=" in line:
-                yield line.split("=")[0]
+            elif is_section and "=" in line:
+                yield line
+
+    def keys(self):
+        for line in self.section_lines():
+            yield line.split("=")[0]
 
     def _getitem(self, item):
         try:
@@ -174,17 +175,20 @@ class RecursiveConfig(AbstractConfig):
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.path}>"
 
+    def _get_file_config(self, item_path, file_extension, config_class):
+        file_path = item_path.with_suffix(file_extension)
+        if file_path.exists():
+            return config_class(file_path)
+        return None
+
     def _getitem(self, item):
         item_path = self.path / f"{item}"
-        file_path = f"{item_path}.ini"
-        if os.path.isfile(file_path):
-            return NamedConfig(file_path)
-        yml_path = item_path.with_suffix(".yml")
-        if yml_path.exists():
-            return YAMLConfig(yml_path)
-        yaml_path = item_path.with_suffix(".yaml")
-        if yaml_path.exists():
-            return YAMLConfig(yaml_path)
+        if os.path.isfile(f"{item_path}.ini"):
+            return NamedConfig(f"{item_path}.ini")
+        for ext, config_type in [(".yml", YAMLConfig), (".yaml", YAMLConfig)]:
+            config = self._get_file_config(item_path, ext, config_type)
+            if config:
+                return config
         if os.path.isdir(item_path):
             return RecursiveConfig(item_path)
         raise KeyError(f"No configuration found for {item} at path {self.path}")
