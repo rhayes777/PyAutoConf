@@ -90,6 +90,9 @@ class SectionConfig(AbstractConfig):
     def section_lines(self):
         with open(self.path, encoding="utf-8") as f:
             lines = f.read().split("\n")
+        yield from self.parse_section_lines(lines)
+
+    def parse_section_lines(self, lines):
         is_section = False
         for line in lines:
             if line == f"[{self.section}]":
