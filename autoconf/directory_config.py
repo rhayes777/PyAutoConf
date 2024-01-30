@@ -2,9 +2,7 @@ import configparser
 import os
 from abc import abstractmethod, ABC
 from pathlib import Path
-
 import yaml
-
 from autoconf import exc
 
 
@@ -65,12 +63,12 @@ class DictConfig(AbstractConfig):
 
     def items(self):
         for key in self.d:
-            yield key, self[key]
+            yield (key, self[key])
 
 
 class YAMLConfig(AbstractConfig):
     def __init__(self, path):
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             self._dict = yaml.safe_load(f)
 
     def _getitem(self, item):
@@ -90,9 +88,8 @@ class SectionConfig(AbstractConfig):
         self.parser = parser
 
     def keys(self):
-        with open(self.path) as f:
+        with open(self.path, encoding="utf-8") as f:
             string = f.read()
-
         lines = string.split("\n")
         is_section = False
         for line in lines:
@@ -142,11 +139,7 @@ class NamedConfig(AbstractConfig):
         return self.parser.sections()
 
     def _getitem(self, item):
-        return SectionConfig(
-            self.path,
-            self.parser,
-            item,
-        )
+        return SectionConfig(self.path, self.parser, item)
 
 
 class RecursiveConfig(AbstractConfig):
@@ -207,20 +200,10 @@ class PriorConfigWrapper:
                 return config.for_class_and_suffix_path(cls, path)
             except KeyError:
                 pass
-        directories = " ".join(str(config.directory) for config in self.prior_configs)
-
+        directories = " ".join((str(config.directory) for config in self.prior_configs))
         print()
-
         raise exc.ConfigException(
-            f"No prior config found for class: \n\n"
-            f"{cls.__name__} \n\n"
-            f"For parameter name and path: \n\n "
-            f"{'.'.join(path)} \n\n "
-            f"In any of the following directories:\n\n"
-            f"{directories}\n\n"
-            f"Either add configuration for the parameter or a type annotation for a class with valid configuration.\n\n"
-            f"The following readthedocs page explains prior configuration files in PyAutoFit and will help you fix "
-            f"the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
+            f"No prior config found for class: \n\n{cls.__name__} \n\nFor parameter name and path: \n\n {'.'.join(path)} \n\n In any of the following directories:\n\n{directories}\n\nEither add configuration for the parameter or a type annotation for a class with valid configuration.\n\nThe following readthedocs page explains prior configuration files in PyAutoFit and will help you fix the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
         )
 
 
