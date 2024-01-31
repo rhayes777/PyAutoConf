@@ -37,7 +37,7 @@ def for_file(module_path: str) -> dict:
     }
 
 
-def generate(directory: str):
+def generate(directory: str, output_directory=Path(os.getcwd()) / "priors"):
     """
     Generate prior configuration for a given directory, recursively.
 
@@ -48,21 +48,20 @@ def generate(directory: str):
 
     Parameters
     ----------
+    output_directory
+        Where to output the prior configuration files
     directory
         The directory for which prior are generated
     """
-    cwd = Path(os.getcwd())
-    try:
-        os.mkdir(path.join(cwd, "priors"))
-    except FileExistsError:
-        pass
+    os.makedirs(output_directory, exist_ok=True)
+
     for directory, _, files in os.walk(directory):
         directory = Path(directory)
         for file in files:
             if file.endswith(".py"):
                 full_path = directory / file
                 spec = for_file(full_path)
-                config_path = cwd / "priors" / file.replace(".py", ".json")
+                config_path = output_directory / file.replace(".py", ".json")
                 if len(spec) > 0:
                     if os.path.exists(config_path):
                         logger.info(f"{config_path} already exists")
