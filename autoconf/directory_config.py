@@ -97,10 +97,10 @@ class SectionConfig(AbstractConfig):
         for line in lines:
             if line == f"[{self.section}]":
                 is_section = True
-            elif line.startswith("["):
-                is_section = False
-            elif is_section and "=" in line:
-                yield line
+            elif line.startswith("[") or (is_section and "=" in line):
+                is_section = False if line.startswith("[") else True
+                if is_section:
+                    yield line
 
     def keys(self):
         for line in self.section_lines():

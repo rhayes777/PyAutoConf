@@ -7,13 +7,10 @@ from pathlib import Path
 from typing import List, Type, Tuple
 import ntpath
 from os import path
-
 import yaml
-
 from autoconf.directory_config import family
 
 logger = logging.getLogger(__name__)
-
 default_prior = {
     "type": "Uniform",
     "lower_limit": 0.0,
@@ -23,23 +20,46 @@ default_prior = {
 }
 
 
+def get_config_with_defaults(i, argument, defaults):
+    config = {}
+    if i < len(defaults):
+        default = defaults[i]
+        if isinstance(default, Sized):
+            return {f"{argument}_{j}": default_prior for j in range(len(default))}
+    config[argument] = default_prior
+    return config
+
+
+def get_config_with_defaults(i, argument, defaults):
+    config = {}
+    if i < len(defaults):
+        default = defaults[i]
+        if isinstance(default, Sized):
+            return {f"{argument}_{j}": default_prior for j in range(len(default))}
+    config[argument] = default_prior
+    return config
+
+
+def get_config_with_defaults(i, argument, defaults):
+    config = {}
+    if i < len(defaults):
+        default = defaults[i]
+        if isinstance(default, Sized):
+            return {f"{argument}_{j}": default_prior for j in range(len(default))}
+    config[argument] = default_prior
+    return config
+
+
 def make_config_for_class(cls):
     path = path_for_class(cls)
     arg_spec = inspect.getfullargspec(cls)
-    arguments = arg_spec.args[1:]
-    defaults = list(reversed(arg_spec.defaults or list()))
-
-    config = dict()
-    for i, argument in enumerate(reversed(arguments)):
-        if i < len(defaults):
-            default = defaults[i]
-            if isinstance(default, Sized):
-                for j in range(len(default)):
-                    config[f"{argument}_{j}"] = default_prior
-                continue
-        config[argument] = default_prior
-
-    return path, config
+    arguments, defaults = (arg_spec.args[1:], list(reversed(arg_spec.defaults or [])))
+    config_list = [
+        get_config_with_defaults(i, argument, defaults)
+        for i, argument in enumerate(reversed(arguments))
+    ]
+    config = {key: val for dict_ in config_list for key, val in dict_.items()}
+    return (path, config)
 
 
 def path_for_class(cls) -> List[str]:
@@ -89,19 +109,16 @@ class JSONPriorConfig:
 
     @property
     def path_value_map(self) -> dict:
-        """
-        A dictionary matching every possible path to the configuration it points to.
-        """
+        """A dictionary matching every possible path to the configuration it points to."""
         if self._path_value_map is None:
 
             def get_path_values(obj):
-                path_values = dict()
+                path_values = {}
                 if isinstance(obj, dict):
                     for key, value in obj.items():
                         path_values[key] = value
                         for path, path_value in get_path_values(value).items():
                             path_values[f"{key}.{path}"] = path_value
-
                 return path_values
 
             self._path_value_map = get_path_values(self.obj)
@@ -133,10 +150,8 @@ class JSONPriorConfig:
         -------
         A configuration instance.
         """
-        config_dict = dict()
-
+        config_dict = {}
         config_path = Path(directory)
-
         for suffix, parser in [
             ("json", json.load),
             ("yaml", yaml.safe_load),
@@ -144,9 +159,8 @@ class JSONPriorConfig:
         ]:
             for file in config_path.rglob(f"*.{suffix}"):
                 parts = file.relative_to(config_path).with_suffix("").parts
-                with open(file) as f:
+                with open(file, encoding="utf-8") as f:
                     config_dict[".".join(parts)] = parser(f)
-
         return JSONPriorConfig(config_dict, directory=directory)
 
     def __str__(self):
