@@ -16,6 +16,25 @@ def make_array():
     return np.array([1.0])
 
 
+class ArrayImpl:
+    def __init__(self, array):
+        self.array = array
+
+    @property
+    def dtype(self):
+        return self.array.dtype
+
+    def tolist(self):
+        return self.array.tolist()
+
+    def __array__(self):
+        return self.array
+
+
+def test_array_impl(array):
+    assert to_dict(ArrayImpl(array)) == to_dict(array)
+
+
 def test_array_as_dict(array_dict, array):
     assert to_dict(array) == array_dict
 

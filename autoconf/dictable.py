@@ -35,6 +35,18 @@ def nd_array_from_dict(nd_array_dict: dict, **_) -> np.ndarray:
     return np.array(nd_array_dict["array"], dtype=getattr(np, nd_array_dict["dtype"]))
 
 
+def is_array(obj) -> bool:
+    """
+    True if the object is a numpy array or an ArrayImpl (i.e. from JAX)
+    """
+    if isinstance(obj, np.ndarray):
+        return True
+    try:
+        return obj.__class__.__name__ == "ArrayImpl"
+    except AttributeError:
+        return False
+
+
 def to_dict(obj):
     if isinstance(obj, (int, float, str, bool, type(None))):
         return obj
@@ -45,7 +57,7 @@ def to_dict(obj):
         except TypeError as e:
             logger.debug(e)
 
-    if isinstance(obj, np.ndarray):
+    if is_array(obj):
         try:
             return nd_array_as_dict(obj)
         except Exception as e:
