@@ -1,3 +1,5 @@
+import shutil
+
 import json
 import os
 from pathlib import Path
@@ -9,6 +11,7 @@ from autoconf.json_prior import generate as g
 directory = Path(__file__).parent
 package_directory = directory / "source_code"
 module_path = package_directory / "module.py"
+output_directory = Path(__file__).parent / "output"
 
 
 @pytest.fixture(name="prior_json")
@@ -44,7 +47,7 @@ def make_prior_json():
 def cleanup():
     yield
     try:
-        os.remove("priors/module.json")
+        shutil.rmtree(output_directory)
     except FileNotFoundError:
         pass
 
@@ -55,7 +58,7 @@ def test_generate_for_file(prior_json):
 
 
 def test_generate(prior_json):
-    g.generate(package_directory)
+    g.generate(package_directory, output_directory=output_directory)
 
-    with open(f"priors/module.json") as f:
+    with open(output_directory / "module.json") as f:
         assert json.load(f) == prior_json

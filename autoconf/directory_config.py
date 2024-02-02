@@ -2,9 +2,7 @@ import configparser
 import os
 from abc import abstractmethod, ABC
 from pathlib import Path
-
 import yaml
-
 from autoconf import exc
 
 
@@ -65,12 +63,12 @@ class DictConfig(AbstractConfig):
 
     def items(self):
         for key in self.d:
-            yield key, self[key]
+            yield (key, self[key])
 
 
 class YAMLConfig(AbstractConfig):
     def __init__(self, path):
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             self._dict = yaml.safe_load(f)
 
     def _getitem(self, item):
@@ -89,21 +87,24 @@ class SectionConfig(AbstractConfig):
         self.section = section
         self.parser = parser
 
-    def keys(self):
-        with open(self.path) as f:
-            string = f.read()
+    def section_lines(self):
+        with open(self.path, encoding="utf-8") as f:
+            lines = f.read().split("\n")
+        yield from self.parse_section_lines(lines)
 
-        lines = string.split("\n")
+    def parse_section_lines(self, lines):
         is_section = False
         for line in lines:
             if line == f"[{self.section}]":
                 is_section = True
-                continue
-            if line.startswith("["):
-                is_section = False
-                continue
-            if is_section and "=" in line:
-                yield line.split("=")[0]
+            elif line.startswith("[") or (is_section and "=" in line):
+                is_section = False if line.startswith("[") else True
+                if is_section:
+                    yield line
+
+    def keys(self):
+        for line in self.section_lines():
+            yield line.split("=")[0]
 
     def _getitem(self, item):
         try:
@@ -142,11 +143,7 @@ class NamedConfig(AbstractConfig):
         return self.parser.sections()
 
     def _getitem(self, item):
-        return SectionConfig(
-            self.path,
-            self.parser,
-            item,
-        )
+        return SectionConfig(self.path, self.parser, item)
 
 
 class RecursiveConfig(AbstractConfig):
@@ -181,17 +178,20 @@ class RecursiveConfig(AbstractConfig):
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.path}>"
 
+    def _get_file_config(self, item_path, file_extension, config_class):
+        file_path = item_path.with_suffix(file_extension)
+        if file_path.exists():
+            return config_class(file_path)
+        return None
+
     def _getitem(self, item):
         item_path = self.path / f"{item}"
-        file_path = f"{item_path}.ini"
-        if os.path.isfile(file_path):
-            return NamedConfig(file_path)
-        yml_path = item_path.with_suffix(".yml")
-        if yml_path.exists():
-            return YAMLConfig(yml_path)
-        yaml_path = item_path.with_suffix(".yaml")
-        if yaml_path.exists():
-            return YAMLConfig(yaml_path)
+        if os.path.isfile(f"{item_path}.ini"):
+            return NamedConfig(f"{item_path}.ini")
+        for ext, config_type in [(".yml", YAMLConfig), (".yaml", YAMLConfig)]:
+            config = self._get_file_config(item_path, ext, config_type)
+            if config:
+                return config
         if os.path.isdir(item_path):
             return RecursiveConfig(item_path)
         raise KeyError(f"No configuration found for {item} at path {self.path}")
@@ -207,20 +207,10 @@ class PriorConfigWrapper:
                 return config.for_class_and_suffix_path(cls, path)
             except KeyError:
                 pass
-        directories = " ".join(str(config.directory) for config in self.prior_configs)
-
+        directories = " ".join((str(config.directory) for config in self.prior_configs))
         print()
-
         raise exc.ConfigException(
-            f"No prior config found for class: \n\n"
-            f"{cls.__name__} \n\n"
-            f"For parameter name and path: \n\n "
-            f"{'.'.join(path)} \n\n "
-            f"In any of the following directories:\n\n"
-            f"{directories}\n\n"
-            f"Either add configuration for the parameter or a type annotation for a class with valid configuration.\n\n"
-            f"The following readthedocs page explains prior configuration files in PyAutoFit and will help you fix "
-            f"the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
+            f"No prior config found for class: \n\n{cls.__name__} \n\nFor parameter name and path: \n\n {'.'.join(path)} \n\n In any of the following directories:\n\n{directories}\n\nEither add configuration for the parameter or a type annotation for a class with valid configuration.\n\nThe following readthedocs page explains prior configuration files in PyAutoFit and will help you fix the error https://pyautofit.readthedocs.io/en/latest/general/adding_a_model_component.html"
         )
 
 

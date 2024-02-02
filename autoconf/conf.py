@@ -5,9 +5,7 @@ import shutil
 from functools import wraps
 from pathlib import Path
 from typing import Optional, Union, Dict, MutableMapping
-
 import yaml
-
 from autoconf.directory_config import (
     RecursiveConfig,
     PriorConfigWrapper,
@@ -18,7 +16,6 @@ from autoconf.exc import ConfigException
 from autoconf.json_prior.config import JSONPriorConfig
 
 logger = logging.getLogger(__name__)
-
 LOGGING_CONFIG_FILE = "logging.yaml"
 
 
@@ -59,8 +56,8 @@ class DictWrapper(MutableMapping):
             key = key.lower()
         try:
             return self._dict[key]
-        except KeyError:
-            raise KeyError(f"key {key} not found in paths {self.paths_string}")
+        except KeyError as exc:
+            raise KeyError(f"key {key} not found in paths {self.paths_string}") from exc
 
     @property
     def paths_string(self):
@@ -107,14 +104,10 @@ class Config:
                 logger.warning(
                     f"{config_path} passed as config path. Did you mean to use output_path={config_path}?"
                 )
-
         self._prior_config = None
-
         self._configs = list()
         self._dict = DictWrapper(self.paths)
-
         self.configs = list(map(RecursiveConfig, config_paths))
-
         self.output_path = output_path
 
     @property
@@ -232,44 +225,30 @@ class Config:
             with an expected configuration suffix
         """
         logger.debug(f"Pushing new config with path {new_path}")
-
         if not Path(new_path).exists():
             raise ConfigException(f"{new_path} does not exist")
-
         suffixes = {
             Path(file).suffix for _, _, files in os.walk(new_path) for file in files
         }
-
-        CONFIG_SUFFIXES = [
-            ".yml",
-            ".ini",
-            ".json",
-            ".yaml",
-        ]
-
+        CONFIG_SUFFIXES = [".yml", ".ini", ".json", ".yaml"]
         if not any((suffix in suffixes for suffix in CONFIG_SUFFIXES)):
             raise ConfigException(
                 f"{new_path} does not contain any files ending with {'/'.join(CONFIG_SUFFIXES)} recursively"
             )
-
         self.output_path = output_path or self.output_path
-
         try:
             if self.configs[0] == new_path or (
-                keep_first and len(self.configs) > 1 and self.configs[1] == new_path
+                keep_first and len(self.configs) > 1 and (self.configs[1] == new_path)
             ):
                 return
         except IndexError:
             pass
-
         new_config = RecursiveConfig(new_path)
-
         configs = list(filter(lambda config: config != new_config, self.configs))
         if keep_first:
             self.configs = configs[:1] + [new_config] + configs[1:]
         else:
             self.configs = [new_config] + configs
-
         self.configure_logging()
 
     def register(self, file: str):
@@ -285,11 +264,9 @@ class Config:
 
 
 current_directory = Path(os.getcwd())
-
 default = Config(
     current_directory / "config", output_path=current_directory / "output/"
 )
-
 instance = default
 
 
@@ -321,12 +298,9 @@ def output_path_for_test(temporary_path="temp", remove=True):
             remove_()
             original_path = instance.output_path
             instance.output_path = temporary_path
-
             result = func(*args, **kwargs)
-
             remove_()
             instance.output_path = original_path
-
             return result
 
         return wrapper
@@ -357,14 +331,10 @@ def with_config(*path: str, value):
             config = instance
             for string in path[:-1]:
                 config = config[string]
-
             original_value = config[path[-1]]
             config[path[-1]] = value
-
             result = func(*args, **kwargs)
-
             config[path[-1]] = original_value
-
             return result
 
         return wrapper
