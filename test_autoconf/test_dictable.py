@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 import pytest
+from pathlib import Path
 
 from autoconf.dictable import to_dict, from_dict, register_parser
 
@@ -73,3 +74,9 @@ def test_register_parser():
 
 def test_no_type():
     assert from_dict({"hi": "there"}) == {"hi": "there"}
+
+
+def test_serialise_path():
+    path = Path("/path/to/file.json")
+    path_dict = to_dict(path)
+    assert from_dict(path_dict) == path

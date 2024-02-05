@@ -63,6 +63,12 @@ def to_dict(obj):
         except Exception as e:
             logger.info(e)
 
+    if isinstance(obj, Path):
+        return {
+            "type": "path",
+            "path": str(obj),
+        }
+
     if inspect.isclass(obj):
         return {
             "type": "type",
@@ -176,6 +182,9 @@ def from_dict(dictionary, **kwargs):
     except TypeError as e:
         logger.debug(e)
         return None
+
+    if type_ == "path":
+        return Path(dictionary["path"])
 
     if type_ in __parsers:
         return __parsers[type_](dictionary, **kwargs)
