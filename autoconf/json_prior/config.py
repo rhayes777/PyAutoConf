@@ -7,40 +7,26 @@ from pathlib import Path
 from typing import List, Type, Tuple
 import ntpath
 from os import path
-
 import yaml
-
 from autoconf.directory_config import family
-
 logger = logging.getLogger(__name__)
-
-default_prior = {
-    "type": "Uniform",
-    "lower_limit": 0.0,
-    "upper_limit": 1.0,
-    "width_modifier": {"type": "Absolute", "value": 0.2},
-    "gaussian_limits": {"lower": 0.0, "upper": 1.0},
-}
-
+default_prior = {'type': 'Uniform', 'lower_limit': 0.0, 'upper_limit': 1.0, 'width_modifier': {'type': 'Absolute', 'value': 0.2}, 'gaussian_limits': {'lower': 0.0, 'upper': 1.0}}
+from itertools import zip_longest
 
 def make_config_for_class(cls):
     path = path_for_class(cls)
     arg_spec = inspect.getfullargspec(cls)
     arguments = arg_spec.args[1:]
-    defaults = list(reversed(arg_spec.defaults or list()))
+    defaults = arg_spec.defaults[::-1] if arg_spec.defaults else []
+    config = {}
 
-    config = dict()
-    for i, argument in enumerate(reversed(arguments)):
-        if i < len(defaults):
-            default = defaults[i]
-            if isinstance(default, Sized):
-                for j in range(len(default)):
-                    config[f"{argument}_{j}"] = default_prior
-                continue
-        config[argument] = default_prior
-
-    return path, config
-
+    def process_argument(arg, default):
+        if default is not None and isinstance(default, Sized):
+            return [(f'{arg}_{i}', default_prior) for i in range(len(default))]
+        else:
+            return [(arg, default_prior)]
+    config.update(dict((item for arg, default in zip_longest(reversed(arguments), defaults, fillvalue=None) for item in process_argument(arg, default))))
+    return (path, config)
 
 def path_for_class(cls) -> List[str]:
     """
@@ -55,10 +41,10 @@ def path_for_class(cls) -> List[str]:
     -------
     A list of modules terminating in the name of a class
     """
-    return f"{cls.__module__}.{cls.__name__}".split(".")
-
+    return f'{cls.__module__}.{cls.__name__}'.split('.')
 
 class JSONPriorConfig:
+
     def __init__(self, config_dict: dict, directory=None):
         """
         Parses configuration describing priors associated with classes.
@@ -100,10 +86,8 @@ class JSONPriorConfig:
                     for key, value in obj.items():
                         path_values[key] = value
                         for path, path_value in get_path_values(value).items():
-                            path_values[f"{key}.{path}"] = path_value
-
+                            path_values[f'{key}.{path}'] = path_value
                 return path_values
-
             self._path_value_map = get_path_values(self.obj)
         return self._path_value_map
 
@@ -113,14 +97,10 @@ class JSONPriorConfig:
         Tuple pairs matching every possible path to the configuration it points to.
         These are ordered by key length with the longest key first.
         """
-        return sorted(
-            list(self.path_value_map.items()),
-            key=lambda item: len(item[0]),
-            reverse=True,
-        )
+        return sorted(list(self.path_value_map.items()), key=lambda item: len(item[0]), reverse=True)
 
     @classmethod
-    def from_directory(cls, directory: str) -> "JSONPriorConfig":
+    def from_directory(cls, directory: str) -> 'JSONPriorConfig':
         """
         Load JSONPriorConfiguration from a file.
 
@@ -134,29 +114,22 @@ class JSONPriorConfig:
         A configuration instance.
         """
         config_dict = dict()
-
         config_path = Path(directory)
-
-        for suffix, parser in [
-            ("json", json.load),
-            ("yaml", yaml.safe_load),
-            ("yml", yaml.safe_load),
-        ]:
-            for file in config_path.rglob(f"*.{suffix}"):
-                parts = file.relative_to(config_path).with_suffix("").parts
+        for suffix, parser in [('json', json.load), ('yaml', yaml.safe_load), ('yml', yaml.safe_load)]:
+            for file in config_path.rglob(f'*.{suffix}'):
+                parts = file.relative_to(config_path).with_suffix('').parts
                 with open(file) as f:
-                    config_dict[".".join(parts)] = parser(f)
-
+                    config_dict['.'.join(parts)] = parser(f)
         return JSONPriorConfig(config_dict, directory=directory)
 
     def __str__(self):
         return json.dumps(self.obj)
 
     def __getitem__(self, item):
-        return JSONPriorConfig(self.obj[".".join(item)], directory=self.directory)
+        return JSONPriorConfig(self.obj['.'.join(item)], directory=self.directory)
 
     def __contains__(self, item):
-        return ".".join(item) in self.obj
+        return '.'.join(item) in self.obj
 
     def for_class_and_suffix_path(self, cls: Type, suffix_path: List[str]):
         """
@@ -185,9 +158,7 @@ class JSONPriorConfig:
                 return self(path_for_class(c) + suffix_path)
             except KeyError:
                 pass
-        raise KeyError(
-            f"No config found for class {cls} and path {suffix_path} in {self.directory}"
-        )
+        raise KeyError(f'No config found for class {cls} and path {suffix_path} in {self.directory}')
 
     def __call__(self, config_path: List[str]):
         """
@@ -211,11 +182,8 @@ class JSONPriorConfig:
         PriorException
             If no configuration is found.
         """
-        key = ".".join(config_path)
+        key = '.'.join(config_path)
         for path, value in self.path_value_tuples:
             if key.endswith(path):
                 return value
-        raise KeyError(
-            f"No configuration was found for the path {config_path}"
-            + ("" if self.directory is None else f" ({self.directory})")
-        )
+        raise KeyError(f'No configuration was found for the path {config_path}' + ('' if self.directory is None else f' ({self.directory})'))
