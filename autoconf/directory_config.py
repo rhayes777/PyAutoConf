@@ -164,17 +164,11 @@ class RecursiveConfig(AbstractConfig):
 
     def _getitem(self, item):
         item_path = self.path / f'{item}'
-        file_path = f'{item_path}.ini'
-        if os.path.isfile(file_path):
-            return NamedConfig(file_path)
-        yml_path = item_path.with_suffix('.yml')
-        if yml_path.exists():
-            return YAMLConfig(yml_path)
-        yaml_path = item_path.with_suffix('.yaml')
-        if yaml_path.exists():
-            return YAMLConfig(yaml_path)
-        if os.path.isdir(item_path):
-            return RecursiveConfig(item_path)
+        config_choices = [{'path': f'{item_path}.ini', 'config': NamedConfig, 'isfile': True}, {'path': item_path.with_suffix('.yml'), 'config': YAMLConfig}, {'path': item_path.with_suffix('.yaml'), 'config': YAMLConfig}, {'path': item_path, 'config': RecursiveConfig, 'isdir': True}]
+        for choice in config_choices:
+            path_exists = os.path.isfile(choice['path']) if 'isfile' in choice else choice['path'].exists()
+            if path_exists:
+                return choice['config'](choice['path'])
         raise KeyError(f'No configuration found for {item} at path {self.path}')
 
 class PriorConfigWrapper:
