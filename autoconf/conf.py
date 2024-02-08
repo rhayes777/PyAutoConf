@@ -49,8 +49,8 @@ class DictWrapper(MutableMapping):
             key = key.lower()
         try:
             return self._dict[key]
-        except KeyError:
-            raise KeyError(f'key {key} not found in paths {self.paths_string}')
+        except KeyError as exc:
+            raise KeyError(f'key {key} not found in paths {self.paths_string}') from exc
 
     @property
     def paths_string(self):
