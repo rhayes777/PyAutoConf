@@ -87,20 +87,21 @@ class SectionConfig(AbstractConfig):
         self.section = section
         self.parser = parser
 
-    def keys(self):
-        with open(self.path) as f:
-            string = f.read()
-        lines = string.split('\n')
+    def read_file(self):
+        with open(self.path, encoding='utf-8') as f:
+            return f.read().split('\n')
+
+    def handle_lines(self, lines):
         is_section = False
         for line in lines:
-            if line == f'[{self.section}]':
-                is_section = True
-                continue
             if line.startswith('['):
-                is_section = False
-                continue
-            if is_section and '=' in line:
+                is_section = line == f'[{self.section}]'
+            elif is_section and '=' in line:
                 yield line.split('=')[0]
+
+    def keys(self):
+        lines = self.read_file()
+        return self.handle_lines(lines)
 
     def _getitem(self, item):
         try:
