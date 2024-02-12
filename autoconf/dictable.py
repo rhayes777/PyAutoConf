@@ -110,6 +110,7 @@ def instance_as_dict(obj):
         arguments |= set(obj.__identifier_fields__)
     except (AttributeError, TypeError):
         pass
+
     argument_dict = {
         arg: getattr(obj, arg)
         for arg in arguments
@@ -118,6 +119,11 @@ def instance_as_dict(obj):
             getattr(obj, arg),
         )
     }
+    try:
+        for field in obj.__nullify_fields__:
+            argument_dict[field] = None
+    except (AttributeError, TypeError):
+        pass
 
     return {
         "type": "instance",
