@@ -98,6 +98,8 @@ def get_arguments(obj):
     args = set(args_spec.args[1:])
     if args_spec.varkw:
         for base in type(obj).__bases__:
+            if base is object:
+                continue
             args |= get_arguments(base)
     return args
 
