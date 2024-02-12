@@ -93,8 +93,17 @@ def to_dict(obj):
     return obj
 
 
+def get_arguments(obj):
+    args_spec = inspect.getfullargspec(obj.__init__)
+    args = set(args_spec.args[1:])
+    if args_spec.varkw:
+        for base in type(obj).__bases__:
+            args |= get_arguments(base)
+    return args
+
+
 def instance_as_dict(obj):
-    arguments = set(inspect.getfullargspec(obj.__init__).args[1:])
+    arguments = get_arguments(obj)
     try:
         arguments |= set(obj.__identifier_fields__)
     except (AttributeError, TypeError):
