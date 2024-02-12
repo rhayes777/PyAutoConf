@@ -80,3 +80,33 @@ def test_serialise_path():
     path = Path("/path/to/file.json")
     path_dict = to_dict(path)
     assert from_dict(path_dict) == path
+
+
+class Parent:
+    def __init__(self, parent_arg):
+        self.parent_arg = parent_arg
+
+
+class Child(Parent):
+    def __init__(self, child_arg, **kwargs):
+        super().__init__(**kwargs)
+        self.child_arg = child_arg
+
+
+def test_serialise_kwargs():
+    child = Child(
+        child_arg="child",
+        parent_arg="parent",
+    )
+    child_dict = to_dict(child)
+    assert child_dict == {
+        "arguments": {
+            "child_arg": "child",
+            "parent_arg": "parent",
+        },
+        "class_path": "test_autoconf.test_dictable.Child",
+        "type": "instance",
+    }
+    new_child = from_dict(child_dict)
+    assert new_child.child_arg == "child"
+    assert new_child.parent_arg == "parent"

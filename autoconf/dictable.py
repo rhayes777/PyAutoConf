@@ -4,7 +4,7 @@ import logging
 
 import numpy as np
 from pathlib import Path
-from typing import Union, Callable
+from typing import Union, Callable, Set
 
 from autoconf.class_path import get_class_path, get_class
 
@@ -93,12 +93,55 @@ def to_dict(obj):
     return obj
 
 
+def get_arguments(obj) -> Set[str]:
+    """
+    Get the arguments of a class. This is done by inspecting the constructor.
+
+    If the constructor has a **kwargs parameter, the arguments of the base classes are also included.
+
+    Parameters
+    ----------
+    obj
+        The class to get the arguments of.
+
+    Returns
+    -------
+    A set of the arguments of the class.
+    """
+    args_spec = inspect.getfullargspec(obj.__init__)
+    args = set(args_spec.args[1:])
+    if args_spec.varkw:
+        for base in obj.__bases__:
+            if base is object:
+                continue
+            args |= get_arguments(base)
+    return args
+
+
 def instance_as_dict(obj):
-    arguments = set(inspect.getfullargspec(obj.__init__).args[1:])
+    """
+    Convert an instance of a class to a dictionary representation.
+
+    Serialises any children of the object which are given as constructor arguments
+    or included in the __identifier_fields__ attribute.
+
+    Sets any fields in the __nullify_fields__ attribute to None.
+
+    Parameters
+    ----------
+    obj
+        The instance of the class to be converted to a dictionary representation.
+
+    Returns
+    -------
+    A dictionary representation of the instance.
+    """
+    arguments = get_arguments(type(obj))
     try:
         arguments |= set(obj.__identifier_fields__)
     except (AttributeError, TypeError):
         pass
+
     argument_dict = {
         arg: getattr(obj, arg)
         for arg in arguments
@@ -107,6 +150,11 @@ def instance_as_dict(obj):
             getattr(obj, arg),
         )
     }
+    try:
+        for field in obj.__nullify_fields__:
+            argument_dict[field] = None
+    except (AttributeError, TypeError):
+        pass
 
     return {
         "type": "instance",
