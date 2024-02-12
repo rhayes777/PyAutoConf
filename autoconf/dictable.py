@@ -97,7 +97,7 @@ def get_arguments(obj):
     args_spec = inspect.getfullargspec(obj.__init__)
     args = set(args_spec.args[1:])
     if args_spec.varkw:
-        for base in type(obj).__bases__:
+        for base in obj.__bases__:
             if base is object:
                 continue
             args |= get_arguments(base)
@@ -105,7 +105,7 @@ def get_arguments(obj):
 
 
 def instance_as_dict(obj):
-    arguments = get_arguments(obj)
+    arguments = get_arguments(type(obj))
     try:
         arguments |= set(obj.__identifier_fields__)
     except (AttributeError, TypeError):
