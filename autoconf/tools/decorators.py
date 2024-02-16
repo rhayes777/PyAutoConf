@@ -1,4 +1,4 @@
-class CachedProperty(object):
+class CachedProperty:
     """
     A property that is only computed once per instance and then replaces
     itself with an ordinary attribute. Deleting the attribute resets the
@@ -16,6 +16,4 @@ class CachedProperty(object):
         if self.func.__name__ not in obj.__dict__:
             obj.__dict__[self.func.__name__] = self.func(obj)
         return obj.__dict__[self.func.__name__]
-
-
 cached_property = CachedProperty
