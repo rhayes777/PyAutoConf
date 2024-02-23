@@ -5,31 +5,21 @@ import shutil
 from functools import wraps
 from pathlib import Path
 from typing import Optional, Union, Dict, MutableMapping
-
 import yaml
-
-from autoconf.directory_config import (
-    RecursiveConfig,
-    PriorConfigWrapper,
-    AbstractConfig,
-    family,
-)
+from autoconf.directory_config import RecursiveConfig, PriorConfigWrapper, AbstractConfig, family
 from autoconf.exc import ConfigException
 from autoconf.json_prior.config import JSONPriorConfig
-
 logger = logging.getLogger(__name__)
-
-LOGGING_CONFIG_FILE = "logging.yaml"
-
+LOGGING_CONFIG_FILE = 'logging.yaml'
 
 def get_matplotlib_backend():
     try:
-        return instance["visualize"]["general"]["general"]["backend"]
+        return instance['visualize']['general']['general']['backend']
     except KeyError:
-        return "default"
-
+        return 'default'
 
 class DictWrapper(MutableMapping):
+
     def __delitem__(self, v) -> None:
         del self._dict[v]
 
@@ -59,12 +49,12 @@ class DictWrapper(MutableMapping):
             key = key.lower()
         try:
             return self._dict[key]
-        except KeyError:
-            raise KeyError(f"key {key} not found in paths {self.paths_string}")
+        except KeyError as exc:
+            raise KeyError(f'key {key} not found in paths {self.paths_string}') from exc
 
     @property
     def paths_string(self):
-        return "\n".join(map(str, self.paths))
+        return '\n'.join(map(str, self.paths))
 
     def __repr__(self):
         return repr(self._dict)
@@ -75,13 +65,11 @@ class DictWrapper(MutableMapping):
                 return self[item]
             except KeyError:
                 pass
-        raise KeyError(
-            f"config for {cls} or its parents not found in paths {self.paths_string}"
-        )
-
+        raise KeyError(f'config for {cls} or its parents not found in paths {self.paths_string}')
 
 class Config:
-    def __init__(self, *config_paths, output_path: Union[str, Path] = "output"):
+
+    def __init__(self, *config_paths, output_path: Union[str, Path]='output'):
         """
         Singleton to manage configuration.
 
@@ -103,18 +91,12 @@ class Config:
             The path where data should be saved.
         """
         for config_path in config_paths:
-            if Path(config_path).name == "output":
-                logger.warning(
-                    f"{config_path} passed as config path. Did you mean to use output_path={config_path}?"
-                )
-
+            if Path(config_path).name == 'output':
+                logger.warning(f'{config_path} passed as config path. Did you mean to use output_path={config_path}?')
         self._prior_config = None
-
         self._configs = list()
         self._dict = DictWrapper(self.paths)
-
         self.configs = list(map(RecursiveConfig, config_paths))
-
         self.output_path = output_path
 
     @property
@@ -138,7 +120,6 @@ class Config:
                             d[key] = value
                 except KeyError as e:
                     logger.debug(e)
-
             for config_ in reversed(self._configs):
                 recurse_config(config_, self._dict)
         return self._dict
@@ -165,7 +146,7 @@ class Config:
                     with open(path / LOGGING_CONFIG_FILE) as f:
                         return yaml.safe_load(f)
             except FileNotFoundError:
-                logger.debug(f"No configuration found at path {config.path}")
+                logger.debug(f'No configuration found at path {config.path}')
         return None
 
     @property
@@ -199,17 +180,10 @@ class Config:
         for the attributes of given classes.
         """
         if self._prior_config is None:
-            self._prior_config = PriorConfigWrapper(
-                [JSONPriorConfig.from_directory(path / "priors") for path in self.paths]
-            )
+            self._prior_config = PriorConfigWrapper([JSONPriorConfig.from_directory(path / 'priors') for path in self.paths])
         return self._prior_config
 
-    def push(
-        self,
-        new_path: Union[str, Path],
-        output_path: Optional[str] = None,
-        keep_first: bool = False,
-    ):
+    def push(self, new_path: Union[str, Path], output_path: Optional[str]=None, keep_first: bool=False):
         """
         Push a new configuration path. This overrides the existing config
         paths, with existing configs being used as a backup when a value
@@ -231,45 +205,25 @@ class Config:
             If the pushed path does not exist or does not contain at least one file
             with an expected configuration suffix
         """
-        logger.debug(f"Pushing new config with path {new_path}")
-
+        logger.debug(f'Pushing new config with path {new_path}')
         if not Path(new_path).exists():
-            raise ConfigException(f"{new_path} does not exist")
-
-        suffixes = {
-            Path(file).suffix for _, _, files in os.walk(new_path) for file in files
-        }
-
-        CONFIG_SUFFIXES = [
-            ".yml",
-            ".ini",
-            ".json",
-            ".yaml",
-        ]
-
+            raise ConfigException(f'{new_path} does not exist')
+        suffixes = {Path(file).suffix for _, _, files in os.walk(new_path) for file in files}
+        CONFIG_SUFFIXES = ['.yml', '.ini', '.json', '.yaml']
         if not any((suffix in suffixes for suffix in CONFIG_SUFFIXES)):
-            raise ConfigException(
-                f"{new_path} does not contain any files ending with {'/'.join(CONFIG_SUFFIXES)} recursively"
-            )
-
+            raise ConfigException(f"{new_path} does not contain any files ending with {'/'.join(CONFIG_SUFFIXES)} recursively")
         self.output_path = output_path or self.output_path
-
         try:
-            if self.configs[0] == new_path or (
-                keep_first and len(self.configs) > 1 and self.configs[1] == new_path
-            ):
+            if self.configs[0] == new_path or (keep_first and len(self.configs) > 1 and (self.configs[1] == new_path)):
                 return
         except IndexError:
             pass
-
         new_config = RecursiveConfig(new_path)
-
         configs = list(filter(lambda config: config != new_config, self.configs))
         if keep_first:
             self.configs = configs[:1] + [new_config] + configs[1:]
         else:
             self.configs = [new_config] + configs
-
         self.configure_logging()
 
     def register(self, file: str):
@@ -281,19 +235,12 @@ class Config:
         file
             The path to the project's __init__
         """
-        self.push(Path(file).parent / "config", keep_first=True)
-
-
+        self.push(Path(file).parent / 'config', keep_first=True)
 current_directory = Path(os.getcwd())
-
-default = Config(
-    current_directory / "config", output_path=current_directory / "output/"
-)
-
+default = Config(current_directory / 'config', output_path=current_directory / 'output/')
 instance = default
 
-
-def output_path_for_test(temporary_path="temp", remove=True):
+def output_path_for_test(temporary_path='temp', remove=True):
     """
     Temporarily change the output path for the scope of a function
     (e.g. a test). Remove the files after the test has completed
@@ -316,23 +263,18 @@ def output_path_for_test(temporary_path="temp", remove=True):
             shutil.rmtree(temporary_path, ignore_errors=True)
 
     def decorator(func):
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             remove_()
             original_path = instance.output_path
             instance.output_path = temporary_path
-
             result = func(*args, **kwargs)
-
             remove_()
             instance.output_path = original_path
-
             return result
-
         return wrapper
-
     return decorator
-
 
 def with_config(*path: str, value):
     """
@@ -352,21 +294,16 @@ def with_config(*path: str, value):
     """
 
     def decorator(func):
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             config = instance
             for string in path[:-1]:
                 config = config[string]
-
             original_value = config[path[-1]]
             config[path[-1]] = value
-
             result = func(*args, **kwargs)
-
             config[path[-1]] = original_value
-
             return result
-
         return wrapper
-
     return decorator
