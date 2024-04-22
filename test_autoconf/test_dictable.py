@@ -110,3 +110,24 @@ def test_serialise_kwargs():
     new_child = from_dict(child_dict)
     assert new_child.child_arg == "child"
     assert new_child.parent_arg == "parent"
+
+
+class WithOptional:
+    def __init__(self, arg: int = 1):
+        self.arg = arg
+
+
+def test_serialise_with_arg():
+    assert to_dict(WithOptional()) == {
+        "arguments": {"arg": 1},
+        "class_path": "test_autoconf.test_dictable.WithOptional",
+        "type": "instance",
+    }
+
+
+def test_serialise_without_arg():
+    assert to_dict(WithOptional(), filter_args=("arg",)) == {
+        "arguments": {},
+        "class_path": "test_autoconf.test_dictable.WithOptional",
+        "type": "instance",
+    }
