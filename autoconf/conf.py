@@ -334,6 +334,10 @@ def output_path_for_test(temporary_path="temp", remove=True):
     return decorator
 
 
+class NoValue:
+    pass
+
+
 def with_config(*path: str, value):
     """
     Create a decorator that swaps a value in configuration
@@ -358,12 +362,19 @@ def with_config(*path: str, value):
             for string in path[:-1]:
                 config = config[string]
 
-            original_value = config[path[-1]]
+            try:
+                original_value = config[path[-1]]
+            except KeyError:
+                original_value = NoValue
+
             config[path[-1]] = value
 
             result = func(*args, **kwargs)
 
-            config[path[-1]] = original_value
+            if original_value is NoValue:
+                del config[path[-1]]
+            else:
+                config[path[-1]] = original_value
 
             return result
 
