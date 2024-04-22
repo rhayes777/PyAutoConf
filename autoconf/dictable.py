@@ -4,7 +4,7 @@ import logging
 
 import numpy as np
 from pathlib import Path
-from typing import Union, Callable, Set
+from typing import Union, Callable, Set, Tuple
 
 from autoconf.class_path import get_class_path, get_class
 
@@ -47,7 +47,7 @@ def is_array(obj) -> bool:
         return False
 
 
-def to_dict(obj):
+def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
     if isinstance(obj, (int, float, str, bool, type(None))):
         return obj
 
@@ -80,7 +80,11 @@ def to_dict(obj):
     if isinstance(obj, dict):
         return {
             "type": "dict",
-            "arguments": {key: to_dict(value) for key, value in obj.items()},
+            "arguments": {
+                key: to_dict(value)
+                for key, value in obj.items()
+                if key not in filter_args
+            },
         }
     if obj.__class__.__name__ == "method":
         return to_dict(obj())
@@ -88,7 +92,7 @@ def to_dict(obj):
         return obj
 
     if inspect.isclass(type(obj)):
-        return instance_as_dict(obj)
+        return instance_as_dict(obj, filter_args=filter_args)
 
     return obj
 
@@ -118,7 +122,7 @@ def get_arguments(obj) -> Set[str]:
     return args
 
 
-def instance_as_dict(obj):
+def instance_as_dict(obj, filter_args: Tuple[str, ...] = ()):
     """
     Convert an instance of a class to a dictionary representation.
 
@@ -131,6 +135,8 @@ def instance_as_dict(obj):
     ----------
     obj
         The instance of the class to be converted to a dictionary representation.
+    filter_args
+        A tuple of arguments to exclude from the dictionary representation.
 
     Returns
     -------
@@ -145,6 +151,7 @@ def instance_as_dict(obj):
     argument_dict = {
         arg: getattr(obj, arg)
         for arg in arguments
+        if arg not in filter_args
         if hasattr(obj, arg)
         and not inspect.ismethod(
             getattr(obj, arg),
@@ -153,6 +160,15 @@ def instance_as_dict(obj):
     try:
         for field in obj.__nullify_fields__:
             argument_dict[field] = None
+    except (AttributeError, TypeError):
+        pass
+
+    try:
+        for field in obj.__exclude_fields__:
+            try:
+                argument_dict.pop(field)
+            except KeyError:
+                logger.debug(f"Field {field} not found in object")
     except (AttributeError, TypeError):
         pass
 
