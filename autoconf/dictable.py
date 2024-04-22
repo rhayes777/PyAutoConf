@@ -156,6 +156,15 @@ def instance_as_dict(obj):
     except (AttributeError, TypeError):
         pass
 
+    try:
+        for field in obj.__exclude_fields__:
+            try:
+                argument_dict.pop(field)
+            except KeyError:
+                logger.debug(f"Field {field} not found in object")
+    except (AttributeError, TypeError):
+        pass
+
     return {
         "type": "instance",
         "class_path": get_class_path(obj.__class__),
