@@ -131,3 +131,19 @@ def test_serialise_without_arg():
         "class_path": "test_autoconf.test_dictable.WithOptional",
         "type": "instance",
     }
+
+
+class C:
+    pass
+
+
+def test_tuple():
+    assert from_dict(
+        json.loads(
+            json.dumps(
+                to_dict(
+                    (C, C),
+                )
+            )
+        )
+    ) == (C, C)

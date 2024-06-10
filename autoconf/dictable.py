@@ -77,6 +77,8 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
 
     if isinstance(obj, list):
         return {"type": "list", "values": list(map(to_dict, obj))}
+    if isinstance(obj, tuple):
+        return {"type": "tuple", "values": list(map(to_dict, obj))}
     if isinstance(obj, dict):
         return {
             "type": "dict",
@@ -255,6 +257,8 @@ def from_dict(dictionary, **kwargs):
 
     if type_ == "list":
         return list(map(from_dict, dictionary["values"]))
+    if type_ == "tuple":
+        return tuple(map(from_dict, dictionary["values"]))
     if type_ == "dict":
         return {key: from_dict(value, **kwargs) for key, value in dictionary.items()}
 
