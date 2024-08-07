@@ -51,6 +51,14 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
     if isinstance(obj, (int, float, str, bool, type(None))):
         return obj
 
+    if isinstance(obj, slice):
+        return {
+            "type": "slice",
+            "start": obj.start,
+            "stop": obj.stop,
+            "step": obj.step,
+        }
+
     if inspect.isfunction(obj):
         return {
             "type": "function",
@@ -257,6 +265,13 @@ def from_dict(dictionary, **kwargs):
 
     if type_ == "path":
         return Path(dictionary["path"])
+
+    if type_ == "slice":
+        return slice(
+            dictionary["start"],
+            dictionary["stop"],
+            dictionary["step"],
+        )
 
     if type_ == "function":
         return get_class(dictionary["class_path"])

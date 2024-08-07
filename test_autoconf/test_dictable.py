@@ -166,3 +166,9 @@ def test_function():
         )()
         == 1
     )
+
+
+def test_slice():
+    s = slice(1, 2, 3)
+
+    assert s == from_dict(to_dict(s))
