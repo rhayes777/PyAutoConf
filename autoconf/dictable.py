@@ -59,6 +59,13 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
             "step": obj.step,
         }
 
+    if isinstance(obj, np.number):
+        return {
+            "type": "np.number",
+            "dtype": str(obj.dtype),
+            "value": obj.item(),
+        }
+
     if inspect.isfunction(obj):
         return {
             "type": "function",
@@ -272,6 +279,12 @@ def from_dict(dictionary, **kwargs):
             dictionary["stop"],
             dictionary["step"],
         )
+
+    if type_ == "np.number":
+        return getattr(
+            np,
+            dictionary["dtype"],
+        )(dictionary["value"])
 
     if type_ == "function":
         return get_class(dictionary["class_path"])

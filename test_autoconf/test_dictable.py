@@ -172,3 +172,11 @@ def test_slice():
     s = slice(1, 2, 3)
 
     assert s == from_dict(to_dict(s))
+
+
+def test_int_64():
+    i = np.int64(1)
+    result = from_dict(to_dict(i))
+
+    assert result == 1
+    assert isinstance(result, np.int64)
