@@ -54,9 +54,9 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
     if isinstance(obj, slice):
         return {
             "type": "slice",
-            "start": obj.start,
-            "stop": obj.stop,
-            "step": obj.step,
+            "start": to_dict(obj.start),
+            "stop": to_dict(obj.stop),
+            "step": to_dict(obj.step),
         }
 
     if isinstance(obj, np.number):
@@ -275,9 +275,9 @@ def from_dict(dictionary, **kwargs):
 
     if type_ == "slice":
         return slice(
-            dictionary["start"],
-            dictionary["stop"],
-            dictionary["step"],
+            from_dict(dictionary["start"]),
+            from_dict(dictionary["stop"]),
+            from_dict(dictionary["step"]),
         )
 
     if type_ == "np.number":

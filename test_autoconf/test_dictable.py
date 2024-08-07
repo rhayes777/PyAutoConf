@@ -180,3 +180,15 @@ def test_int_64():
 
     assert result == 1
     assert isinstance(result, np.int64)
+
+
+def test_int64_slice():
+    s = slice(np.int64(1), np.int64(2), np.int64(3))
+
+    assert s == from_dict(
+        json.loads(
+            json.dumps(
+                to_dict(s),
+            )
+        )
+    )
