@@ -51,6 +51,12 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
     if isinstance(obj, (int, float, str, bool, type(None))):
         return obj
 
+    if inspect.isfunction(obj):
+        return {
+            "type": "function",
+            "class_path": obj.__module__ + "." + obj.__qualname__,
+        }
+
     if hasattr(obj, "dict"):
         try:
             return obj.dict()
@@ -251,6 +257,9 @@ def from_dict(dictionary, **kwargs):
 
     if type_ == "path":
         return Path(dictionary["path"])
+
+    if type_ == "function":
+        return get_class(dictionary["class_path"])
 
     if type_ in __parsers:
         return __parsers[type_](dictionary, **kwargs)

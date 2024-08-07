@@ -147,3 +147,22 @@ def test_tuple():
             )
         )
     ) == (C, C)
+
+
+def function():
+    return 1
+
+
+def test_function():
+    assert (
+        from_dict(
+            json.loads(
+                json.dumps(
+                    to_dict(
+                        function,
+                    )
+                )
+            )
+        )()
+        == 1
+    )
