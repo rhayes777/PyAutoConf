@@ -1,4 +1,4 @@
 typing-inspect>=0.4.0
 pathlib
 PyYAML>=6.0.1
-numpy<=1.26.0
+numpy>=1.24.0,<=2.0.1
