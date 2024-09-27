@@ -192,3 +192,10 @@ def test_int64_slice():
             )
         )
     )
+
+
+def test_compound_key():
+    d = {(1, 2): 1}
+
+    string = json.dumps(to_dict(d))
+    assert d == from_dict(json.loads(string))
