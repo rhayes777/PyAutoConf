@@ -116,7 +116,10 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
     if isinstance(obj, tuple):
         return {"type": "tuple", "values": list(map(to_dict, obj))}
     if isinstance(obj, dict):
-        result = {
+        if any(isinstance(key, (list, dict, tuple)) for key in obj.keys()):
+            return compound_key_dict(obj)
+
+        return {
             "type": "dict",
             "arguments": {
                 key: to_dict(value)
@@ -124,11 +127,6 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
                 if key not in filter_args
             },
         }
-        try:
-            json.dumps(result)
-            return result
-        except TypeError:
-            return compound_key_dict(obj)
 
     if obj.__class__.__name__ == "method":
         return to_dict(obj())
