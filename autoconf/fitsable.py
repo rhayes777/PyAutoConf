@@ -138,7 +138,7 @@ def output_to_fits(
 
     file_path = Path(file_path)
 
-    file_dir = Path(str(file_path.parts[:-1]))
+    file_dir = Path(*file_path.parts[:-1])
     file_dir.mkdir(parents=True, exist_ok=True)
 
     if overwrite and file_path.is_file():
