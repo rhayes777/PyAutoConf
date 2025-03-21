@@ -27,6 +27,7 @@ def create_fits(fits_path, array):
 
 
 def test__from_fits__all_imaging_data_structures_are_flipped_for_ds9():
+
     conf.instance.push(new_path=path.join(test_path, "files", "config_flip"))
 
     fits_path = path.join("{}".format(path.dirname(path.realpath(__file__))), "files")
@@ -36,9 +37,9 @@ def test__from_fits__all_imaging_data_structures_are_flipped_for_ds9():
     create_fits(fits_path=array_path, array=arr)
 
     arr = fitsable.ndarray_via_fits_from(file_path=array_path, hdu=0)
-    assert (arr.native == np.array([[0.0, 0.0], [1.0, 0.0]])).all()
+    assert (arr == np.array([[0.0, 0.0], [1.0, 0.0]])).all()
 
-    arr.output_to_fits(file_path=array_path, overwrite=True)
+    fitsable.output_to_fits(values=arr, file_path=array_path, overwrite=True)
 
     hdu_list = fits.open(array_path)
     arr = np.array(hdu_list[0].data).astype("float64")

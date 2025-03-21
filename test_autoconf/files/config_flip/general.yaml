@@ -1,2 +1,2 @@
 fits:
-  flip_for_ds9: false
+  flip_for_ds9: true
