@@ -102,43 +102,6 @@ def hdu_list_for_output_from(
          
     return fits.HDUList(hdus=hdu_list)
 
-def ndarray_via_hdu_from(hdu):
-    """
-    Returns an ``Array2D`` by from a `PrimaryHDU` object which has been loaded via `astropy.fits`
-    
-    This assumes that the `header` of the `PrimaryHDU` contains an entry named `PIXSCALE` which gives the
-    pixel-scale of the array.
-    
-    For a full description of ``Array2D`` objects, including a description of the ``slim`` and ``native`` attribute
-    used by the API, see
-    the :meth:`Array2D class API documentation <autoarray.structures.arrays.uniform_2d.AbstractArray2D.__new__>`.
-    
-    Parameters
-    ----------
-    primary_hdu
-        The `PrimaryHDU` object which has already been loaded from a .fits file via `astropy.fits` and contains
-        the array data and the pixel-scale in the header with an entry named `PIXSCALE`.
-    origin
-        The (y,x) scaled units origin of the coordinate system.
-    
-    Examples
-    --------
-    
-    .. code-block:: python
-    
-        from astropy.io import fits
-        import autoarray as aa
-    
-        primary_hdu = fits.open("path/to/file.fits")
-    
-        array_2d = aa.Array2D.from_primary_hdu(
-            primary_hdu=primary_hdu,
-        )
-    """
-    values = hdu.data.astype("float")
-    return flip_for_ds9_from(values)
-
-
 def output_to_fits(
     values: np.ndarray,
     file_path: Union[Path, str],
@@ -190,6 +153,43 @@ def output_to_fits(
     hdu.writeto(file_path)
 
 
+def ndarray_via_hdu_from(hdu):
+    """
+    Returns an ``Array2D`` by from a `PrimaryHDU` object which has been loaded via `astropy.fits`
+
+    This assumes that the `header` of the `PrimaryHDU` contains an entry named `PIXSCALE` which gives the
+    pixel-scale of the array.
+
+    For a full description of ``Array2D`` objects, including a description of the ``slim`` and ``native`` attribute
+    used by the API, see
+    the :meth:`Array2D class API documentation <autoarray.structures.arrays.uniform_2d.AbstractArray2D.__new__>`.
+
+    Parameters
+    ----------
+    primary_hdu
+        The `PrimaryHDU` object which has already been loaded from a .fits file via `astropy.fits` and contains
+        the array data and the pixel-scale in the header with an entry named `PIXSCALE`.
+    origin
+        The (y,x) scaled units origin of the coordinate system.
+
+    Examples
+    --------
+
+    .. code-block:: python
+
+        from astropy.io import fits
+        import autoarray as aa
+
+        primary_hdu = fits.open("path/to/file.fits")
+
+        array_2d = aa.Array2D.from_primary_hdu(
+            primary_hdu=primary_hdu,
+        )
+    """
+    values = hdu.data.astype("float")
+    return flip_for_ds9_from(values)
+
+
 def ndarray_via_fits_from(
     file_path: Union[Path, str], hdu: int, do_not_scale_image_data: bool = False
 ):
@@ -218,12 +218,7 @@ def ndarray_via_fits_from(
     array_2d = numpy_array_2d_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
     hdu_list = fits.open(file_path, do_not_scale_image_data=do_not_scale_image_data)
-
-    flip_for_ds9 = conf.instance["general"]["fits"]["flip_for_ds9"]
-
-    if flip_for_ds9:
-        return np.flipud(np.array(hdu_list[hdu].data)).astype("float64")
-    return np.array(hdu_list[hdu].data).astype("float64")
+    return ndarray_via_hdu_from(hdu_list[hdu])
 
 
 def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
@@ -252,7 +247,6 @@ def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
     array_2d = numpy_array_2d_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
     hdu_list = fits.open(file_path)
-
     return hdu_list[hdu].header
 
 
@@ -315,71 +309,3 @@ def update_fits_file(
 
 
 
-def numpy_array_1d_to_fits(
-    array_1d: np.ndarray,
-    file_path: Union[Path, str],
-    overwrite: bool = False,
-    header_dict: Optional[dict] = None,
-):
-    """
-    Write a 1D NumPy array to a .fits file.
-
-    Parameters
-    ----------
-    array_1d
-        The 1D array that is written to fits.
-    file_path
-        The full path of the file that is output, including the file name and ``.fits`` extension.
-    overwrite
-        If `True` and a file already exists with the input file_path the .fits file is overwritten. If False, an error
-        will be raised.
-    header_dict
-        A dictionary of values that are written to the header of the .fits file.
-
-    Returns
-    -------
-    None
-
-    Examples
-    --------
-    array_1d = np.ones((5,))
-    numpy_array_to_fits(array_1d=array_1d, file_path='/path/to/file/filename.fits', overwrite=True)
-    """
-
-    file_dir = os.path.split(file_path)[0]
-
-    if not os.path.exists(file_dir):
-        os.makedirs(file_dir)
-
-    if overwrite and os.path.exists(file_path):
-        os.remove(file_path)
-
-    hdu = hdu_for_output_from(array_1d=array_1d, header_dict=header_dict)
-    hdu.writeto(file_path)
-
-
-def numpy_array_1d_via_fits_from(file_path: Union[Path, str], hdu: int):
-    """
-    Read a 1D NumPy array from a .fits file.
-
-    After loading the NumPy array, the array is flipped upside-down using np.flipud. This is so that the structures
-    appear the same orientation as .fits files loaded in DS9.
-
-    Parameters
-    ----------
-    file_path
-        The full path of the file that is loaded, including the file name and ``.fits`` extension.
-    hdu
-        The HDU extension of the array that is loaded from the .fits file.
-
-    Returns
-    -------
-    ndarray
-        The NumPy array that is loaded from the .fits file.
-
-    Examples
-    --------
-    array_2d = numpy_array_via_fits(file_path='/path/to/file/filename.fits', hdu=0)
-    """
-    hdu_list = fits.open(file_path)
-    return np.array(hdu_list[hdu].data)
