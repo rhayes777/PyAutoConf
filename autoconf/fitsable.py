@@ -1,10 +1,41 @@
 from __future__ import annotations
 from astropy.io import fits
 import numpy as np
+from pathlib import Path
 from typing import Optional, Union, List
 
 from autoconf import conf
 
+
+def flip_for_ds9_from(values: np.ndarray) -> np.ndarray:
+    """
+    Returns the input 2D array flipped upside-down depending on the project config files.
+
+    This is for Astronomy projects so that structures appear the same orientation as `.fits` files loaded in DS9.
+
+    Parameters
+    ----------
+    values
+        The 2D array that is flipped upside-down.
+
+    Returns
+    -------
+    The 2D array flipped upside-down.
+
+    Examples
+    --------
+    data = np.ones((5,5))
+
+    flip_for_ds9_from(data)
+    """
+    if len(values.shape) > 1:
+
+        flip_for_ds9 = conf.instance["general"]["fits"]["flip_for_ds9"]
+
+        if flip_for_ds9:
+            return np.flipud(values)
+
+    return values
 
 def hdu_list_for_output_from(
     values_list: List[np.ndarray],
@@ -61,13 +92,8 @@ def hdu_list_for_output_from(
     
         if ext_name_list is not None:
             header["EXTNAME"] = ext_name_list[i].upper()
-    
-        if len(values.shape) > 1:
-    
-            flip_for_ds9 = conf.instance["general"]["fits"]["flip_for_ds9"]
-    
-            if flip_for_ds9:
-                values = np.flipud(values)
+
+        values = flip_for_ds9_from(values)
                 
         if i == 0:
             hdu_list.append(fits.PrimaryHDU(values, header=header))
@@ -75,3 +101,285 @@ def hdu_list_for_output_from(
             hdu_list.append(fits.ImageHDU(values, header=header))
          
     return fits.HDUList(hdus=hdu_list)
+
+def ndarray_via_hdu_from(hdu):
+    """
+    Returns an ``Array2D`` by from a `PrimaryHDU` object which has been loaded via `astropy.fits`
+    
+    This assumes that the `header` of the `PrimaryHDU` contains an entry named `PIXSCALE` which gives the
+    pixel-scale of the array.
+    
+    For a full description of ``Array2D`` objects, including a description of the ``slim`` and ``native`` attribute
+    used by the API, see
+    the :meth:`Array2D class API documentation <autoarray.structures.arrays.uniform_2d.AbstractArray2D.__new__>`.
+    
+    Parameters
+    ----------
+    primary_hdu
+        The `PrimaryHDU` object which has already been loaded from a .fits file via `astropy.fits` and contains
+        the array data and the pixel-scale in the header with an entry named `PIXSCALE`.
+    origin
+        The (y,x) scaled units origin of the coordinate system.
+    
+    Examples
+    --------
+    
+    .. code-block:: python
+    
+        from astropy.io import fits
+        import autoarray as aa
+    
+        primary_hdu = fits.open("path/to/file.fits")
+    
+        array_2d = aa.Array2D.from_primary_hdu(
+            primary_hdu=primary_hdu,
+        )
+    """
+    values = hdu.data.astype("float")
+    return flip_for_ds9_from(values)
+
+
+def output_to_fits(
+    values: np.ndarray,
+    file_path: Union[Path, str],
+    overwrite: bool = False,
+    header_dict: Optional[dict] = None,
+    ext_name: Optional[str] = None,
+):
+    """
+    Write a NumPy array to a .fits file.
+
+    Before outputting a NumPy array, the array may be flipped upside-down using np.flipud depending on the project
+    config files. This is for Astronomy projects so that structures appear the same orientation as ``.fits`` files
+    loaded in DS9.
+
+    Parameters
+    ----------
+    values
+        The numpy array of values that is written to fits.
+    file_path
+        The full path of the file that is output, including the file name and ``.fits`` extension.
+    overwrite
+        If `True` and a file already exists with the input file_path the .fits file is overwritten. If `False`, an
+        error is raised.
+    header_dict
+        A dictionary of values that are written to the header of the .fits file.
+    ext_name
+        The name of the extension in the fits file, which displays in the header of the fits file and is visible.
+
+    Examples
+    --------
+    values = np.ones((5,5))
+    numpy_array_to_fits(values=values, file_path='/path/to/file/filename.fits', overwrite=True)
+    """
+
+    file_path = Path(file_path)
+
+    file_dir = Path(str(file_path.parts[:-1]))
+    file_dir.mkdir(parents=True, exist_ok=True)
+
+    if overwrite and file_path.is_file():
+        file_path.unlink()
+
+    hdu = hdu_list_for_output_from(
+        values_list=[values],
+        header_dict=header_dict,
+        ext_name_list=[ext_name] if ext_name is not None else None,
+    )
+
+    hdu.writeto(file_path)
+
+
+def ndarray_via_fits_from(
+    file_path: Union[Path, str], hdu: int, do_not_scale_image_data: bool = False
+):
+    """
+    Read a 2D NumPy array from a .fits file.
+
+    After loading the NumPy array, the array is flipped upside-down using np.flipud. This is so that the structures
+    appear the same orientation as .fits files loaded in DS9.
+
+    Parameters
+    ----------
+    file_path
+        The full path of the file that is loaded, including the file name and ``.fits`` extension.
+    hdu
+        The HDU extension of the array that is loaded from the .fits file.
+    do_not_scale_image_data
+        If True, the .fits file is not rescaled automatically based on the .fits header info.
+
+    Returns
+    -------
+    ndarray
+        The NumPy array that is loaded from the .fits file.
+
+    Examples
+    --------
+    array_2d = numpy_array_2d_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
+    """
+    hdu_list = fits.open(file_path, do_not_scale_image_data=do_not_scale_image_data)
+
+    flip_for_ds9 = conf.instance["general"]["fits"]["flip_for_ds9"]
+
+    if flip_for_ds9:
+        return np.flipud(np.array(hdu_list[hdu].data)).astype("float64")
+    return np.array(hdu_list[hdu].data).astype("float64")
+
+
+def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
+    """
+    Read a 2D NumPy array from a .fits file.
+
+    After loading the NumPy array, the array is flipped upside-down using np.flipud. This is so that the structures
+    appear the same orientation as .fits files loaded in DS9.
+
+    Parameters
+    ----------
+    file_path
+        The full path of the file that is loaded, including the file name and ``.fits`` extension.
+    hdu
+        The HDU extension of the array that is loaded from the .fits file.
+    do_not_scale_image_data
+        If True, the .fits file is not rescaled automatically based on the .fits header info.
+
+    Returns
+    -------
+    dict
+        The header dictionary.
+
+    Examples
+    --------
+    array_2d = numpy_array_2d_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
+    """
+    hdu_list = fits.open(file_path)
+
+    return hdu_list[hdu].header
+
+
+def update_fits_file(
+    arr: np.ndarray,
+    file_path: str,
+    tag: Optional[str] = None,
+    header: Optional[fits.Header] = None,
+):
+    """
+    Update a .fits file with a new array.
+
+    This function is used by the `fits_multi` output interface so that a single .fits file with groups of data
+    in hdu's can be created.
+
+    It may receive a `tag` which is used to set the `EXTNAME` of the HDU in the .fits file and therefore is the name
+    of the hdu seen by the user when they open it with DS9 or other .fits software.
+
+    A header may also be provided, which by default has the pixel scales of the array added to it.
+
+    Parameters
+    ----------
+    arr
+        The array that is written to the .fits file.
+    file_path
+        The full path of the file that is output, including the file name and ``.fits`` extension.
+    tag
+        The `EXTNAME` of the HDU in the .fits file.
+    header
+        The header of the .fits file that the array is written to, which if blank will still contain the pixel scales
+        of the array.
+    """
+
+    if header is None:
+        header = fits.Header()
+
+    try:
+        y, x = map(str, arr.pixel_scales)
+        header["PIXSCAY"] = y
+        header["PIXSCAX"] = x
+    except AttributeError:
+        pass
+
+    if conf.instance["general"]["fits"]["flip_for_ds9"]:
+        arr = np.flipud(arr)
+
+    if os.path.exists(file_path):
+        with fits.open(file_path, mode="update") as hdul:
+            hdul.append(fits.ImageHDU(arr, header))
+            if tag is not None:
+                hdul[-1].header["EXTNAME"] = tag.upper()
+            hdul.flush()
+
+    else:
+        hdu = fits.PrimaryHDU(arr, header)
+        if tag is not None:
+            hdu.header["EXTNAME"] = tag.upper()
+        hdul = fits.HDUList([hdu])
+        hdul.writeto(file_path, overwrite=True)
+
+
+
+def numpy_array_1d_to_fits(
+    array_1d: np.ndarray,
+    file_path: Union[Path, str],
+    overwrite: bool = False,
+    header_dict: Optional[dict] = None,
+):
+    """
+    Write a 1D NumPy array to a .fits file.
+
+    Parameters
+    ----------
+    array_1d
+        The 1D array that is written to fits.
+    file_path
+        The full path of the file that is output, including the file name and ``.fits`` extension.
+    overwrite
+        If `True` and a file already exists with the input file_path the .fits file is overwritten. If False, an error
+        will be raised.
+    header_dict
+        A dictionary of values that are written to the header of the .fits file.
+
+    Returns
+    -------
+    None
+
+    Examples
+    --------
+    array_1d = np.ones((5,))
+    numpy_array_to_fits(array_1d=array_1d, file_path='/path/to/file/filename.fits', overwrite=True)
+    """
+
+    file_dir = os.path.split(file_path)[0]
+
+    if not os.path.exists(file_dir):
+        os.makedirs(file_dir)
+
+    if overwrite and os.path.exists(file_path):
+        os.remove(file_path)
+
+    hdu = hdu_for_output_from(array_1d=array_1d, header_dict=header_dict)
+    hdu.writeto(file_path)
+
+
+def numpy_array_1d_via_fits_from(file_path: Union[Path, str], hdu: int):
+    """
+    Read a 1D NumPy array from a .fits file.
+
+    After loading the NumPy array, the array is flipped upside-down using np.flipud. This is so that the structures
+    appear the same orientation as .fits files loaded in DS9.
+
+    Parameters
+    ----------
+    file_path
+        The full path of the file that is loaded, including the file name and ``.fits`` extension.
+    hdu
+        The HDU extension of the array that is loaded from the .fits file.
+
+    Returns
+    -------
+    ndarray
+        The NumPy array that is loaded from the .fits file.
+
+    Examples
+    --------
+    array_2d = numpy_array_via_fits(file_path='/path/to/file/filename.fits', hdu=0)
+    """
+    hdu_list = fits.open(file_path)
+    return np.array(hdu_list[hdu].data)
