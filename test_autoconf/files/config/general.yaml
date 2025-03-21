@@ -1,0 +1,4 @@
+fits:
+  flip_for_ds9: false
+hpc:
+  hpc_mode: false
