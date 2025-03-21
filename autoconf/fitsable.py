@@ -152,7 +152,6 @@ def output_to_fits(
 
     hdu.writeto(file_path)
 
-
 def ndarray_via_hdu_from(hdu):
     """
     Returns an ``Array2D`` by from a `PrimaryHDU` object which has been loaded via `astropy.fits`
