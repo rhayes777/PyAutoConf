@@ -1,5 +1,18 @@
 from __future__ import annotations
-from astropy.io import fits
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    try:
+        from astropy.io import fits
+    except ImportError:
+        pass
+
+try:
+    from astropy.io import fits
+except ImportError:
+    pass
+
 import numpy as np
 from pathlib import Path
 from typing import Dict, Optional, Union, List
