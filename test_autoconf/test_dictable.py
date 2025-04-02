@@ -199,3 +199,16 @@ def test_compound_key():
 
     string = json.dumps(to_dict(d))
     assert d == from_dict(json.loads(string))
+
+
+class Prior:
+    def __eq__(self, other):
+        return isinstance(other, Prior)
+
+    def __hash__(self):
+        return hash(Prior)
+
+
+def test_prior_key():
+    string = json.dumps(to_dict({Prior(): 1}))
+    assert from_dict(json.loads(string)) == {Prior(): 1}

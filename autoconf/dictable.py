@@ -116,7 +116,10 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
     if isinstance(obj, tuple):
         return {"type": "tuple", "values": list(map(to_dict, obj))}
     if isinstance(obj, dict):
-        if any(isinstance(key, (list, dict, tuple)) for key in obj.keys()):
+        if any(
+            not (isinstance(key, (str, int, float, bool)) or key is None)
+            for key in obj.keys()
+        ):
             return compound_key_dict(obj)
 
         return {
