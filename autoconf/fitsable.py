@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -99,7 +100,9 @@ def hdu_list_for_output_from(
 
     if header_dict is not None:
         for key, value in header_dict.items():
-            header.append((key, value, [""]))
+            # Convert enum to its string value if needed
+            key_str = key.value if isinstance(key, Enum) else key
+            header.append((key_str, value, [""]))
     
     for i, values in enumerate(values_list):
     
