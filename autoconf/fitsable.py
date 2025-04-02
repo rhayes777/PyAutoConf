@@ -99,7 +99,10 @@ def hdu_list_for_output_from(
 
     if header_dict is not None:
         for key, value in header_dict.items():
-            header.append((key, value, [""]))
+            try:
+                header.append((key, value, [""]))
+            except ValueError:
+                header.append((key.value, value, [""])) # If enum is used for headeer_dict
     
     for i, values in enumerate(values_list):
     
