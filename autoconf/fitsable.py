@@ -109,6 +109,12 @@ def hdu_list_for_output_from(
         if ext_name_list is not None:
             header["EXTNAME"] = ext_name_list[i].upper()
 
+        # Convert from JAX
+        try:
+            values = np.array(values.array)
+        except AttributeError:
+            values = np.array(values)
+
         values = flip_for_ds9_from(values)
                 
         if i == 0:
