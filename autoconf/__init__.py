@@ -1,6 +1,5 @@
 from . import exc
 from .tools.decorators import cached_property
-from .tools.decorators import lazy_property
 from .conf import Config
 from .conf import instance
 from .json_prior.config import default_prior
