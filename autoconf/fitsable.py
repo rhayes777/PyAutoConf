@@ -102,8 +102,11 @@ def hdu_list_for_output_from(
         for key, value in header_dict.items():
             # Convert enum to its string value if needed
             key_str = key.value if isinstance(key, Enum) else key
-            header.append((key_str, value, [""]))
-    
+            try:
+                header.append((key_str, value, [""]))
+            except ValueError:
+                header.append((key_str, float(value), [""]))
+
     for i, values in enumerate(values_list):
     
         if ext_name_list is not None:
