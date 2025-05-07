@@ -236,7 +236,7 @@ def ndarray_via_fits_from(
 
     Examples
     --------
-    array_2d = numpy_array_2d_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
+    array_2d = ndarray_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
     hdu_list = fits.open(file_path, do_not_scale_image_data=do_not_scale_image_data)
     return ndarray_via_hdu_from(hdu_list[hdu])
@@ -265,7 +265,7 @@ def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
 
     Examples
     --------
-    array_2d = numpy_array_2d_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
+    array_2d = ndarray_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
     hdu_list = fits.open(file_path)
     return hdu_list[hdu].header
