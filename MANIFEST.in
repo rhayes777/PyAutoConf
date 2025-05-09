@@ -11,6 +11,7 @@ exclude workspace
 exclude .coverage
 exclude howtolens
 exclude .travis.yml
+include LICENSE
 include README.rst
 include setup.cfg
 prune .cache
