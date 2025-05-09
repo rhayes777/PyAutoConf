@@ -1,6 +1,7 @@
 import inspect
 import json
 import logging
+import os
 
 import numpy as np
 from pathlib import Path
@@ -378,5 +379,9 @@ def output_to_json(obj, file_path: Union[Path, str]):
     file_path
         The path to the .json file that the dictionary representation of the object is written too.
     """
+    file_path = Path(file_path)
+    file_dir = Path(*file_path.parts[:-1])
+    file_dir.mkdir(parents=True, exist_ok=True)
+
     with open(file_path, "w+") as f:
         json.dump(to_dict(obj), f, indent=4)
