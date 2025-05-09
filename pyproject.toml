@@ -49,4 +49,4 @@ test = ["pytest"]
 dev = ["pytest", "black"]
 
 [tool.pytest.ini_options]
-testpaths = ["test_autofit"]
+testpaths = ["test_autoconf"]
