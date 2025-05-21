@@ -23,8 +23,8 @@ jobs:
         pip3 install wheel
         pip3 install numpy
         pip3 install pytest==6.2.5 coverage pytest-cov
-        pip3 install -r PyAutoConf/requirements.txt
-        pip3 install -r PyAutoConf/optional_requirements.txt
+        pip install ./PyAutoConf
+        pip install ./PyAutoConf[optional]
     - name: Run tests
       run: |
         pushd PyAutoConf
