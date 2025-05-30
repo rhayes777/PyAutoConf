@@ -148,8 +148,11 @@ class Config:
         Set the most up to date logging configuration
         """
         logging_config = self.logging_config
-        if logging_config is not None:
-            logging.config.dictConfig(logging_config)
+        try:
+            if logging_config is not None:
+                logging.config.dictConfig(logging_config)
+        except ValueError as e:
+            logger.warning(e)
 
     @property
     def logging_config(self) -> Optional[Dict]:
