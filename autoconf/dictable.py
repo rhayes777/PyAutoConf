@@ -64,6 +64,12 @@ def compound_key_dict(obj):
 
 
 def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
+    if hasattr(obj, "dict"):
+        try:
+            return obj.dict()
+        except TypeError as e:
+            logger.debug(e)
+
     if isinstance(obj, (int, float, str, bool, type(None))):
         return obj
 
@@ -87,12 +93,6 @@ def to_dict(obj, filter_args: Tuple[str, ...] = ()) -> dict:
             "type": "function",
             "class_path": obj.__module__ + "." + obj.__qualname__,
         }
-
-    if hasattr(obj, "dict"):
-        try:
-            return obj.dict()
-        except TypeError as e:
-            logger.debug(e)
 
     if is_array(obj):
         try:
