@@ -16,7 +16,7 @@ default_prior = {
     "lower_limit": 0.0,
     "upper_limit": 1.0,
     "width_modifier": {"type": "Absolute", "value": 0.2},
-    "gaussian_limits": {"lower": 0.0, "upper": 1.0},
+    "limits": {"lower": 0.0, "upper": 1.0},
 }
 
 

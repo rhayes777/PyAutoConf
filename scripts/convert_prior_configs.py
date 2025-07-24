@@ -19,7 +19,7 @@ ORDER = [
     "lower_limit",
     "upper_limit",
     "width_modifier",
-    "gaussian_limits",
+    "limits",
 ]
 
 for path in Path(sys.argv[1]).rglob("*.json"):
