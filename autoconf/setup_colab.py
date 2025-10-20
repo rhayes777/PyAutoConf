@@ -1,14 +1,56 @@
 import os
 os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
 
-def for_autolens():
+def for_autolens(raise_error_if_not_gpu: bool = True):
 
+    import os
+    os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
+
+    import jax
     import subprocess
     import sys
-    from autoconf import conf
 
     try:
+
         import google.colab
+
+        devices = jax.devices()
+
+        # Normalize device_kind for matching
+        for d in devices:
+            kind = str(d).lower()
+
+            no_gpu = False
+
+            if "gpu" in kind or "cuda" in kind:
+                print(f"GPU / CUDA detected: {d}")
+            elif "tpu" in kind:
+                print(f"TPU detected: {d}")
+            elif "cpu" in kind:
+                print(f"CPU detected: {d}")
+                no_gpu = True
+            else:
+                print(f"Other device detected: {d}")
+                no_gpu = True
+
+            if no_gpu and raise_error_if_not_gpu:
+
+                raise RuntimeError(
+                    """
+                    No GPU detected in Google Colab. PyAutoLens runs > 50 times faster with a GPU, so switch GPU 
+                    on in Colab settings.
+
+                    To do this:
+
+                    - Click "Runtime" in the top menu.
+                    - Click "Change runtime type".
+                    - Under "Hardware accelerator", select one of the "GPU" options available.
+
+                    You can set up Colab with a CPU (e.g. if GPUs are unavailable)  by uncommenting the 
+                    line "raise_error_if_not_gpu=False" in the setup_colab() function call.
+                    """
+                )
+
     except ImportError:
         print(
             """
@@ -22,6 +64,9 @@ def for_autolens():
         )
         return
 
+    print()
+    print("Now Installing PyAutoLens and setting up Colab Environment:")
+
     # Install required packages
     subprocess.check_call([sys.executable, "-m", "pip", "install",
                            "autoconf", "autofit", "autoarray", "autogalaxy", "autolens",
@@ -30,9 +75,14 @@ def for_autolens():
                            "timeout_decorator==0.5.0", "anesthetic==2.8.14",
                            "--no-deps"])
 
-    subprocess.run([
-        "git", "clone", "https://github.com/Jammy2211/autolens_workspace"
-    ], check=True)
+    from autoconf import conf
+
+    try:
+        subprocess.run([
+            "git", "clone", "https://github.com/Jammy2211/autolens_workspace"
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        print("Workspace already exists so not cloning again.")
 
     os.chdir("/content/autolens_workspace")
 
