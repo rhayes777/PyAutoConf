@@ -1,23 +1,26 @@
-def setup_colab_autolens():
+import os
+os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
 
-    import os
+def for_autolens():
+
     import subprocess
     import sys
     from autoconf import conf
 
-    os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
-
     try:
         import google.colab
     except ImportError:
-        raise RuntimeError(
+        print(
             """
             You are not running in a Google Colab environment so cannot use the setup_colab() function.
 
             You should therefore have PyAutoLens installed locally in your environment already (e.g. via pip or 
             conda and can run the rest of your script normally).
+            
+            You may now continue running your script or Notebook.
             """
         )
+        return
 
     # Install required packages
     subprocess.check_call([sys.executable, "-m", "pip", "install",
