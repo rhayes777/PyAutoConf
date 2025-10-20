@@ -1,12 +1,50 @@
+import logging
 import os
 os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
+
+logger = logging.getLogger(__name__)
+
+def check_jax_using_gpu(log_gpu_warning : bool = True) -> bool:
+
+    import jax
+
+    devices = jax.devices()
+
+    # Normalize device_kind for matching
+    for d in devices:
+        kind = str(d).lower()
+
+        no_gpu = False
+
+        if "gpu" in kind or "cuda" in kind:
+            print(f"GPU / CUDA detected: {d}")
+        elif "tpu" in kind:
+            print(f"TPU detected: {d}")
+        elif "cpu" in kind:
+            print(f"CPU detected: {d}")
+            no_gpu = True
+        else:
+            print(f"Other device detected: {d}")
+            no_gpu = True
+
+    if no_gpu and log_gpu_warning:
+
+        logger.info(
+            """
+            JAX did not detect a GPU or TPU device and is using the CPU for computations.
+
+            PyAutoLens runs > 50 times faster with a GPU, so it is recommended to reinstall
+            JAX With GPU support, if you have a GPU available, by following the JAX 
+            installation instructions.
+            """)
+
+    return no_gpu
 
 def for_autolens(raise_error_if_not_gpu: bool = True):
 
     import os
     os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
 
-    import jax
     import subprocess
     import sys
 
@@ -14,42 +52,25 @@ def for_autolens(raise_error_if_not_gpu: bool = True):
 
         import google.colab
 
-        devices = jax.devices()
+        no_gpu = check_jax_using_gpu(log_gpu_warning=False)
 
-        # Normalize device_kind for matching
-        for d in devices:
-            kind = str(d).lower()
+        if no_gpu and raise_error_if_not_gpu:
 
-            no_gpu = False
+            raise RuntimeError(
+                """
+                No GPU detected in Google Colab. PyAutoLens runs > 50 times faster with a GPU, so switch GPU 
+                on in Colab settings.
 
-            if "gpu" in kind or "cuda" in kind:
-                print(f"GPU / CUDA detected: {d}")
-            elif "tpu" in kind:
-                print(f"TPU detected: {d}")
-            elif "cpu" in kind:
-                print(f"CPU detected: {d}")
-                no_gpu = True
-            else:
-                print(f"Other device detected: {d}")
-                no_gpu = True
+                To do this:
 
-            if no_gpu and raise_error_if_not_gpu:
+                - Click "Runtime" in the top menu.
+                - Click "Change runtime type".
+                - Under "Hardware accelerator", select one of the "GPU" options available.
 
-                raise RuntimeError(
-                    """
-                    No GPU detected in Google Colab. PyAutoLens runs > 50 times faster with a GPU, so switch GPU 
-                    on in Colab settings.
-
-                    To do this:
-
-                    - Click "Runtime" in the top menu.
-                    - Click "Change runtime type".
-                    - Under "Hardware accelerator", select one of the "GPU" options available.
-
-                    You can set up Colab with a CPU (e.g. if GPUs are unavailable)  by uncommenting the 
-                    line "raise_error_if_not_gpu=False" in the setup_colab() function call.
-                    """
-                )
+                You can set up Colab with a CPU (e.g. if GPUs are unavailable)  by uncommenting the 
+                line "raise_error_if_not_gpu=False" in the setup_colab() function call.
+                """
+            )
 
     except ImportError:
         print(
