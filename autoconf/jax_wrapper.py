@@ -45,6 +45,7 @@ if use_jax:
 
     import jax
     from jax import numpy
+    from jax import numpy as np
 
     jax_enable_x64 = jax.config.read("jax_enable_x64")
 
@@ -89,6 +90,7 @@ To enable JAX (if supported), set: config -> general -> jax -> use_jax = true
     """)
 
     import numpy  # noqa
+    import numpy as np
 
     def jit(function, *_, **__):
         return function
