@@ -26,6 +26,7 @@ classifiers = [
 keywords = ["cli"]
 dependencies = [
     "pathlib",
+    "jaxnnls==1.0.1",
     "jax==0.4.28",
     "jaxlib==0.4.28",
     "typing-inspect>=0.4.0",
