@@ -10,4 +10,4 @@ from .json_prior.config import JSONPriorConfig
 from .setup_colab import for_autolens
 
 
-__version__ = "2025.10.21.1"
+__version__ = "2025.11.5.1"
