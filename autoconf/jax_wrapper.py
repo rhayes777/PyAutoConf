@@ -32,7 +32,7 @@ if not xla_env_set:
 
     os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
 
-jax_enable_x64 = os.environ.get["JAX_ENABLE_X64"]
+jax_enable_x64 = os.environ.get("JAX_ENABLE_X64")
 
 if jax_enable_x64 is None:
     jax_enable_x64 = False
