@@ -2,104 +2,53 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-"""
-Allows the user to switch between using NumPy and JAX for linear algebra operations.
+import os
 
-If USE_JAX=true in general.yaml then JAX's NumPy is used, otherwise vanilla NumPy is used.
-"""
-from autoconf import conf
+xla_env = os.environ.get("XLA_FLAGS")
 
-use_jax = conf.instance["general"]["jax"]["use_jax"]
+xla_env_set = True
 
-if use_jax:
+if xla_env is None:
+    xla_env_set = False
+elif isinstance(xla_env, str):
+    xla_env_set = "--xla_disable_hlo_passes=constant_folding" in xla_env
 
-    import os
+if not xla_env_set:
+    logger.info(
+        """
+        For fast JAX compile times, the envirment variable XLA_FLAGS must be set to "--xla_disable_hlo_passes=constant_folding",
+        which is currently not.
+        
+        In Python, to do this manually, use the code: 
+        
+        import os
+        os.environ["XLA_FLAGS"] = "--xla_disable_hlo_passes=constant_folding"
+        
+        The environment variable has been set automatically for you now, however if JAX has already been imported, 
+        this change will not take effect and JAX function compiling times may be slow. 
+        
+        Therefore, it is recommended to set this environment variable before running your script, e.g. in your terminal.
+        """)
 
-    xla_env = os.environ.get("XLA_FLAGS")
+    os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
 
-    xla_env_set = True
+jax_enable_x64 = os.environ.get("JAX_ENABLE_X64")
 
-    if xla_env is None:
-        xla_env_set = False
-    elif isinstance(xla_env, str):
-        xla_env_set = "--xla_disable_hlo_passes=constant_folding" in xla_env
+if jax_enable_x64 is None:
+    jax_enable_x64 = False
+elif isinstance(jax_enable_x64, str):
+    jax_enable_x64 = jax_enable_x64.lower() == "true"
 
-    if not xla_env_set:
-        logger.info(
-            """
-            For fast JAX compile times, the envirment variable XLA_FLAGS must be set to "--xla_disable_hlo_passes=constant_folding",
-            which is currently not.
-            
-            In Python, to do this manually, use the code: 
-            
-            import os
-            os.environ["XLA_FLAGS"] = "--xla_disable_hlo_passes=constant_folding"
-            
-            The environment variable has been set automatically for you now, however if JAX has already been imported, 
-            this change will not take effect and JAX function compiling times may be slow. 
-            
-            Therefore, it is recommended to set this environment variable before running your script, e.g. in your terminal.
-            """)
+if not jax_enable_x64:
 
-        os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
+    os.environ["JAX_ENABLE_X64"] = "True"
 
-    import jax
-    from jax import numpy
-    from jax import numpy as np
-
-    jax_enable_x64 = jax.config.read("jax_enable_x64")
-
-    if not jax_enable_x64:
-
-        jax.config.update("jax_enable_x64", True)
-
-        logger.info(
-            """"
-            JAX 64-bit precision has been automatically enabled for you (jax_enable_x64=True),
-            as double precision is required for most scientific computing applications.
-            
-            To enable 64 precision as default in JAX, set the environment variable 
-            JAX_ENABLE_X64=true before running your script.
-            """
-        )
-
-    print(
-
-    """
-***JAX ENABLED*** 
-    
-Using JAX for grad/jit and GPU/TPU acceleration. 
-To disable JAX, set: config -> general -> jax -> use_jax = false
-    """)
-
-    def jit(function, *args, **kwargs):
-        return jax.jit(function, *args, **kwargs)
-
-    def grad(function, *args, **kwargs):
-        return jax.grad(function, *args, **kwargs)
-
-
-else:
-
-    print(
-    """
-***JAX DISABLED*** 
-    
-Falling back to standard NumPy (no grad/jit or GPU support).
-To enable JAX (if supported), set: config -> general -> jax -> use_jax = true
-    """)
-
-    import numpy  # noqa
-    import numpy as np
-
-    def jit(function, *_, **__):
-        return function
-
-    def grad(function, *_, **__):
-        return function
-
-from jax._src.tree_util import (
-    register_pytree_node_class as register_pytree_node_class,
-    register_pytree_node as register_pytree_node,
-)
-
+    logger.info(
+        """"
+        JAX 64-bit precision has been automatically enabled for you (JAX_ENABLE_X64=True),
+        as double precision is required for most scientific computing applications.
+        
+        To enable 64 precision as default in JAX, set the environment variable 
+        JAX_ENABLE_X64=true before running your script.
+        """
+    )
