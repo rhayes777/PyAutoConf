@@ -27,8 +27,8 @@ keywords = ["cli"]
 dependencies = [
     "pathlib",
     "jaxnnls==1.0.1",
-    "jax==0.4.28",
-    "jaxlib==0.4.28",
+    "jax>=0.4.13,<0.5.0",
+    "jaxlib>=0.4.13,<0.5.0",
     "typing-inspect>=0.4.0",
     "PyYAML>=6.0.1",
     "numpy>=1.24.0,<=2.0.1"
