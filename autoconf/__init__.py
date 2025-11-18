@@ -1,3 +1,4 @@
+from . import jax_wrapper
 from . import exc
 from .tools.decorators import cached_property
 from .conf import Config
