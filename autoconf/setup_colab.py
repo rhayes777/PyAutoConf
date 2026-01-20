@@ -40,85 +40,175 @@ def check_jax_using_gpu(log_gpu_warning : bool = True) -> bool:
 
     return no_gpu
 
-def for_autolens(raise_error_if_not_gpu: bool = True):
+def _colab_setup(
+    *,
+    project_name: str,
+    workspace_repo: str,
+    workspace_dir: str,
+    packages: list[str],
+    raise_error_if_not_gpu: bool,
+    gpu_error_message: str,
+) -> None:
+    """
+    Shared Google Colab setup for the PyAuto* ecosystem.
 
+    Assumes a `check_jax_using_gpu(log_gpu_warning: bool)` utility exists in scope.
+    """
     import os
-    os.environ['XLA_FLAGS'] = "--xla_disable_hlo_passes=constant_folding"
-
     import subprocess
     import sys
 
-    try:
+    # Identical JAX performance tweak.
+    os.environ["XLA_FLAGS"] = "--xla_disable_hlo_passes=constant_folding"
 
-        import google.colab
+    # --- Ensure we're in Colab and (optionally) have a GPU ---
+    try:
+        import google.colab  # noqa: F401
 
         no_gpu = check_jax_using_gpu(log_gpu_warning=False)
 
         if no_gpu and raise_error_if_not_gpu:
-
-            raise RuntimeError(
-                """
-                No GPU detected in Google Colab. PyAutoLens runs > 50 times faster with a GPU, so switch GPU 
-                on in Colab settings.
-
-                To do this:
-
-                - Click "Runtime" in the top menu.
-                - Click "Change runtime type".
-                - Under "Hardware accelerator", select one of the "GPU" options available.
-
-                You can set up Colab with a CPU (e.g. if GPUs are unavailable)  by uncommenting the 
-                line "raise_error_if_not_gpu=False" in the setup_colab() function call.
-                """
-            )
+            raise RuntimeError(gpu_error_message)
 
     except ImportError:
         print(
-            """
+            f"""
             You are not running in a Google Colab environment so cannot use the setup_colab() function.
 
-            You should therefore have PyAutoLens installed locally in your environment already (e.g. via pip or 
-            conda and can run the rest of your script normally).
-            
+            You should therefore have {project_name} installed locally in your environment already (e.g. via pip or
+            conda) and can run the rest of your script normally.
+
             You may now continue running your script or Notebook.
             """
         )
         return
 
+    # --- Install packages (no deps, consistent with your current approach) ---
     print()
-    print("Now Installing PyAutoLens and setting up Colab Environment:")
+    print(f"Now Installing {project_name} and setting up Colab Environment:")
 
-    # Install required packages
-    subprocess.check_call([sys.executable, "-m", "pip", "install",
-                           "autoconf", "autofit", "autoarray", "autogalaxy", "autolens",
-                           "pyvis==0.3.2", "dill==0.4.0", "jaxnnls",
-                           "pyprojroot==0.2.0", "nautilus-sampler==1.0.4",
-                           "timeout_decorator==0.5.0", "anesthetic==2.8.14",
-                           "--no-deps"])
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", *packages, "--no-deps"]
+    )
 
-    from autoconf import conf
-
+    # --- Clone workspace ---
     try:
-        subprocess.run([
-            "git", "clone", "https://github.com/Jammy2211/autolens_workspace"
-        ], check=True)
-    except subprocess.CalledProcessError as e:
+        subprocess.run(["git", "clone", workspace_repo, workspace_dir], check=True)
+    except subprocess.CalledProcessError:
         print("Workspace already exists so not cloning again.")
 
-    os.chdir("/content/autolens_workspace")
+    # --- Configure autoconf paths ---
+    from autoconf import conf
+
+    os.chdir(workspace_dir)
 
     conf.instance.push(
-        new_path="/content/autolens_workspace/config",
-        output_path="/content/autolens_workspace/output",
+        new_path=os.path.join(workspace_dir, "config"),
+        output_path=os.path.join(workspace_dir, "output"),
     )
 
     print(
-        """
+        f"""
         ***Google Colab Setup Complete, which included:***
 
-        - Installation of PyAutoLens and other required packages.
-        - Cloning of the autolens_workspace GitHub repository.
+        - Installation of {project_name} and other required packages.
+        - Cloning of the workspace GitHub repository.
         - Setting up environment variables for JAX for improved performance.
         - Setting the configuration paths to the workspace config and output folders suitable for Colab.
         """
+    )
+
+
+def for_autogalaxy(raise_error_if_not_gpu: bool = True) -> None:
+    """
+    Google Colab helper for PyAutoGalaxy.
+
+    Parallel to `for_autolens`, but installs PyAutoGalaxy only (no `autolens`) and clones the
+    `autogalaxy_workspace`.
+    """
+    packages = [
+        # Core stack
+        "autoconf",
+        "autofit",
+        "autoarray",
+        "autogalaxy",
+        # Notebook/runtime extras commonly used across workspaces
+        "pyvis==0.3.2",
+        "dill==0.4.0",
+        "jaxnnls",
+        "pyprojroot==0.2.0",
+        "nautilus-sampler==1.0.4",
+        "timeout_decorator==0.5.0",
+        "anesthetic==2.8.14",
+    ]
+
+    gpu_error_message = """
+    No GPU detected in Google Colab. PyAutoGalaxy runs much faster with a GPU, so switch GPU
+    on in Colab settings.
+
+    To do this:
+
+    - Click "Runtime" in the top menu.
+    - Click "Change runtime type".
+    - Under "Hardware accelerator", select one of the "GPU" options available.
+
+    You can set up Colab with a CPU (e.g. if GPUs are unavailable) by calling:
+
+        setup_colab.for_autogalaxy(raise_error_if_not_gpu=False)
+    """
+
+    _colab_setup(
+        project_name="PyAutoGalaxy",
+        workspace_repo="https://github.com/Jammy2211/autogalaxy_workspace",
+        workspace_dir="/content/autogalaxy_workspace",
+        packages=packages,
+        raise_error_if_not_gpu=raise_error_if_not_gpu,
+        gpu_error_message=gpu_error_message,
+    )
+
+def for_autolens(raise_error_if_not_gpu: bool = True) -> None:
+    """
+    Google Colab helper for PyAutoLens.
+
+    Installs the full PyAutoLens stack and clones the `autolens_workspace`.
+    """
+    packages = [
+        # Core stack
+        "autoconf",
+        "autofit",
+        "autoarray",
+        "autogalaxy",
+        "autolens",
+        # Notebook/runtime extras commonly used across workspaces
+        "pyvis==0.3.2",
+        "dill==0.4.0",
+        "jaxnnls",
+        "pyprojroot==0.2.0",
+        "nautilus-sampler==1.0.4",
+        "timeout_decorator==0.5.0",
+        "anesthetic==2.8.14",
+    ]
+
+    gpu_error_message = """
+    No GPU detected in Google Colab. PyAutoLens runs > 50 times faster with a GPU, so switch GPU
+    on in Colab settings.
+
+    To do this:
+
+    - Click "Runtime" in the top menu.
+    - Click "Change runtime type".
+    - Under "Hardware accelerator", select one of the "GPU" options available.
+
+    You can set up Colab with a CPU (e.g. if GPUs are unavailable) by calling:
+
+        setup_colab.for_autolens(raise_error_if_not_gpu=False)
+    """
+
+    _colab_setup(
+        project_name="PyAutoLens",
+        workspace_repo="https://github.com/Jammy2211/autolens_workspace",
+        workspace_dir="/content/autolens_workspace",
+        packages=packages,
+        raise_error_if_not_gpu=raise_error_if_not_gpu,
+        gpu_error_message=gpu_error_message,
     )
