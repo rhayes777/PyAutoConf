@@ -18,38 +18,6 @@ import numpy as np
 from pathlib import Path
 from typing import Dict, Optional, Union, List
 
-from autoconf import conf
-
-
-def flip_for_ds9_from(values: np.ndarray) -> np.ndarray:
-    """
-    Returns the input 2D array flipped upside-down depending on the project config files.
-
-    This is for Astronomy projects so that structures appear the same orientation as `.fits` files loaded in DS9.
-
-    Parameters
-    ----------
-    values
-        The 2D array that is flipped upside-down.
-
-    Returns
-    -------
-    The 2D array flipped upside-down.
-
-    Examples
-    --------
-    data = np.ones((5,5))
-
-    flip_for_ds9_from(data)
-    """
-    if len(values.shape) > 1:
-
-        flip_for_ds9 = conf.instance["general"]["fits"]["flip_for_ds9"]
-
-        if flip_for_ds9:
-            return np.flipud(values)
-
-    return values
 
 def hdu_list_for_output_from(
     values_list: List[np.ndarray],
@@ -59,14 +27,10 @@ def hdu_list_for_output_from(
     """
     Returns the HDU list which can be used to output arrays to a .fits file.
 
-    Before outputting each NumPy array, the array may be flipped upside-down using np.flipud depending on the project
-    config files. This is for Astronomy projects so that structures appear the same orientation as ``.fits`` files
-    loaded in DS9.
-
     The output .fits files may contain multiple HDUs comprising different images. Conventionally, the first array,
     the `PrimaryHDU`, contains the 2D mask applied to the data and the remaining HDUs contain the data itself.
     The mask is used to add information to the header, for example the pixel scale of the data.
-    
+
     Each HDU contains its `ext_name` in the header, which is visible when the .fits file is loaded in DS9.
 
     Parameters
@@ -118,8 +82,6 @@ def hdu_list_for_output_from(
         except AttributeError:
             values = np.array(values)
 
-        values = flip_for_ds9_from(values)
-                
         if i == 0:
             hdu_list.append(fits.PrimaryHDU(values, header=header))
         else:
@@ -136,10 +98,6 @@ def output_to_fits(
 ):
     """
     Write a NumPy array to a .fits file.
-
-    Before outputting a NumPy array, the array may be flipped upside-down using np.flipud depending on the project
-    config files. This is for Astronomy projects so that structures appear the same orientation as ``.fits`` files
-    loaded in DS9.
 
     Parameters
     ----------
@@ -161,21 +119,32 @@ def output_to_fits(
     numpy_array_to_fits(values=values, file_path='/path/to/file/filename.fits', overwrite=True)
     """
 
-    file_path = Path(file_path)
-
-    file_dir = Path(*file_path.parts[:-1])
-    file_dir.mkdir(parents=True, exist_ok=True)
-
-    if overwrite and file_path.is_file():
-        file_path.unlink()
-
     hdu = hdu_list_for_output_from(
         values_list=[values],
         header_dict=header_dict,
         ext_name_list=[ext_name] if ext_name is not None else None,
     )
 
-    hdu.writeto(file_path)
+    write_hdu_list(hdu, file_path=file_path, overwrite=overwrite)
+
+def write_hdu_list(hdu_list, file_path, overwrite=False):
+    """Write an ``HDUList`` to a FITS file, creating directories as needed.
+
+    Parameters
+    ----------
+    hdu_list
+        The ``astropy.io.fits.HDUList`` to write.
+    file_path : str or Path
+        Full output path including ``.fits`` extension.
+    overwrite : bool
+        If ``True`` an existing file is replaced.
+    """
+    file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    if overwrite and file_path.is_file():
+        file_path.unlink()
+    hdu_list.writeto(file_path)
+
 
 def ndarray_via_hdu_from(hdu):
     """
@@ -211,7 +180,7 @@ def ndarray_via_hdu_from(hdu):
         )
     """
     values = hdu.data.astype("float")
-    return flip_for_ds9_from(values)
+    return values
 
 
 def ndarray_via_fits_from(
@@ -219,9 +188,6 @@ def ndarray_via_fits_from(
 ):
     """
     Read a 2D NumPy array from a .fits file.
-
-    After loading the NumPy array, the array is flipped upside-down using np.flipud. This is so that the structures
-    appear the same orientation as .fits files loaded in DS9.
 
     Parameters
     ----------
@@ -248,9 +214,6 @@ def ndarray_via_fits_from(
 def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
     """
     Read a 2D NumPy array from a .fits file.
-
-    After loading the NumPy array, the array is flipped upside-down using np.flipud. This is so that the structures
-    appear the same orientation as .fits files loaded in DS9.
 
     Parameters
     ----------
