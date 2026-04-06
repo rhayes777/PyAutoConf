@@ -239,18 +239,18 @@ class Config:
         if not Path(new_path).exists():
             raise ConfigException(f"{new_path} does not exist")
 
-        suffixes = {
-            Path(file).suffix for _, _, files in os.walk(new_path) for file in files
-        }
+        CONFIG_SUFFIXES = (".yml", ".ini", ".json", ".yaml")
 
-        CONFIG_SUFFIXES = [
-            ".yml",
-            ".ini",
-            ".json",
-            ".yaml",
-        ]
+        has_config = False
+        for dirpath, _, files in os.walk(new_path):
+            for file in files:
+                if file.endswith(CONFIG_SUFFIXES):
+                    has_config = True
+                    break
+            if has_config:
+                break
 
-        if not any((suffix in suffixes for suffix in CONFIG_SUFFIXES)):
+        if not has_config:
             raise ConfigException(
                 f"{new_path} does not contain any files ending with {'/'.join(CONFIG_SUFFIXES)} recursively"
             )
