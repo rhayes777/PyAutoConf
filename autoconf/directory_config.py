@@ -150,11 +150,24 @@ class NamedConfig(AbstractConfig):
 
 
 class RecursiveConfig(AbstractConfig):
+    def __init__(self, path):
+        self.path = Path(path)
+        self._listing = None
+
+    @property
+    def listing(self):
+        if self._listing is None:
+            try:
+                self._listing = set(os.listdir(self.path))
+            except FileNotFoundError:
+                self._listing = set()
+        return self._listing
+
     def keys(self):
         try:
             return [
                 path.split(".")[0]
-                for path in os.listdir(self.path)
+                for path in self.listing
                 if all(
                     [
                         path != "priors",
@@ -169,9 +182,6 @@ class RecursiveConfig(AbstractConfig):
         except FileNotFoundError as e:
             raise KeyError(f"No configuration found at {self.path}") from e
 
-    def __init__(self, path):
-        self.path = Path(path)
-
     def __eq__(self, other):
         return str(self) == str(other)
 
@@ -182,18 +192,18 @@ class RecursiveConfig(AbstractConfig):
         return f"<{self.__class__.__name__} {self.path}>"
 
     def _getitem(self, item):
-        item_path = self.path / f"{item}"
-        file_path = f"{item_path}.ini"
-        if os.path.isfile(file_path):
-            return NamedConfig(file_path)
-        yml_path = item_path.with_suffix(".yml")
-        if yml_path.exists():
-            return YAMLConfig(yml_path)
-        yaml_path = item_path.with_suffix(".yaml")
-        if yaml_path.exists():
-            return YAMLConfig(yaml_path)
-        if os.path.isdir(item_path):
-            return RecursiveConfig(item_path)
+        listing = self.listing
+        ini_name = f"{item}.ini"
+        if ini_name in listing:
+            return NamedConfig(self.path / ini_name)
+        yml_name = f"{item}.yml"
+        if yml_name in listing:
+            return YAMLConfig(self.path / yml_name)
+        yaml_name = f"{item}.yaml"
+        if yaml_name in listing:
+            return YAMLConfig(self.path / yaml_name)
+        if item in listing and os.path.isdir(self.path / item):
+            return RecursiveConfig(self.path / item)
         raise KeyError(f"No configuration found for {item} at path {self.path}")
 
 
