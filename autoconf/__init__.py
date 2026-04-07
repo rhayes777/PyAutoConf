@@ -9,6 +9,7 @@ from .json_prior.config import path_for_class
 from .json_prior.config import JSONPriorConfig
 
 from .setup_colab import for_autolens
+from .test_mode import test_mode_level, is_test_mode
 
 
 __version__ = "2026.4.5.3"
