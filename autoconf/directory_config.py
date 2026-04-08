@@ -80,6 +80,8 @@ class YAMLConfig(AbstractConfig):
         return value
 
     def keys(self):
+        if not isinstance(self._dict, dict):
+            return iter(())
         return self._dict.keys()
 
 
