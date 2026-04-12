@@ -10,7 +10,7 @@ def test_mode_level():
     2 = bypass sampler entirely, call likelihood once
     3 = bypass sampler entirely, skip likelihood call
     """
-    return int(os.environ.get("PYAUTOFIT_TEST_MODE", "0"))
+    return int(os.environ.get("PYAUTO_TEST_MODE", "0"))
 
 
 def is_test_mode():
@@ -18,3 +18,33 @@ def is_test_mode():
     Return True if any test mode is active.
     """
     return test_mode_level() > 0
+
+
+def skip_fit_output():
+    """
+    Return True if fit I/O should be skipped.
+
+    Controls: pre/post-fit output, VRAM profiling, result info text,
+    likelihood function checks.
+    """
+    return os.environ.get("PYAUTO_SKIP_FIT_OUTPUT", "0") == "1"
+
+
+def skip_visualization():
+    """
+    Return True if fit visualization should be skipped.
+
+    Controls: Visualizer.should_visualize, plot decorators,
+    quantity visualizers.
+    """
+    return os.environ.get("PYAUTO_SKIP_VISUALIZATION", "0") == "1"
+
+
+def skip_checks():
+    """
+    Return True if validation checks should be skipped.
+
+    Controls: mesh pixel validation (hilbert), position resampling,
+    inversion position exceptions, sample weight thresholds.
+    """
+    return os.environ.get("PYAUTO_SKIP_CHECKS", "0") == "1"
