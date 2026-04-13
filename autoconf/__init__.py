@@ -21,4 +21,4 @@ from .setup_notebook import setup_notebook
 from .test_mode import test_mode_level, is_test_mode, skip_fit_output, skip_visualization, skip_checks
 
 
-__version__ = "2026.4.13.3"
+__version__ = "2026.4.13.5"
