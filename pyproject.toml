@@ -52,3 +52,7 @@ dev = ["pytest", "black"]
 
 [tool.pytest.ini_options]
 testpaths = ["test_autoconf"]
+filterwarnings = [
+    "ignore:cuda_plugin_extension:UserWarning",
+    "ignore::DeprecationWarning:jax",
+]
