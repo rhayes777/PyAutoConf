@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/rhayes777/PyAutoConf"
+Homepage = "https://github.com/PyAutoLabs/PyAutoConf"
 
 [tool.setuptools]
 include-package-data = true

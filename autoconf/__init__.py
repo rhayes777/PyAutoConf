@@ -1,3 +1,11 @@
+import sys
+
+if sys.version_info < (3, 12):
+    raise RuntimeError(
+        f"PyAutoConf requires Python 3.12 or later. "
+        f"You are running Python {sys.version_info.major}.{sys.version_info.minor}."
+    )
+
 from . import jax_wrapper
 from . import exc
 from .tools.decorators import cached_property
