@@ -19,6 +19,7 @@ from .json_prior.config import JSONPriorConfig
 from .setup_colab import for_autolens
 from .setup_notebook import setup_notebook
 from .test_mode import test_mode_level, is_test_mode, skip_fit_output, skip_visualization, skip_checks
+from .workspace import check_version, WorkspaceVersionMismatchError
 
 
 __version__ = "2026.4.13.6"
