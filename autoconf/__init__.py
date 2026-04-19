@@ -1,3 +1,12 @@
+"""
+autoconf — configuration, serialization, and I/O helpers for the PyAuto ecosystem.
+
+Text-format I/O surfaces:
+
+- :mod:`autoconf.dictable`  — JSON (``output_to_json`` / ``from_json``)
+- :mod:`autoconf.fitsable`  — FITS (``output_to_fits`` / ``ndarray_via_fits_from``)
+- :mod:`autoconf.csvable`   — CSV  (``output_to_csv`` / ``list_from_csv``)
+"""
 import sys
 
 if sys.version_info < (3, 12):
