@@ -3,7 +3,7 @@
 **PyAutoConf** is the configuration management library for the PyAuto ecosystem. It handles object serialization/deserialization via YAML, JSON-based priors and configuration generation, and provides utility tools for scientific Python applications.
 
 - Package name: `autoconf`
-- Requires Python >= 3.9
+- Requires Python >= 3.12
 
 ## Repository Structure
 
