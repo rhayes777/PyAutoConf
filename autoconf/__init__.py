@@ -8,6 +8,7 @@ Text-format I/O surfaces:
 - :mod:`autoconf.csvable`   — CSV  (``output_to_csv`` / ``list_from_csv``)
 """
 import sys
+import warnings
 from pathlib import Path
 
 
@@ -30,17 +31,60 @@ def _python_version_check_bypassed():
         return False
 
 
-if sys.version_info < (3, 12) and not _python_version_check_bypassed():
-    raise RuntimeError(
-        f"Python {sys.version_info.major}.{sys.version_info.minor} detected. "
-        f"PyAutoConf is officially supported on Python 3.12+.\n"
-        f"Python 3.9, 3.10, and 3.11 will technically work but are not tested against.\n"
-        f"\n"
-        f"To bypass this check, add the following to your config/general.yaml:\n"
-        f"\n"
-        f"  version:\n"
-        f"    python_version_check: False\n"
+_RECOMMENDED_PYTHON_VERSIONS = {(3, 12), (3, 13)}
+
+
+def _emit_python_version_warning():
+    current = sys.version_info[:2]
+    if current in _RECOMMENDED_PYTHON_VERSIONS:
+        return
+    if _python_version_check_bypassed():
+        return
+
+    py = f"{current[0]}.{current[1]}"
+    lines = [
+        f"PyAuto: Python {py} detected -- first-class support is 3.12 and 3.13.",
+        "",
+        f"Things will probably work fine on {py}, but it is not the recommended",
+        "version and you may hit edge cases.",
+    ]
+    if current < (3, 11):
+        lines.extend(
+            [
+                "",
+                "Note: JAX acceleration is not available on Python <3.11. Models",
+                "that pass use_jax=True will error.",
+            ]
+        )
+    lines.extend(
+        [
+            "",
+            "Recommended: install Python 3.12 or 3.13.",
+            "To silence this warning, add to <cwd>/config/general.yaml:",
+            "",
+            "    version:",
+            "      python_version_check: False",
+        ]
     )
+
+    inner_width = max(len(line) for line in lines)
+    border = "+" + "-" * (inner_width + 4) + "+"
+    framed = [border]
+    for line in lines:
+        framed.append("|  " + line.ljust(inner_width) + "  |")
+    framed.append(border)
+
+    print("\n".join(framed), file=sys.stderr)
+    warnings.warn(
+        f"PyAuto: running on Python {py}; first-class support is 3.12/3.13. "
+        f"Suppress this warning via 'version.python_version_check: False' in "
+        f"config/general.yaml.",
+        UserWarning,
+        stacklevel=2,
+    )
+
+
+_emit_python_version_warning()
 
 from . import jax_wrapper
 from . import exc

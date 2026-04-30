@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "PyAuto Configration"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 license = { text = "MIT" }
-requires-python = ">=3.12"
+requires-python = ">=3.9"
 authors = [
     { name = "James Nightingale", email = "James.Nightingale@newcastle.ac.uk" },
     { name = "Richard Hayes", email = "richard@rghsoftware.co.uk" },
@@ -18,15 +18,16 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Physics",
   "Natural Language :: English",
   "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13"
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14"
 ]
 keywords = ["cli"]
 dependencies = [
     "pathlib",
-    "jaxnnls==1.0.1",
-    "jax>=0.4.35,<0.10.0",
-    "jaxlib>=0.4.35,<0.10.0",
     "typing-inspect>=0.4.0",
     "PyYAML>=6.0.1",
     "numpy>=1.24.0,<3.0.0"
@@ -46,7 +47,15 @@ version_scheme = "post-release"
 local_scheme = "no-local-version"
 
 [project.optional-dependencies]
-optional=["astropy>=5.0"]
+jax = [
+    "jax>=0.4.35,<0.10.0; python_version >= '3.11'",
+    "jaxlib>=0.4.35,<0.10.0; python_version >= '3.11'",
+    "jaxnnls==1.0.1; python_version >= '3.11'"
+]
+optional = [
+    "autoconf[jax]",
+    "astropy>=5.0"
+]
 test = ["pytest"]
 dev = ["pytest", "black"]
 
