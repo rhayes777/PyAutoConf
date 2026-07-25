@@ -1,2 +1,5 @@
-# Executable scripts must keep LF endings — a CRLF shebang breaks execution on HPC/Linux.
-scripts/*.py eol=lf
+# All files use Unix line endings (LF) — see AGENTS.md. text=auto lets git
+# detect binaries; eol=lf normalises every text file on checkout and checkin,
+# subsuming the earlier targeted shebang/script rules. Tree-wide CRLF
+# normalisation landed alongside this file (2026-07-25).
+* text=auto eol=lf
