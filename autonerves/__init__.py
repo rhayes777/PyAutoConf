@@ -42,24 +42,32 @@ def _emit_python_version_warning():
         return
 
     py = f"{current[0]}.{current[1]}"
-    lines = [
-        f"PyAuto: Python {py} detected -- first-class support is 3.12 and 3.13.",
-        "",
-        f"Things will probably work fine on {py}, but it is not the recommended",
-        "version and you may hit edge cases.",
-    ]
-    if current < (3, 11):
-        lines.extend(
-            [
-                "",
-                "Note: JAX acceleration is not available on Python <3.11. Models",
-                "that pass use_jax=True will error.",
-            ]
+    if current < (3, 12):
+        lines = [
+            f"PyAuto: Python {py} detected -- Python 3.12 or newer is required.",
+            "",
+            "This Python version is unsupported by current PyAuto releases.",
+            "Install Python 3.12 or 3.13, or pin a pre-migration PyAuto release.",
+        ]
+        warning = (
+            f"PyAuto: running on unsupported Python {py}; current releases "
+            "require Python >=3.12."
+        )
+    else:
+        lines = [
+            f"PyAuto: Python {py} detected -- this Python version is experimental.",
+            "",
+            "PyAuto currently tests and supports Python 3.12 and 3.13.",
+            f"Python {py} may encounter known compatibility issues.",
+            "Use Python 3.12 or 3.13 for production work.",
+        ]
+        warning = (
+            f"PyAuto: running on experimental Python {py}; supported versions "
+            "are 3.12/3.13."
         )
     lines.extend(
         [
             "",
-            "Recommended: install Python 3.12 or 3.13.",
             "To silence this warning, add to <cwd>/config/general.yaml:",
             "",
             "    version:",
@@ -76,9 +84,9 @@ def _emit_python_version_warning():
 
     print("\n".join(framed), file=sys.stderr)
     warnings.warn(
-        f"PyAuto: running on Python {py}; first-class support is 3.12/3.13. "
-        f"Suppress this warning via 'version.python_version_check: False' in "
-        f"config/general.yaml.",
+        warning
+        + " Suppress this warning via 'version.python_version_check: False' "
+        "in config/general.yaml.",
         UserWarning,
         stacklevel=2,
     )

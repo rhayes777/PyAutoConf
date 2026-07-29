@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "PyAuto Configration"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 authors = [
     { name = "James Nightingale", email = "James.Nightingale@newcastle.ac.uk" },
     { name = "Richard Hayes", email = "richard@rghsoftware.co.uk" },
@@ -18,15 +18,11 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Physics",
   "Natural Language :: English",
   "Operating System :: OS Independent",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13"
 ]
 keywords = ["cli"]
 dependencies = [
-    "pathlib",
     "typing-inspect>=0.4.0",
     "PyYAML>=6.0.1",
     "numpy>=1.24.0,<3.0.0"
@@ -47,9 +43,9 @@ local_scheme = "no-local-version"
 
 [project.optional-dependencies]
 jax = [
-    "jax>=0.7.0,<0.11.0; python_version >= '3.11'",
-    "jaxlib>=0.7.0,<0.11.0; python_version >= '3.11'",
-    "jaxnnls==1.0.1; python_version >= '3.11'"
+    "jax>=0.7.0,<0.11.0",
+    "jaxlib>=0.7.0,<0.11.0",
+    "jaxnnls==1.0.1"
 ]
 optional = [
     "autonerves[jax]",
