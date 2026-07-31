@@ -20,7 +20,7 @@ def _set_python_version(monkeypatch, major, minor):
     )
 
 
-@pytest.mark.parametrize("minor", [12, 13])
+@pytest.mark.parametrize("minor", [12, 13, 14])
 def test_supported_python_versions_do_not_warn(monkeypatch, capsys, minor):
     _set_python_version(monkeypatch, major=3, minor=minor)
 
@@ -45,15 +45,15 @@ def test_python_below_minimum_is_reported_as_unsupported(monkeypatch, capsys):
 
 
 def test_python_above_supported_range_is_reported_as_experimental(monkeypatch, capsys):
-    _set_python_version(monkeypatch, major=3, minor=14)
+    _set_python_version(monkeypatch, major=3, minor=15)
 
-    with pytest.warns(UserWarning, match=r"experimental Python 3\.14"):
+    with pytest.warns(UserWarning, match=r"experimental Python 3\.15"):
         autonerves._emit_python_version_warning()
 
     message = capsys.readouterr().err
-    assert "Python 3.14 detected -- this Python version is experimental" in message
-    assert "tests and supports Python 3.12 and 3.13" in message
-    assert "Use Python 3.12 or 3.13 for production work" in message
+    assert "Python 3.15 detected -- this Python version is experimental" in message
+    assert "tests and supports Python 3.12, 3.13 and 3.14" in message
+    assert "Use Python 3.12, 3.13 or 3.14 for production work" in message
 
 
 def test_python_version_warning_respects_yaml_bypass(monkeypatch, tmp_path, capsys):
@@ -66,7 +66,7 @@ def test_python_version_warning_respects_yaml_bypass(monkeypatch, tmp_path, caps
     monkeypatch.setattr(
         autonerves,
         "sys",
-        SimpleNamespace(version_info=(3, 14)),
+        SimpleNamespace(version_info=(3, 15)),
     )
 
     with warnings.catch_warnings(record=True) as caught:
