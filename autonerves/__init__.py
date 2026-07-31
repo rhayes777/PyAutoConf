@@ -31,7 +31,7 @@ def _python_version_check_bypassed():
         return False
 
 
-_RECOMMENDED_PYTHON_VERSIONS = {(3, 12), (3, 13)}
+_RECOMMENDED_PYTHON_VERSIONS = {(3, 12), (3, 13), (3, 14)}
 
 
 def _emit_python_version_warning():
@@ -42,12 +42,18 @@ def _emit_python_version_warning():
         return
 
     py = f"{current[0]}.{current[1]}"
+    supported = [
+        f"{major}.{minor}" for major, minor in sorted(_RECOMMENDED_PYTHON_VERSIONS)
+    ]
+    prose = ", ".join(supported[:-1]) + " and " + supported[-1]
+    choice = ", ".join(supported[:-1]) + " or " + supported[-1]
+    slash = "/".join(supported)
     if current < (3, 12):
         lines = [
             f"PyAuto: Python {py} detected -- Python 3.12 or newer is required.",
             "",
             "This Python version is unsupported by current PyAuto releases.",
-            "Install Python 3.12 or 3.13, or pin a pre-migration PyAuto release.",
+            f"Install Python {choice}, or pin a pre-migration PyAuto release.",
         ]
         warning = (
             f"PyAuto: running on unsupported Python {py}; current releases "
@@ -57,13 +63,13 @@ def _emit_python_version_warning():
         lines = [
             f"PyAuto: Python {py} detected -- this Python version is experimental.",
             "",
-            "PyAuto currently tests and supports Python 3.12 and 3.13.",
+            f"PyAuto currently tests and supports Python {prose}.",
             f"Python {py} may encounter known compatibility issues.",
-            "Use Python 3.12 or 3.13 for production work.",
+            f"Use Python {choice} for production work.",
         ]
         warning = (
             f"PyAuto: running on experimental Python {py}; supported versions "
-            "are 3.12/3.13."
+            f"are {slash}."
         )
     lines.extend(
         [
