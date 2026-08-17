@@ -116,4 +116,7 @@ from .test_mode import test_mode_level, is_test_mode, skip_fit_output, skip_visu
 from .workspace import check_version, WorkspaceVersionMismatchError
 
 
-__version__ = "2026.7.23.1"
+# Last manual sync of the source stamp. Release wheels are stamped at build
+# time and the git tag is the release truth — deliberately never bumped per
+# release (PyAutoBuild#118/#120).
+__version__ = "2026.8.17.1"
