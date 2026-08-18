@@ -207,8 +207,10 @@ def ndarray_via_fits_from(
     --------
     array_2d = ndarray_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
-    hdu_list = fits.open(file_path, do_not_scale_image_data=do_not_scale_image_data)
-    return ndarray_via_hdu_from(hdu_list[hdu])
+    with fits.open(
+        file_path, do_not_scale_image_data=do_not_scale_image_data
+    ) as hdu_list:
+        return ndarray_via_hdu_from(hdu_list[hdu])
 
 
 def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
@@ -233,8 +235,8 @@ def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
     --------
     array_2d = ndarray_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
-    hdu_list = fits.open(file_path)
-    return hdu_list[hdu].header
+    with fits.open(file_path) as hdu_list:
+        return hdu_list[hdu].header
 
 
 

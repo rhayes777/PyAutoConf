@@ -82,6 +82,22 @@ def _version_date(parsed_version):
         return None
 
 
+def _is_source_checkout(root):
+    """
+    True when ``root`` is a Python package source checkout (a ``setup.py`` or
+    ``pyproject.toml`` at its top level) rather than a workspace clone.
+
+    ``check_version`` is called unconditionally on library import with
+    ``workspace_root`` defaulting to the current working directory, so any
+    pytest run or script executed from inside a library's own repo would
+    otherwise warn "Cannot verify the workspace ..." on every import — a
+    false positive, since a source checkout is not a workspace and records
+    no version floor to verify. Workspace clones ship neither file, so a
+    genuine workspace missing its version keys still warns.
+    """
+    return (root / "setup.py").exists() or (root / "pyproject.toml").exists()
+
+
 def _library_name_from_workspace(workspace_root):
     name = workspace_root.name
     suffix = "_workspace"
@@ -168,7 +184,10 @@ def check_version(library_version, workspace_root=None):
     installs) warn on inequality rather than raising.
 
     If no floor source is found, a warning is emitted and the check is
-    skipped.
+    skipped — unless ``workspace_root`` is a package source checkout
+    (``setup.py``/``pyproject.toml`` at its top level), in which case the
+    check is skipped silently: running from inside a library's own repo is
+    not a workspace-compatibility question at all.
 
     The check can be disabled in two ways:
 
@@ -203,6 +222,8 @@ def check_version(library_version, workspace_root=None):
             floor_version = version_file.read_text().strip()
 
     if floor_version is None or floor_version == "":
+        if _is_source_checkout(root):
+            return
         warnings.warn(_missing_version_warning(root, library_version))
         return
 

@@ -33,6 +33,26 @@ def test_missing_sources_warns(tmp_path):
         check_version("2026.7.22.1", workspace_root=tmp_path)
 
 
+@pytest.mark.parametrize("marker", ["setup.py", "pyproject.toml"])
+def test_missing_sources_in_source_checkout_skips_silently(tmp_path, marker):
+    """A package source checkout (setup.py/pyproject.toml at the root) is not
+    a workspace — importing a library from inside its own repo must not warn
+    that the "workspace" version cannot be verified."""
+    (tmp_path / marker).write_text("")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        check_version("2026.7.22.1", workspace_root=tmp_path)
+
+
+def test_source_checkout_with_version_floor_still_checked(tmp_path):
+    """The source-checkout skip only covers the no-floor false positive — a
+    recorded floor is still enforced even with a setup.py present."""
+    (tmp_path / "setup.py").write_text("")
+    (tmp_path / "version.txt").write_text("2026.7.22.1\n")
+    with pytest.raises(WorkspaceVersionMismatchError):
+        check_version("2025.1.1.1", workspace_root=tmp_path)
+
+
 def test_env_override_skips_mismatch(tmp_path, monkeypatch):
     monkeypatch.setenv("PYAUTO_SKIP_WORKSPACE_VERSION_CHECK", "1")
     (tmp_path / "version.txt").write_text("2025.1.1.1\n")
