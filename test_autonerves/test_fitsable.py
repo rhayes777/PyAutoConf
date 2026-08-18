@@ -70,6 +70,22 @@ def test__output_to_fits__header_dict():
     assert header["A"] == 1
 
 
+def test__fits_readers_close_their_file_handles():
+    """Regression: `fits.open` without close leaked file handles, emitting
+    `ResourceWarning: unclosed file` throughout every downstream repo that
+    loads FITS via these helpers."""
+    import gc
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", ResourceWarning)
+        fitsable.ndarray_via_fits_from(
+            file_path=test_data_path / "3x3_ones.fits", hdu=0
+        )
+        fitsable.header_obj_from(file_path=test_data_path / "3x3_ones.fits", hdu=0)
+        gc.collect()
+
+
 def test__header_obj_from():
     header_obj = fitsable.header_obj_from(
         file_path=test_data_path / "3x3_ones.fits", hdu=0

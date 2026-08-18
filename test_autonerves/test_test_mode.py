@@ -10,10 +10,13 @@ import pytest
 
 from autonerves.test_mode import (
     is_test_mode,
-    test_mode_level,
-    test_mode_samples,
     with_test_mode_segment,
 )
+
+# ``test_mode_samples`` is real API, but its ``test_`` prefix means a bare-name
+# import here would be collected by pytest as a test function
+# (PytestReturnNotNoneWarning, an ERROR in future pytest) — alias it instead.
+from autonerves.test_mode import test_mode_samples as _test_mode_samples
 
 
 @pytest.fixture(autouse=True)
@@ -69,13 +72,13 @@ class TestTestModeSamples:
 
     def test__env_unset_returns_historical_default_of_four(self):
         os.environ.pop("PYAUTO_TEST_MODE_SAMPLES", None)
-        assert test_mode_samples() == 4
+        assert _test_mode_samples() == 4
 
     def test__env_set_returns_value(self):
         os.environ["PYAUTO_TEST_MODE_SAMPLES"] = "50000"
-        assert test_mode_samples() == 50000
+        assert _test_mode_samples() == 50000
 
     def test__values_below_four_raise(self):
         os.environ["PYAUTO_TEST_MODE_SAMPLES"] = "3"
         with pytest.raises(ValueError):
-            test_mode_samples()
+            _test_mode_samples()
