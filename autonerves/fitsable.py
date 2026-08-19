@@ -9,11 +9,6 @@ if TYPE_CHECKING:
     except ImportError:
         pass
 
-try:
-    from astropy.io import fits
-except ImportError:
-    pass
-
 import numpy as np
 from pathlib import Path
 from typing import Dict, Optional, Union, List
@@ -58,8 +53,10 @@ def hdu_list_for_output_from(
         ext_name_list=["data", "noise_map"]
     )
     """
+    from astropy.io import fits
+
     hdu_list = []
-    
+
     header = fits.Header()
 
     if header_dict is not None:
@@ -207,6 +204,8 @@ def ndarray_via_fits_from(
     --------
     array_2d = ndarray_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
+    from astropy.io import fits
+
     with fits.open(
         file_path, do_not_scale_image_data=do_not_scale_image_data
     ) as hdu_list:
@@ -235,6 +234,8 @@ def header_obj_from(file_path: Union[Path, str], hdu: int) -> Dict:
     --------
     array_2d = ndarray_via_fits_from(file_path='/path/to/file/filename.fits', hdu=0)
     """
+    from astropy.io import fits
+
     with fits.open(file_path) as hdu_list:
         return hdu_list[hdu].header
 

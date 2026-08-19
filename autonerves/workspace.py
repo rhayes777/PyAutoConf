@@ -17,6 +17,19 @@ _BYPASS_ENV_VAR = "PYAUTO_SKIP_WORKSPACE_VERSION_CHECK"
 # enough to suggest the clone is genuinely stale.
 _STALENESS_WINDOW_DAYS = 30
 
+# Every library init (autofit, autogalaxy, autolens, ...) calls check_version,
+# so without dedup a byte-identical warning prints once per library in the
+# import chain. Python's own warning registry does not dedupe here because
+# third-party imports between the calls invalidate it.
+_warned_messages = set()
+
+
+def _warn_once(message):
+    if message in _warned_messages:
+        return
+    _warned_messages.add(message)
+    warnings.warn(message)
+
 
 def _read_general_yaml(workspace_root):
     """
@@ -224,7 +237,7 @@ def check_version(library_version, workspace_root=None):
     if floor_version is None or floor_version == "":
         if _is_source_checkout(root):
             return
-        warnings.warn(_missing_version_warning(root, library_version))
+        _warn_once(_missing_version_warning(root, library_version))
         return
 
     if floor_version == library_version:
@@ -234,7 +247,7 @@ def check_version(library_version, workspace_root=None):
     library_parsed = _parse_version(library_version)
 
     if floor_parsed is None or library_parsed is None:
-        warnings.warn(
+        _warn_once(
             _unparseable_mismatch_message(floor_version, library_version, root)
         )
         return
@@ -252,4 +265,4 @@ def check_version(library_version, workspace_root=None):
         and library_date is not None
         and (library_date - floor_date).days > _STALENESS_WINDOW_DAYS
     ):
-        warnings.warn(_stale_workspace_message(floor_version, library_version, root))
+        _warn_once(_stale_workspace_message(floor_version, library_version, root))
