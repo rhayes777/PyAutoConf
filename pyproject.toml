@@ -32,8 +32,11 @@ dependencies = [
     # wheels for >=0.7), so the markers let Intel Macs resolve to the
     # NumPy-only path instead of failing at install. jax_wrapper warns loudly
     # at import when JAX is absent.
-    'jax>=0.7.0,<0.12.0; sys_platform != "darwin" or platform_machine == "arm64"',
-    'jaxlib>=0.7.0,<0.12.0; sys_platform != "darwin" or platform_machine == "arm64"',
+    # Cap stays <0.11: jax 0.11.1 breaks autofit's beta/gamma message
+    # log_partition under jit ('tuple' object has no attribute 'shape') —
+    # widen only together with that fix (tracked from PyAutoLens#702).
+    'jax>=0.7.0,<0.11.0; sys_platform != "darwin" or platform_machine == "arm64"',
+    'jaxlib>=0.7.0,<0.11.0; sys_platform != "darwin" or platform_machine == "arm64"',
     'jaxnnls==1.0.1; sys_platform != "darwin" or platform_machine == "arm64"'
 ]
 
