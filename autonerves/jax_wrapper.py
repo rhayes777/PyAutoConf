@@ -1,8 +1,24 @@
+import importlib.util
 import logging
 
 logger = logging.getLogger(__name__)
 
 import os
+
+if importlib.util.find_spec("jax") is None:
+    logger.warning(
+        """
+        JAX is not installed, so all computations will run on the pure NumPy
+        path. Performance is significantly reduced without JAX — model fits
+        that take minutes with JAX can take hours without it.
+
+        JAX is a default dependency of the PyAuto libraries; it is absent
+        either because this platform has no JAX wheels (e.g. Intel macOS) or
+        because it was uninstalled. On supported platforms, restore it with:
+
+            pip install jax
+        """
+    )
 
 xla_env = os.environ.get("XLA_FLAGS")
 
