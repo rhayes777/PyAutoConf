@@ -26,7 +26,15 @@ keywords = ["cli"]
 dependencies = [
     "typing-inspect>=0.4.0",
     "PyYAML>=6.0.1",
-    "numpy>=1.24.0,<3.0.0"
+    "numpy>=1.24.0,<3.0.0",
+    # JAX is a default dependency (PyAutoLens#702): CPU wheels exist for every
+    # supported platform except Intel macOS (jaxlib ships no macosx_x86_64
+    # wheels for >=0.7), so the markers let Intel Macs resolve to the
+    # NumPy-only path instead of failing at install. jax_wrapper warns loudly
+    # at import when JAX is absent.
+    'jax>=0.7.0,<0.12.0; sys_platform != "darwin" or platform_machine == "arm64"',
+    'jaxlib>=0.7.0,<0.12.0; sys_platform != "darwin" or platform_machine == "arm64"',
+    'jaxnnls==1.0.1; sys_platform != "darwin" or platform_machine == "arm64"'
 ]
 
 [project.urls]
@@ -43,11 +51,11 @@ version_scheme = "post-release"
 local_scheme = "no-local-version"
 
 [project.optional-dependencies]
-jax = [
-    "jax>=0.7.0,<0.11.0",
-    "jaxlib>=0.7.0,<0.11.0",
-    "jaxnnls==1.0.1"
-]
+# JAX moved into the base dependencies (PyAutoLens#702). The extra is kept as
+# a declared no-op so `pip install autonerves[jax]` keeps resolving — removing
+# it would revive the pip history-walk trap ("version X does not provide the
+# extra 'jax'" is a warning, not an error; PyAutoLens#687) in reverse.
+jax = []
 optional = [
     "autonerves[jax]",
     "astropy>=5.0"
