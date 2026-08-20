@@ -6,18 +6,20 @@
 
 [![PyAutoScientist GitHub](https://img.shields.io/badge/%E2%9A%97%EF%B8%8F%20PyAutoScientist-GitHub-181717?style=flat-square)](https://github.com/PyAutoLabs/PyAutoScientist) [![PyAutoScientist ReadTheDocs](https://img.shields.io/badge/%F0%9F%93%96%20PyAutoScientist-ReadTheDocs-8CA1AF?style=flat-square)](https://pyautoscientist.readthedocs.io)
 
-**PyAutoNerves** (package `autonerves`) is the configuration, serialization, and
-I/O foundation of the [PyAuto](https://github.com/PyAutoLabs) ecosystem. It
-provides a layered configuration system with workspace overrides, dict / JSON /
-CSV serialization of arbitrary objects, and FITS I/O.
+**PyAutoNerves is the Nerves of the PyAutoScientist** — the configuration,
+serialization, and I/O foundation (package `autonerves`) connecting the
+workspace's conventions to every library. It provides a layered configuration
+system with workspace overrides, dict / JSON / CSV serialization of arbitrary
+objects, and FITS I/O.
 
 `PyAutoFit`, `PyAutoArray`, `PyAutoGalaxy`, and `PyAutoLens` all depend on
 autonerves: it supplies their packaged default config, the object-serialization
 used to persist models and results, and shared utilities (`test_mode`,
 `jax_wrapper`). Centralising these here keeps a single, consistent config and
-I/O layer beneath every library. Within the
-[PyAutoScientist organism](https://pyautoscientist.readthedocs.io) it is the
-Nerves — the layer connecting the workspace's conventions to every library.
+I/O layer beneath every library. As a released library it ships with every
+nightly train — see the
+[PyAutoHands release board](https://pyautolabs.github.io/PyAutoHands/) for the
+current version.
 
 ## Install
 
@@ -61,4 +63,7 @@ loaded = ndarray_via_fits_from(file_path="demo.fits", hdu=0)   # np.allclose(arr
 
 - Source & tests: [`autonerves/`](autonerves), [`test_autonerves/`](test_autonerves)
 - Agent/contributor instructions: [`AGENTS.md`](AGENTS.md)
+- The organism this repo is the Nerves of:
+  [PyAutoBrain/ORGANISM.md](https://github.com/PyAutoLabs/PyAutoBrain/blob/main/ORGANISM.md),
+  documented in full at <https://pyautoscientist.readthedocs.io>
 - Ecosystem: [PyAutoLabs on GitHub](https://github.com/PyAutoLabs)
