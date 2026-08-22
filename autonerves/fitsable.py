@@ -14,6 +14,14 @@ from pathlib import Path
 from typing import Dict, Optional, Union, List
 
 
+# Exactly 8 characters, and that ceiling is load-bearing rather than stylistic.
+# A 9-character keyword does not raise here: astropy silently promotes it to a
+# HIERARCH card, which `header.get("...")` by the short name then misses,
+# returning None. The reader in ``autoarray.util.dataset_util`` treats None as
+# "unknown regime" and falls back to its shape heuristic -- so an over-long key
+# would not fail loudly, it would quietly un-fix the interferometer case this
+# stamp exists for. Any rename must stay within 8 chars, and is a wire-format
+# change (the reader duplicates this literal), not a refactor.
 SMALL_DATASETS_HEADER_KEY = "SMALLDAT"
 SMALL_DATASETS_HEADER_COMMENT = "PYAUTO_SMALL_DATASETS active at write time"
 

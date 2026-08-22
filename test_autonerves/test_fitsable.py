@@ -212,3 +212,13 @@ def test__stamp_is_idempotent_across_both_funnels(tmp_path, monkeypatch):
 
     header = fits.open(tmp_path / "once.fits")[0].header
     assert len([c for c in header.cards if c.keyword == KEY]) == 1
+
+
+def test__stamp_key_stays_within_the_fits_standard_card_limit():
+    # Not stylistic. A 9-char keyword is silently promoted to a HIERARCH card
+    # by astropy rather than raising, and header.get() by the short name then
+    # returns None -- which readers treat as "unknown regime" and fall back to
+    # the shape heuristic. An over-long key would therefore not fail loudly, it
+    # would quietly un-fix the interferometer case. Pin the ceiling.
+    assert len(KEY) <= 8
+    assert KEY == KEY.upper()
