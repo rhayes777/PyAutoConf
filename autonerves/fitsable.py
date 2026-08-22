@@ -47,7 +47,18 @@ def stamp_small_datasets_regime(header):
     capped run writes identical ``NAXIS`` with different values and trips no
     assertion at all.
 
-    The card is written on **every** FITS the stack writes, in both regimes:
+    The card is written in both regimes on every FITS written through this
+    module -- which is every FITS the PyAuto libraries author, because all 18
+    library write sites build their HDUList here even when they call
+    ``hdu_list.writeto`` themselves. It is **not** universal, and readers must
+    not assume it is: PyAutoFit's aggregator assembles some HDULists by hand
+    (``autofit/aggregator/summary/aggregate_fits.py``), and workspace scripts
+    that use raw astropy directly (e.g. the lenstool converter in
+    autolens_workspace) write unstamped files. Those read as absent, i.e.
+    unknown -- which is the safe direction, and exactly why absence must never
+    be read as "full resolution".
+
+    The three states:
 
     - ``SMALLDAT = T`` -- written under ``PYAUTO_SMALL_DATASETS=1`` (capped).
     - ``SMALLDAT = F`` -- written at full resolution.
