@@ -135,9 +135,9 @@ def hdu_list_for_output_from(
             # Convert enum to its string value if needed
             key_str = key.value if isinstance(key, Enum) else key
             try:
-                header.append((key_str, value, [""]))
+                header.append((key_str, value, ""))
             except ValueError:
-                header.append((key_str, float(value), [""]))
+                header.append((key_str, float(value), ""))
 
     stamp_small_datasets_regime(header)
 
