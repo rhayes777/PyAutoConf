@@ -214,3 +214,23 @@ def with_test_mode_segment(base: Path) -> Path:
     PosixPath('output/test_mode/results_folder')
     """
     return base / "test_mode" if is_test_mode() else base
+
+
+def small_datasets():
+    """
+    Return True if the small-datasets regime is active.
+
+    ``PYAUTO_SMALL_DATASETS=1`` caps simulated datasets to a reduced
+    resolution (``SMALL_DATASETS_SHAPE_NATIVE = (16, 16)`` in
+    ``autoarray.util.dataset_util``) so smoke runs stay fast. The cap changes
+    what a simulator writes to disk, which makes it a *provenance* fact about
+    every file written while it is active -- see
+    :func:`autonerves.fitsable.stamp_small_datasets_regime`, which records it
+    in the FITS header of every array the stack writes.
+
+    The env var is deliberately compared against the exact string ``"1"``,
+    matching every other ``PYAUTO_*`` switch in this module and the readers in
+    ``autoarray.util.dataset_util``. ``"0"``, ``"true"`` and the unset case all
+    mean "full resolution".
+    """
+    return os.environ.get("PYAUTO_SMALL_DATASETS") == "1"

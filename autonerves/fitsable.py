@@ -14,6 +14,77 @@ from pathlib import Path
 from typing import Dict, Optional, Union, List
 
 
+# Exactly 8 characters, and that ceiling is load-bearing rather than stylistic.
+# A 9-character keyword does not raise here: astropy silently promotes it to a
+# HIERARCH card, which `header.get("...")` by the short name then misses,
+# returning None. The reader in ``autoarray.util.dataset_util`` treats None as
+# "unknown regime" and falls back to its shape heuristic -- so an over-long key
+# would not fail loudly, it would quietly un-fix the interferometer case this
+# stamp exists for. Any rename must stay within 8 chars, and is a wire-format
+# change (the reader duplicates this literal), not a refactor.
+SMALL_DATASETS_HEADER_KEY = "SMALLDAT"
+SMALL_DATASETS_HEADER_COMMENT = "PYAUTO_SMALL_DATASETS active at write time"
+
+
+def stamp_small_datasets_regime(header):
+    """
+    Record the small-datasets regime in a FITS ``header``, in place.
+
+    ``PYAUTO_SMALL_DATASETS=1`` caps simulated datasets to a reduced
+    resolution. Nothing else on disk records that fact, so a dataset written
+    by a capped run can survive into a later full-resolution run and be loaded
+    silently -- the root cause of autolens_workspace_test#260.
+
+    Writing the regime *here*, in the same call that writes the data, makes the
+    stamp **truthful by construction**: it cannot disagree with the file it
+    sits in, and there is no stamped-but-empty-directory failure mode. That is
+    the property a marker file written before simulation cannot have.
+
+    Unlike a shape heuristic it also does not depend on the data looking
+    different, which is what makes it the only discriminant able to catch
+    capped **interferometer** datasets: their visibility count is fixed by the
+    committed uv file while the real-space grid behind it is capped, so a
+    capped run writes identical ``NAXIS`` with different values and trips no
+    assertion at all.
+
+    The card is written in both regimes on every FITS written through this
+    module -- which is every FITS the PyAuto libraries author, because all 18
+    library write sites build their HDUList here even when they call
+    ``hdu_list.writeto`` themselves. It is **not** universal, and readers must
+    not assume it is: PyAutoFit's aggregator assembles some HDULists by hand
+    (``autofit/aggregator/summary/aggregate_fits.py``), and workspace scripts
+    that use raw astropy directly (e.g. the lenstool converter in
+    autolens_workspace) write unstamped files. Those read as absent, i.e.
+    unknown -- which is the safe direction, and exactly why absence must never
+    be read as "full resolution".
+
+    The three states:
+
+    - ``SMALLDAT = T`` -- written under ``PYAUTO_SMALL_DATASETS=1`` (capped).
+    - ``SMALLDAT = F`` -- written at full resolution.
+    - **absent** -- unknown. Written before this stamp existed, or by another
+      tool. Readers must fall back to their legacy heuristic and, above all,
+      must never read absence as "full resolution".
+
+    Recording ``F`` explicitly rather than relying on absence is the whole
+    point of the always-write: it lets a reader distinguish "known full" from
+    "no idea", and only the first of those is safe to act on. See
+    ``autoarray.util.dataset_util.should_simulate``, whose predicate ends in
+    ``shutil.rmtree``.
+
+    Assignment (not ``append``) is deliberate -- it is idempotent, so the two
+    call sites below can both stamp the same header without duplicating the
+    card.
+    """
+    from autonerves.test_mode import small_datasets
+
+    header[SMALL_DATASETS_HEADER_KEY] = (
+        small_datasets(),
+        SMALL_DATASETS_HEADER_COMMENT,
+    )
+    return header
+
+
 def hdu_list_for_output_from(
     values_list: List[np.ndarray],
     header_dict: Optional[dict] = None,
@@ -67,6 +138,8 @@ def hdu_list_for_output_from(
                 header.append((key_str, value, [""]))
             except ValueError:
                 header.append((key_str, float(value), [""]))
+
+    stamp_small_datasets_regime(header)
 
     for i, values in enumerate(values_list):
     
@@ -136,6 +209,9 @@ def write_hdu_list(hdu_list, file_path, overwrite=False):
     overwrite : bool
         If ``True`` an existing file is replaced.
     """
+    if len(hdu_list) > 0:
+        stamp_small_datasets_regime(hdu_list[0].header)
+
     file_path = Path(file_path)
     file_path.parent.mkdir(parents=True, exist_ok=True)
     if overwrite and file_path.is_file():
