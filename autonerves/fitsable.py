@@ -14,6 +14,58 @@ from pathlib import Path
 from typing import Dict, Optional, Union, List
 
 
+SMALL_DATASETS_HEADER_KEY = "SMALLDAT"
+SMALL_DATASETS_HEADER_COMMENT = "PYAUTO_SMALL_DATASETS active at write time"
+
+
+def stamp_small_datasets_regime(header):
+    """
+    Record the small-datasets regime in a FITS ``header``, in place.
+
+    ``PYAUTO_SMALL_DATASETS=1`` caps simulated datasets to a reduced
+    resolution. Nothing else on disk records that fact, so a dataset written
+    by a capped run can survive into a later full-resolution run and be loaded
+    silently -- the root cause of autolens_workspace_test#260.
+
+    Writing the regime *here*, in the same call that writes the data, makes the
+    stamp **truthful by construction**: it cannot disagree with the file it
+    sits in, and there is no stamped-but-empty-directory failure mode. That is
+    the property a marker file written before simulation cannot have.
+
+    Unlike a shape heuristic it also does not depend on the data looking
+    different, which is what makes it the only discriminant able to catch
+    capped **interferometer** datasets: their visibility count is fixed by the
+    committed uv file while the real-space grid behind it is capped, so a
+    capped run writes identical ``NAXIS`` with different values and trips no
+    assertion at all.
+
+    The card is written on **every** FITS the stack writes, in both regimes:
+
+    - ``SMALLDAT = T`` -- written under ``PYAUTO_SMALL_DATASETS=1`` (capped).
+    - ``SMALLDAT = F`` -- written at full resolution.
+    - **absent** -- unknown. Written before this stamp existed, or by another
+      tool. Readers must fall back to their legacy heuristic and, above all,
+      must never read absence as "full resolution".
+
+    Recording ``F`` explicitly rather than relying on absence is the whole
+    point of the always-write: it lets a reader distinguish "known full" from
+    "no idea", and only the first of those is safe to act on. See
+    ``autoarray.util.dataset_util.should_simulate``, whose predicate ends in
+    ``shutil.rmtree``.
+
+    Assignment (not ``append``) is deliberate -- it is idempotent, so the two
+    call sites below can both stamp the same header without duplicating the
+    card.
+    """
+    from autonerves.test_mode import small_datasets
+
+    header[SMALL_DATASETS_HEADER_KEY] = (
+        small_datasets(),
+        SMALL_DATASETS_HEADER_COMMENT,
+    )
+    return header
+
+
 def hdu_list_for_output_from(
     values_list: List[np.ndarray],
     header_dict: Optional[dict] = None,
@@ -67,6 +119,8 @@ def hdu_list_for_output_from(
                 header.append((key_str, value, [""]))
             except ValueError:
                 header.append((key_str, float(value), [""]))
+
+    stamp_small_datasets_regime(header)
 
     for i, values in enumerate(values_list):
     
@@ -136,6 +190,9 @@ def write_hdu_list(hdu_list, file_path, overwrite=False):
     overwrite : bool
         If ``True`` an existing file is replaced.
     """
+    if len(hdu_list) > 0:
+        stamp_small_datasets_regime(hdu_list[0].header)
+
     file_path = Path(file_path)
     file_path.parent.mkdir(parents=True, exist_ok=True)
     if overwrite and file_path.is_file():
