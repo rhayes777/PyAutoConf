@@ -222,3 +222,27 @@ def test__stamp_key_stays_within_the_fits_standard_card_limit():
     # would quietly un-fix the interferometer case. Pin the ceiling.
     assert len(KEY) <= 8
     assert KEY == KEY.upper()
+
+
+def test__header_dict_cards_carry_no_junk_comment(tmp_path):
+    # Regression: the comment was passed as the LIST [""], which astropy does not
+    # reject -- it str()s it -- so every header_dict card on disk read
+    # `PIXSCAY = 0.1 / ['']`. Cosmetic, but it shipped in every Imaging dataset
+    # the stack wrote and rendered for anyone opening a PyAuto FITS in DS9 or
+    # astropy. Pin the comment empty so the wart cannot come back.
+    fitsable.output_to_fits(
+        np.ones((4, 4)),
+        file_path=tmp_path / "h.fits",
+        header_dict={"PIXSCAY": 0.1, "ORIGINY": 0.0},
+    )
+
+    header = fits.open(tmp_path / "h.fits")[0].header
+
+    assert header["PIXSCAY"] == 0.1
+    assert header.comments["PIXSCAY"] == ""
+    assert header.comments["ORIGINY"] == ""
+    assert "[" not in str(header.cards["PIXSCAY"])
+
+    # The regime stamp keeps its real comment -- this is about junk, not about
+    # removing every comment.
+    assert fitsable.SMALL_DATASETS_HEADER_COMMENT in str(header.cards[KEY])
