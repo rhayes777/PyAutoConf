@@ -16,6 +16,7 @@ live in the ``_PROJECTS`` registry below — one table, shared by the public
 """
 
 import logging
+import sys
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -137,6 +138,27 @@ def check_jax_using_gpu(log_gpu_warning: bool = True) -> bool:
     return no_gpu
 
 
+def _running_in_ipython() -> bool:
+    """
+    True only when an IPython interactive shell (Jupyter notebook, IPython
+    kernel or terminal) is driving this process.
+
+    A notebook has already imported IPython by the time any cell runs, so a
+    ``sys.modules`` lookup distinguishes the notebook path from a plain
+    interpreter without importing IPython (which may be installed but idle)
+    on every CLI run.
+    """
+    ipython = sys.modules.get("IPython")
+
+    if ipython is None:
+        return False
+
+    try:
+        return ipython.get_ipython() is not None
+    except AttributeError:
+        return False
+
+
 def _installed_version(top_package: str):
     """The installed version string of ``top_package``, or None if unknown."""
     try:
@@ -214,8 +236,7 @@ def _colab_setup(
     try:
         import google.colab  # noqa: F401
     except ImportError:
-        print(
-            f"""
+        message = f"""
             You are not running in a Google Colab environment so cannot use the setup_colab() function.
 
             You should therefore have {project_name} installed locally in your environment already (e.g. via pip or
@@ -223,7 +244,15 @@ def _colab_setup(
 
             You may now continue running your script or Notebook.
             """
-        )
+
+        # In a notebook the user just ran a setup cell that was a no-op and
+        # needs telling they can carry on; on a plain CLI run the same text is
+        # noise on every run, so it drops to DEBUG where it stays retrievable.
+        if _running_in_ipython():
+            print(message)
+        else:
+            logger.debug(message)
+
         return
 
     # JAX performance tweak, applied only on Colab.

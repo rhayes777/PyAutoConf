@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import sys
 import types
@@ -6,6 +7,24 @@ from unittest import mock
 import pytest
 
 from autonerves import setup_colab
+
+
+@pytest.fixture(name="no_ipython")
+def make_no_ipython(monkeypatch):
+    """A plain-interpreter run: no IPython module loaded at all."""
+    monkeypatch.delitem(sys.modules, "IPython", raising=False)
+
+
+@pytest.fixture(name="fake_ipython")
+def make_fake_ipython(monkeypatch):
+    """
+    Stub the ``IPython`` module a live notebook / kernel would have loaded.
+    ``get_ipython`` returns a shell object, marking the session interactive.
+    """
+    module = types.ModuleType("IPython")
+    module.get_ipython = lambda: object()
+    monkeypatch.setitem(sys.modules, "IPython", module)
+    return module
 
 
 class FakeDevice:
@@ -94,13 +113,42 @@ class TestNoImportSideEffects:
 
 
 class TestOutsideColab:
-    def test_setup_is_a_noop(self, capsys):
-        # google.colab is not importable here, so setup() must return cleanly
-        # without installing or cloning anything.
+    def test_cli_run_is_a_silent_noop(self, no_ipython, capsys):
+        # The Witness: google.colab is not importable and no notebook shell is
+        # active (a plain CLI run of a workspace start_here.py), so setup()
+        # must return cleanly without installing or cloning anything AND
+        # without printing the "not running in a Google Colab" block.
+        with mock.patch.object(subprocess, "check_call") as check_call:
+            setup_colab.setup("autolens")
+        check_call.assert_not_called()
+        assert capsys.readouterr().out == ""
+
+    def test_notebook_run_still_surfaces_the_message(self, fake_ipython, capsys):
+        # In a notebook the setup cell was a no-op and the user needs telling
+        # they can carry on — the message must survive there.
         with mock.patch.object(subprocess, "check_call") as check_call:
             setup_colab.setup("autolens")
         check_call.assert_not_called()
         assert "not running in a Google Colab" in capsys.readouterr().out
+
+    def test_imported_but_inactive_ipython_stays_silent(
+        self, fake_ipython, capsys
+    ):
+        # IPython merely importable (or imported by a library) with no shell
+        # driving the process is still the CLI path.
+        fake_ipython.get_ipython = lambda: None
+        setup_colab.setup("autolens")
+        assert capsys.readouterr().out == ""
+
+    def test_cli_message_retrievable_at_debug_level(self, no_ipython, caplog):
+        # The silent path demotes rather than deletes: the text lands on the
+        # module logger at DEBUG for anyone who asks for it.
+        with caplog.at_level(logging.DEBUG, logger="autonerves.setup_colab"):
+            setup_colab.setup("autolens")
+        assert any(
+            "not running in a Google Colab" in record.message
+            for record in caplog.records
+        )
 
     def test_wrappers_delegate(self):
         with mock.patch.object(setup_colab, "setup") as setup_mock:
