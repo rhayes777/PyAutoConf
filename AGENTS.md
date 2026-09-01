@@ -19,13 +19,14 @@ Canonical boundaries live in `PyAutoBrain/ORGANISM.md`; the full body map
 
 | Organ | Repo | Role |
 |-------|------|------|
-| **Mind** | PyAutoMind | Intent, goals, priorities, workflow state; every task starts as a markdown prompt here. |
 | **Brain** | PyAutoBrain | Reasoning/orchestration layer; how work is decomposed and routed; the specialist agents. |
-| **Hands** | PyAutoHands | Packaging, tagging, notebook generation, PyPI release execution. |
-| **Heart** | PyAutoHeart | Health/readiness — the authoritative "is it safe to release?" verdict. |
+| **Mind** | PyAutoMind | Intent, goals, priorities, workflow state; every task starts as a markdown prompt here. |
+| **Cortex** | PyAutoCortex | The Cortex — where the organism learns what is true: the science body map (`projects.yaml`) and the rulings of record for every science run; the science mirror of the Mind (runs and rulings, not prompts and PRs). |
 | **Memory** | PyAutoMemory | Long-term scientific/software/project knowledge (see science pointer below). |
-| **Gut** | PyAutoGut | Owns the lifecycle of condemned self-material (stale branches, stashes, dead code/tests): holds it as durable, recoverable git refs through a transit window and voids it on a sweep. The storage mirror of Memory (retention vs release). |
+| **Heart** | PyAutoHeart | Health/readiness — the authoritative "is it safe to release?" verdict. |
+| **Hands** | PyAutoHands | Packaging, tagging, notebook generation, PyPI release execution. |
 | **Nerves** | PyAutoNerves | The Nerves — the configuration/serialization layer connecting workspace conventions to libraries (layered config, version handshake, test_mode), delivered as the `autonerves` package. |
+| **Gut** | PyAutoGut | Owns the lifecycle of condemned self-material (stale branches, stashes, dead code/tests): holds it as durable, recoverable git refs through a transit window and voids it on a sweep. The storage mirror of Memory (retention vs release). |
 
 Call chain (always this order): **Brain → Heart (gate) → Build (execute)**. Brain agents are **conductors** (front-door; a human drives them; they decide *and* act) or **faculties** (read-only opinions the conductors consult; they judge and stop). New capability grows as a faculty, not a new organ, unless it owns state or effects no existing organ can.
 
