@@ -246,3 +246,98 @@ def test__header_dict_cards_carry_no_junk_comment(tmp_path):
     # The regime stamp keeps its real comment -- this is about junk, not about
     # removing every comment.
     assert fitsable.SMALL_DATASETS_HEADER_COMMENT in str(header.cards[KEY])
+
+
+"""
+__small-datasets cap shape card (PyAutoNerves#159)__
+
+`SMALLDAT = T` records that the env var was set at write time, which is not the
+proposition a reader deciding whether to reuse a dataset asks -- that one is
+"capped at today's cap". `autoarray.util.dataset_util` had to corroborate the
+card against the measured shape of `data.fits`, which interferometer data
+`(n_visibilities, 2)` and multi_dataset's prefixed `{waveband}_data.fits`
+structurally cannot do, so those families re-simulated on every run. `SMALLSHP`
+records the cap itself, so no corroboration is needed.
+"""
+
+SHAPE_KEY = fitsable.SMALL_DATASETS_SHAPE_HEADER_KEY
+
+
+def _cap_card(file_path, hdu=0):
+    with fits.open(file_path) as hdu_list:
+        return hdu_list[hdu].header.get(SHAPE_KEY)
+
+
+def test__capped_write__records_the_cap_in_force(tmp_path, monkeypatch):
+    from autonerves.test_mode import SMALL_DATASETS_SHAPE_NATIVE
+
+    monkeypatch.setenv("PYAUTO_SMALL_DATASETS", "1")
+    fitsable.output_to_fits(np.ones((4, 4)), file_path=tmp_path / "small.fits")
+
+    assert _cap_card(tmp_path / "small.fits") == "%dx%d" % SMALL_DATASETS_SHAPE_NATIVE
+
+
+def test__full_resolution_write__omits_the_card(tmp_path, monkeypatch):
+    # A full-resolution write has no cap to record, so the card is absent --
+    # which readers must treat as "unknown cap", exactly as they treat every
+    # file written before the card existed. Writing something like "none" here
+    # would give a reader a value to compare and a way to get it wrong.
+    monkeypatch.setenv("PYAUTO_SMALL_DATASETS", "0")
+    fitsable.output_to_fits(np.ones((4, 4)), file_path=tmp_path / "full.fits")
+
+    assert _cap_card(tmp_path / "full.fits") is None
+
+    monkeypatch.delenv("PYAUTO_SMALL_DATASETS", raising=False)
+    fitsable.output_to_fits(np.ones((4, 4)), file_path=tmp_path / "unset.fits")
+
+    assert _cap_card(tmp_path / "unset.fits") is None
+
+
+def test__cap_card_round_trips_as_a_string_readable_by_the_short_key(
+    tmp_path, monkeypatch
+):
+    # The 8-character ceiling is load-bearing: a 9-character keyword is
+    # silently promoted to a HIERARCH card, which `header.get(SHORT_KEY)` then
+    # misses and every reader treats as absent -- a silent un-fix, not a
+    # failure. Pin both the key length and the on-disk type.
+    monkeypatch.setenv("PYAUTO_SMALL_DATASETS", "1")
+    fitsable.output_to_fits(np.ones((4, 4)), file_path=tmp_path / "t.fits")
+
+    assert len(SHAPE_KEY) <= 8
+
+    with fits.open(tmp_path / "t.fits") as hdu_list:
+        value = hdu_list[0].header[SHAPE_KEY]
+
+    assert isinstance(value, str)
+
+
+def test__multi_hdu_funnel__records_the_cap_on_every_hdu(tmp_path, monkeypatch):
+    # The path PyAutoArray's fits_imaging/fits_interferometer take -- the one
+    # the interferometer datasets that motivated this card are written by.
+    monkeypatch.setenv("PYAUTO_SMALL_DATASETS", "1")
+
+    hdu_list = fitsable.hdu_list_for_output_from(
+        values_list=[np.ones((4, 4)), np.zeros((4, 4))],
+        ext_name_list=["data", "noise_map"],
+    )
+    fitsable.write_hdu_list(hdu_list, file_path=tmp_path / "dataset.fits")
+
+    from autonerves.test_mode import SMALL_DATASETS_SHAPE_NATIVE
+
+    expected = "%dx%d" % SMALL_DATASETS_SHAPE_NATIVE
+
+    assert _cap_card(tmp_path / "dataset.fits", hdu=0) == expected
+    assert _cap_card(tmp_path / "dataset.fits", hdu=1) == expected
+
+
+def test__stamping_twice_is_idempotent(tmp_path, monkeypatch):
+    # Both call sites in this module stamp the same header; assignment (not
+    # append) must keep that from duplicating either card.
+    monkeypatch.setenv("PYAUTO_SMALL_DATASETS", "1")
+
+    header = fits.Header()
+    fitsable.stamp_small_datasets_regime(header)
+    fitsable.stamp_small_datasets_regime(header)
+
+    assert [card.keyword for card in header.cards].count(SHAPE_KEY) == 1
+    assert [card.keyword for card in header.cards].count(KEY) == 1
