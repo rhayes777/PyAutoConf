@@ -25,6 +25,28 @@ from typing import Dict, Optional, Union, List
 SMALL_DATASETS_HEADER_KEY = "SMALLDAT"
 SMALL_DATASETS_HEADER_COMMENT = "PYAUTO_SMALL_DATASETS active at write time"
 
+# The cap in force in the writing process, as ``"<rows>x<cols>"``. Absent on
+# every file written before this card existed -- and on every file written at
+# full resolution, where there is no cap to record -- both of which readers must
+# treat as "unknown" and fall back on their existing behaviour for.
+#
+# It exists because ``SMALLDAT`` records the wrong proposition for the question
+# a reader actually asks. ``SMALLDAT = T`` means "the env var was set at write
+# time", not "capped at today's cap", so
+# ``autoarray.util.dataset_util._is_capped_at_the_current_cap`` has to
+# corroborate the card against the measured shape of ``data.fits`` -- which
+# interferometer data ``(n_visibilities, 2)`` and multi_dataset's prefixed
+# ``{waveband}_data.fits`` structurally cannot do, so those families are
+# re-simulated on every run. Recording the cap itself makes the card answer the
+# question directly and needs no corroboration.
+#
+# Same 8-character ceiling as the key above, and for the same load-bearing
+# reason: a 9-character keyword is silently promoted to HIERARCH and missed by
+# ``header.get()``, which reads as absent -- safe, but silently un-fixes the
+# case this card exists for.
+SMALL_DATASETS_SHAPE_HEADER_KEY = "SMALLSHP"
+SMALL_DATASETS_SHAPE_HEADER_COMMENT = "small-datasets cap at write time (rowsxcols)"
+
 
 def stamp_small_datasets_regime(header):
     """
@@ -72,16 +94,33 @@ def stamp_small_datasets_regime(header):
     ``autoarray.util.dataset_util.should_simulate``, whose predicate ends in
     ``shutil.rmtree``.
 
+    Beside the regime card, a capped write also records the cap it used, as
+    ``SMALLSHP = '16x16'`` (:data:`SMALL_DATASETS_SHAPE_HEADER_KEY`). ``SMALLDAT
+    = T`` alone says only that the env var was set, which is not the
+    proposition a reader deciding whether to reuse a dataset needs; the cap
+    shape is. It is written only in the capped regime -- a full-resolution write
+    has no cap to record -- so its absence means "unknown cap", never "no cap",
+    and readers fall back to whatever they did before it existed.
+
     Assignment (not ``append``) is deliberate -- it is idempotent, so the two
     call sites below can both stamp the same header without duplicating the
     card.
     """
-    from autonerves.test_mode import small_datasets
+    from autonerves.test_mode import SMALL_DATASETS_SHAPE_NATIVE, small_datasets
+
+    is_capped = small_datasets()
 
     header[SMALL_DATASETS_HEADER_KEY] = (
-        small_datasets(),
+        is_capped,
         SMALL_DATASETS_HEADER_COMMENT,
     )
+
+    if is_capped:
+        header[SMALL_DATASETS_SHAPE_HEADER_KEY] = (
+            "%dx%d" % SMALL_DATASETS_SHAPE_NATIVE,
+            SMALL_DATASETS_SHAPE_HEADER_COMMENT,
+        )
+
     return header
 
 

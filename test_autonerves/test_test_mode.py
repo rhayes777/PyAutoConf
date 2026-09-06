@@ -9,6 +9,8 @@ from pathlib import Path
 import pytest
 
 from autonerves.test_mode import (
+    SMALL_DATASETS_SHAPE_NATIVE,
+    disable_jax,
     is_test_mode,
     with_test_mode_segment,
 )
@@ -82,3 +84,40 @@ class TestTestModeSamples:
         os.environ["PYAUTO_TEST_MODE_SAMPLES"] = "3"
         with pytest.raises(ValueError):
             _test_mode_samples()
+
+
+class TestDisableJax:
+    """``PYAUTO_DISABLE_JAX`` is the documented global switch for forcing the
+    NumPy path. It had no predicate before this class existed, which is why it
+    was honoured in exactly one place in the stack while two workspace guides
+    documented it as global."""
+
+    def test__env_unset_is_false(self, monkeypatch):
+        monkeypatch.delenv("PYAUTO_DISABLE_JAX", raising=False)
+
+        assert disable_jax() is False
+
+    def test__env_one_is_true(self, monkeypatch):
+        monkeypatch.setenv("PYAUTO_DISABLE_JAX", "1")
+
+        assert disable_jax() is True
+
+    @pytest.mark.parametrize("value", ["0", "true", "True", "yes", ""])
+    def test__only_the_exact_string_one_enables_it(self, monkeypatch, value):
+        # Matching every other PYAUTO_* switch in the module: a truthy-looking
+        # string is not "1", and reading it as one would silently disable JAX
+        # for anyone who wrote PYAUTO_DISABLE_JAX=0 to mean "no".
+        monkeypatch.setenv("PYAUTO_DISABLE_JAX", value)
+
+        assert disable_jax() is False
+
+
+def test__small_datasets_cap_shape_is_the_two_axis_tuple_readers_compare():
+    # The cap is stamped into FITS headers as "<rows>x<cols>" and compared back
+    # against this constant by ``autoarray.util.dataset_util``. Pin its shape
+    # and type: a scalar or a 3-tuple here would produce a card no reader can
+    # parse, which reads as "absent" and silently un-fixes the re-simulation
+    # case the card exists for.
+    assert isinstance(SMALL_DATASETS_SHAPE_NATIVE, tuple)
+    assert len(SMALL_DATASETS_SHAPE_NATIVE) == 2
+    assert all(isinstance(axis, int) for axis in SMALL_DATASETS_SHAPE_NATIVE)

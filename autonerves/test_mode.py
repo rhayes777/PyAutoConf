@@ -234,3 +234,38 @@ def small_datasets():
     mean "full resolution".
     """
     return os.environ.get("PYAUTO_SMALL_DATASETS") == "1"
+
+
+# The small-datasets cap, as ``(rows, columns)``. Canonical home: the regime
+# switch it belongs to (:func:`small_datasets`) lives here, and the writer that
+# records the cap in force at write time
+# (:func:`autonerves.fitsable.stamp_small_datasets_regime`) is in this package
+# too, one layer below the library that applies it.
+#
+# ``autoarray.util.dataset_util`` deliberately keeps its own literal of the same
+# value rather than importing this one, for the reason recorded there against
+# ``SMALL_DATASETS_HEADER_KEY``: an editable checkout or a ``--no-deps`` install
+# can put a pre-stamp autonerves on the path, and a literal degrades safely
+# there ("card absent" -> the shape heuristic) where an import would be an
+# ``ImportError`` at module load. A test in that repo pins the two to agree
+# whenever a stamp-aware autonerves is installed, which is the drift guard the
+# duplication needs and the import would not provide.
+SMALL_DATASETS_SHAPE_NATIVE = (16, 16)
+
+
+def disable_jax():
+    """
+    Return True if the JAX backend is disabled for this process.
+
+    ``PYAUTO_DISABLE_JAX=1`` is the documented global switch for forcing the
+    NumPy path (the workspace ``start_here`` guides name it beside the
+    per-call ``use_jax=False``), used by the smoke profiles so a fast run does
+    not pay a JIT compile. It is a *harness-level override*, not a preference:
+    code that takes a ``use_jax`` argument must let this variable win over an
+    explicit ``True``, or the harness pays for a backend it asked to disable.
+
+    The env var is compared against the exact string ``"1"``, matching every
+    other ``PYAUTO_*`` switch in this module. ``"0"``, ``"true"`` and the unset
+    case all mean "JAX is available".
+    """
+    return os.environ.get("PYAUTO_DISABLE_JAX") == "1"
