@@ -1441,8 +1441,6 @@ def _render_html_index(snap: dict) -> str:
                                    if repo_url(snap) else None)
     body = f"""{t_.hero(BOARD_KEY, "Board", lede, navigation=navigation)}
 {panel}
-<p class="verdict {tone}"><b class="{tone}">{st.upper()}</b>
-<span class="muted">{_esc(_summary(snap))}</span></p>
 <p class="muted"><a href="dashboard.md">markdown version</a> ·
 <a href="board.json">board.json</a>{gh_link}</p>
 <h2 id='search'>Search</h2>
