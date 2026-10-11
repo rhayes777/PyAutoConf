@@ -1439,7 +1439,6 @@ def _render_html_index(snap: dict) -> str:
                                    if repo_url(snap) else None)
     body = f"""{t_.hero(BOARD_KEY, "Board", lede, navigation=navigation)}
 {panel}
-<p class="muted"><a href="dashboard.md">markdown version</a></p>
 <h2 id='search'>Search</h2>
 <input id="q" type="search" placeholder="search keys, files and comments…"
  oninput="flt(this.value)" autocomplete="off">
