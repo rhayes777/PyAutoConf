@@ -1408,8 +1408,6 @@ def _render_html_index(snap: dict) -> str:
                   "</ul></div>")
     idx = json.dumps(key_index(snap), separators=(",", ":"),
                      ensure_ascii=False).replace("</", "<\\/")
-    gh = repo_url(snap)
-    gh_link = f' · <a href="{gh}">GitHub</a>' if gh else ""
     lede = ("Every config file and option across the libraries and the "
             "workspaces that override them — read-only.")
     navigation = [
@@ -1441,8 +1439,7 @@ def _render_html_index(snap: dict) -> str:
                                    if repo_url(snap) else None)
     body = f"""{t_.hero(BOARD_KEY, "Board", lede, navigation=navigation)}
 {panel}
-<p class="muted"><a href="dashboard.md">markdown version</a> ·
-<a href="board.json">board.json</a>{gh_link}</p>
+<p class="muted"><a href="dashboard.md">markdown version</a></p>
 <h2 id='search'>Search</h2>
 <input id="q" type="search" placeholder="search keys, files and comments…"
  oninput="flt(this.value)" autocomplete="off">
