@@ -225,6 +225,72 @@ def test_below_minimum_library_version_raises_with_upgrade_advice(tmp_path):
     assert "==" not in msg
 
 
+def test_old_compatibility_floor_without_release_stamp_is_not_stale(tmp_path):
+    _write_general_yaml(tmp_path, "version:\n  minimum_library_version: 2026.7.9.1")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        check_version("2026.10.7.1", workspace_root=tmp_path)
+
+
+@pytest.mark.parametrize("stamp_source", ["yaml", "version.txt"])
+@pytest.mark.parametrize("stamp", ["2026.10.7.1", "2026.9.7.1"])
+def test_release_stamp_not_old_floor_controls_freshness(tmp_path, stamp_source, stamp):
+    body = "version:\n  minimum_library_version: 2026.7.9.1\n"
+    if stamp_source == "yaml":
+        body += f"  workspace_version: {stamp}\n"
+    else:
+        (tmp_path / "version.txt").write_text(stamp)
+    _write_general_yaml(tmp_path, body)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        check_version("2026.10.7.1", workspace_root=tmp_path)
+
+
+@pytest.mark.parametrize("floor", ["2026.7.9.1", "2026.10.7.1"])
+def test_stale_stamp_warns_even_with_a_different_compatibility_floor(tmp_path, floor):
+    _write_general_yaml(
+        tmp_path,
+        f"version:\n  minimum_library_version: {floor}\n"
+        "  workspace_version: 2026.9.6.1\n",
+    )
+    with pytest.warns(UserWarning, match="release version 2026.9.6.1"):
+        check_version("2026.10.7.1", workspace_root=tmp_path)
+
+
+def test_yaml_release_stamp_overrides_old_version_file_for_freshness(tmp_path):
+    _write_general_yaml(
+        tmp_path,
+        "version:\n  minimum_library_version: 2026.7.9.1\n"
+        "  workspace_version: 2026.10.7.1\n",
+    )
+    (tmp_path / "version.txt").write_text("2026.7.9.1")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        check_version("2026.10.7.1", workspace_root=tmp_path)
+
+
+def test_fresh_release_stamp_does_not_bypass_compatibility_floor(tmp_path):
+    _write_general_yaml(
+        tmp_path,
+        "version:\n  minimum_library_version: 2026.10.8.1\n"
+        "  workspace_version: 2026.10.7.1\n",
+    )
+    with pytest.raises(WorkspaceVersionMismatchError):
+        check_version("2026.10.7.1", workspace_root=tmp_path)
+
+
+@pytest.mark.parametrize("stamp", ["dev", "2026.13.7.1", ""])
+def test_unusable_release_stamp_does_not_turn_floor_into_freshness(tmp_path, stamp):
+    _write_general_yaml(
+        tmp_path,
+        "version:\n  minimum_library_version: 2026.7.9.1\n"
+        f"  workspace_version: '{stamp}'\n",
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        check_version("2026.10.7.1", workspace_root=tmp_path)
+
+
 def test_unparseable_library_version_warns_not_raises(tmp_path):
     (tmp_path / "version.txt").write_text("2026.7.22.1\n")
     with pytest.warns(UserWarning, match="cannot be compared"):
