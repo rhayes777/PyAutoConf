@@ -169,10 +169,10 @@ def _below_floor_message(floor_version, library_version, workspace_root):
     )
 
 
-def _stale_workspace_message(floor_version, library_version, workspace_root):
+def _stale_workspace_message(workspace_version, library_version, workspace_root):
     return (
-        f"The workspace at {workspace_root} records library version "
-        f"{floor_version}, but the installed library is {library_version} — "
+        f"The workspace at {workspace_root} records release version "
+        f"{workspace_version}, but the installed library is {library_version} — "
         f"more than {_STALENESS_WINDOW_DAYS} days newer. The workspace "
         f"examples and configs may lag the installed API. Pull the latest "
         f"workspace:\n\n"
@@ -211,8 +211,11 @@ def check_version(library_version, workspace_root=None):
     An installed library **older** than the floor raises
     ``WorkspaceVersionMismatchError`` — the workspace's scripts may use API
     the install does not have. An installed library **newer** than the floor
-    passes; if it is more than ``_STALENESS_WINDOW_DAYS`` days newer (by
-    date-version comparison) a warning suggests pulling the workspace.
+    passes. Freshness is checked separately against ``workspace_version``
+    (or legacy ``version.txt``), never against ``minimum_library_version``.
+    If the library is more than ``_STALENESS_WINDOW_DAYS`` days newer than
+    that release stamp, a warning suggests pulling the workspace. Without
+    a release stamp, no freshness warning is issued.
     Versions that cannot be parsed as date versions (e.g. development
     installs) warn on inequality rather than raising.
 
@@ -246,15 +249,15 @@ def check_version(library_version, workspace_root=None):
     if _yaml_bypass_set(general_yaml):
         return
 
-    floor_version = _yaml_version_value(general_yaml, "minimum_library_version")
-
-    if floor_version is None:
-        floor_version = _yaml_version_value(general_yaml, "workspace_version")
-
-    if floor_version is None:
+    workspace_version = _yaml_version_value(general_yaml, "workspace_version")
+    if workspace_version is None:
         version_file = root / "version.txt"
         if version_file.exists():
-            floor_version = version_file.read_text().strip()
+            workspace_version = version_file.read_text().strip()
+
+    floor_version = _yaml_version_value(general_yaml, "minimum_library_version")
+    if floor_version is None:
+        floor_version = workspace_version
 
     if floor_version is None or floor_version == "":
         if _is_source_checkout(root) or not _looks_like_workspace(root):
@@ -262,13 +265,12 @@ def check_version(library_version, workspace_root=None):
         _warn_once(_missing_version_warning(root, library_version))
         return
 
-    if floor_version == library_version:
-        return
-
     floor_parsed = _parse_version(floor_version)
     library_parsed = _parse_version(library_version)
 
     if floor_parsed is None or library_parsed is None:
+        if floor_version == library_version:
+            return
         _warn_once(
             _unparseable_mismatch_message(floor_version, library_version, root)
         )
@@ -279,12 +281,15 @@ def check_version(library_version, workspace_root=None):
             _below_floor_message(floor_version, library_version, root)
         )
 
-    floor_date = _version_date(floor_parsed)
+    workspace_parsed = _parse_version(workspace_version)
+    workspace_date = (
+        _version_date(workspace_parsed) if workspace_parsed is not None else None
+    )
     library_date = _version_date(library_parsed)
 
     if (
-        floor_date is not None
+        workspace_date is not None
         and library_date is not None
-        and (library_date - floor_date).days > _STALENESS_WINDOW_DAYS
+        and (library_date - workspace_date).days > _STALENESS_WINDOW_DAYS
     ):
-        _warn_once(_stale_workspace_message(floor_version, library_version, root))
+        _warn_once(_stale_workspace_message(workspace_version, library_version, root))
